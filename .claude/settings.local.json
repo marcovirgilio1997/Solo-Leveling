@@ -7,7 +7,9 @@
       "Bash(powershell -Command \"Get-Content 'c:/Users/Marco/OneDrive/Desktop/SoloLeveling/styles.css' | Select-Object -Skip 2576 -First 20\")",
       "Bash(powershell -Command \"Get-Content 'c:/Users/Marco/OneDrive/Desktop/SoloLeveling/styles.css' | Select-Object -Skip 373 -First 12\")",
       "Bash(powershell -Command \"Get-Content 'c:/Users/Marco/OneDrive/Desktop/SoloLeveling/styles.css' | Select-Object -Skip 383 -First 12\")",
-      "Bash(powershell -Command \"Get-Content 'c:/Users/Marco/OneDrive/Desktop/SoloLeveling/styles.css' | Select-Object -Skip 373 -First 15\")"
+      "Bash(powershell -Command \"Get-Content 'c:/Users/Marco/OneDrive/Desktop/SoloLeveling/styles.css' | Select-Object -Skip 373 -First 15\")",
+      "Bash(python3 -c ' *)",
+      "Bash(node -e ' *)"
     ]
   }
 }
