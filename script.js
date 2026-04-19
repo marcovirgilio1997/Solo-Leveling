@@ -74,6 +74,12 @@ async function cargarDesdeSupabase() {
       bonusMission: !!row.bonus_mission
     };
   }
+  const { data: configData } = await db.from('config').select('*');
+  if (configData) {
+    for (const row of configData) {
+      localStorage.setItem(row.key, row.value);
+    }
+  }
   updateUI();
   renderCalendar();
 }
@@ -729,14 +735,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  document.getElementById('btnConfirmarFecha')?.addEventListener('click', () => {
+  document.getElementById('btnConfirmarFecha')?.addEventListener('click', async () => {
     const input = document.getElementById('inputFechaInicio');
     if (!input) return;
     const val = input.value; // 'YYYY-MM-DD' o vacío
     if (val) {
       localStorage.setItem('fechaInicio', val);
+      await db.from('config').upsert({ key: 'fechaInicio', value: val }, { onConflict: 'key' });
     } else {
       localStorage.removeItem('fechaInicio');
+      await db.from('config').delete().eq('key', 'fechaInicio');
     }
     updateUI();
     // Refrescar el panel "TU PROGRESO" dentro del modal con los nuevos datos
