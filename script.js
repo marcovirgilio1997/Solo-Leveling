@@ -124,13 +124,19 @@ function calcularEXPTotal() {
   let zeroStreak = 0;
   let previousDate = null;
 
+  const todayStr = getTodayStr();
+
   for (const { date, data } of entries) {
+    const fechaStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+    const esHoy = fechaStr === todayStr;
     const count = (data.nutricion ? 1 : 0) + (data.entrenamiento ? 1 : 0) + (data.suplementos ? 1 : 0);
     const dailyExp = count * MISSION_EXP + (count === 3 ? FULL_CLEAR_BONUS : 0) + (data.bonusMission ? BONUS_MISSION_EXP : 0);
 
     let penalty = 0;
-    if (count === 0) penalty += ZERO_MISSION_PENALTY;
-    if (count === 1) penalty += ONE_MISSION_PENALTY;
+    if (!esHoy) {
+      if (count === 0) penalty += ZERO_MISSION_PENALTY;
+      if (count === 1) penalty += ONE_MISSION_PENALTY;
+    }
 
     if (count === 0) {
       zeroStreak = (previousDate && date - previousDate === 86400000) ? zeroStreak + 1 : 1;
@@ -138,7 +144,7 @@ function calcularEXPTotal() {
       zeroStreak = 0;
     }
 
-    if (zeroStreak === 3) penalty += THREE_DAY_STREAK_PENALTY;
+    if (!esHoy && zeroStreak === 3) penalty += THREE_DAY_STREAK_PENALTY;
 
     total += dailyExp + penalty;
     previousDate = date;
