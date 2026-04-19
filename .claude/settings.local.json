@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"Get-Content 'c:/Users/Marco/OneDrive/Desktop/SoloLeveling/styles.css' | Select-String 'stat-item|stat-name|stat-value|stats-grid' | Select-Object LineNumber, Line\")",
+      "Bash(powershell -Command \"Get-Content 'c:/Users/Marco/OneDrive/Desktop/SoloLeveling/styles.css' | Select-Object -Skip 366 -First 60\")",
+      "Bash(powershell -Command \"Get-Content 'c:/Users/Marco/OneDrive/Desktop/SoloLeveling/styles.css' | Select-Object -Skip 1219 -First 20\")",
+      "Bash(powershell -Command \"Get-Content 'c:/Users/Marco/OneDrive/Desktop/SoloLeveling/styles.css' | Select-Object -Skip 2576 -First 20\")",
+      "Bash(powershell -Command \"Get-Content 'c:/Users/Marco/OneDrive/Desktop/SoloLeveling/styles.css' | Select-Object -Skip 373 -First 12\")",
+      "Bash(powershell -Command \"Get-Content 'c:/Users/Marco/OneDrive/Desktop/SoloLeveling/styles.css' | Select-Object -Skip 383 -First 12\")",
+      "Bash(powershell -Command \"Get-Content 'c:/Users/Marco/OneDrive/Desktop/SoloLeveling/styles.css' | Select-Object -Skip 373 -First 15\")"
+    ]
+  }
+}
