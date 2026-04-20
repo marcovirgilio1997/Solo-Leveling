@@ -203,7 +203,7 @@ function updateRankRing(expTotal) {
   const progress = rango === 'S' ? 100 : nxt > cur ? ((expTotal - cur) / (nxt - cur)) * 100 : 0;
   const clamped = Math.min(Math.max(progress, 0), 100);
   if (ring) {
-    const circumference = 2 * Math.PI * 68;
+    const circumference = 2 * Math.PI * 92;
     const offset = circumference - (clamped / 100) * circumference;
     ring.style.strokeDasharray = `${circumference} ${circumference}`;
     ring.style.strokeDashoffset = `${offset}`;

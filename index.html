@@ -40,30 +40,34 @@
             <!-- Nombre del Cazador -->
             <div class="hunter-name-display">
                 <div class="hunter-name" id="hunterNameDisplay">MARCO</div>
-                <div class="hunter-rank-title" id="rango-titulo">Novato</div>
             </div>
 
-            <div class="profile-status-row">
-                <div class="rank-ring-card">
-                    <svg class="rank-ring" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
-                        <circle class="rank-ring-inner-bg" cx="80" cy="80" r="62"></circle>
-                        <circle class="rank-ring-bg" cx="80" cy="80" r="68"></circle>
-                        <circle class="rank-ring-progress" id="rankRingProgress" cx="80" cy="80" r="68" stroke-dasharray="427.26 427.26" stroke-dashoffset="427.26"></circle>
+            <div class="profile-status-center">
+                <div class="rank-ring-card-epic">
+                    <svg class="rank-ring-epic" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Fondo oscuro -->
+                        <circle cx="110" cy="110" r="106" fill="#00050F" fill-opacity="0.97"/>
+                        <!-- Halo decorativo exterior -->
+                        <circle cx="110" cy="110" r="104" fill="none" stroke="#00BFFF" stroke-width="0.5" stroke-dasharray="4 8" opacity="0.3"/>
+                        <!-- Track -->
+                        <circle cx="110" cy="110" r="92" fill="none" stroke="#061A2E" stroke-width="16"/>
+                        <!-- Progreso -->
+                        <circle cx="110" cy="110" r="92" fill="none"
+                            id="rankRingProgress"
+                            stroke="#00BFFF"
+                            stroke-width="16"
+                            stroke-linecap="round"
+                            stroke-dasharray="578.05 578.05"
+                            stroke-dashoffset="578.05"/>
+                        <!-- Anillo interior decorativo -->
+                        <circle cx="110" cy="110" r="74" fill="none" stroke="#00BFFF" stroke-width="0.5" opacity="0.12"/>
                     </svg>
-                    <div class="rank-ring-label">
-                        <span class="ring-rank-letter" id="rango-letra">E</span>
-                        <span class="ring-rank-text">RANGO</span>
+                    <div class="rank-ring-label-epic">
+                        <span class="ring-rank-letter-epic" id="rango-letra">E</span>
+                        <span class="ring-rank-name-epic" id="rango-titulo">Novato</span>
+                        <div class="ring-exp-divider"></div>
+                        <span class="ring-exp-value-epic" id="exp-text">0 / 1500 EXP</span>
                     </div>
-                </div>
-                <div class="exp-panel">
-                    <div class="exp-panel-label">EXP</div>
-                    <div class="exp-panel-bar">
-                        <div class="exp-panel-fill" id="expFill">
-                            <div class="exp-shimmer"></div>
-                            <div class="exp-tip-glow"></div>
-                        </div>
-                    </div>
-                    <div class="exp-panel-text" id="exp-text">0 / 1000 EXP</div>
                 </div>
             </div>
         </div>
