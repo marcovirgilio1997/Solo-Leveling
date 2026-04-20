@@ -183,6 +183,7 @@ body {
         0 0 30px #00BFFF;
     letter-spacing: 3px;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 
 /* Sección STATUS */
