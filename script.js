@@ -163,7 +163,9 @@ function calcularRacha() {
   const fechaInicio = localStorage.getItem('fechaInicio') || null;
   let racha = 0;
   const hoy = new Date();
-  for (let i = 0; i < 365; i++) {
+  const todayStr = getTodayStr();
+
+  for (let i = 1; i < 365; i++) {  // empieza en 1, saltea hoy
     const d = new Date(hoy);
     d.setDate(hoy.getDate() - i);
     const key = dateToStr(d);
