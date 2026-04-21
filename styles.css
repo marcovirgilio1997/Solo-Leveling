@@ -539,6 +539,31 @@ body::after {
   line-height: 1;
 }
 
+.stat-desc {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.72em;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 1px;
+  margin-top: 5px;
+  text-transform: lowercase;
+}
+
+.stat-sub, .stat-desc {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.72em;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 1px;
+  margin-top: 5px;
+  text-transform: lowercase;
+}
+.stat-desc {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.72em;
+  color: rgba(255,255,255,0.25);
+  margin-top: 5px;
+  letter-spacing: 1px;
+}
+
 /* Tooltip */
 .stat-tooltip {
   display: none;
