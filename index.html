@@ -36,6 +36,10 @@
 
         <!-- Sección STATUS principal -->
         <div class="status-section">
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
 
             <!-- Nombre del Cazador -->
             <div class="hunter-name-display">
@@ -76,6 +80,13 @@
                             stroke-dashoffset="578.05"/>
                         <!-- Anillo interior decorativo -->
                         <circle cx="110" cy="110" r="74" fill="none" stroke="#00BFFF" stroke-width="0.5" opacity="0.12"/>
+                        <g class="ring-spinner-group" style="transform-origin: 110px 110px; animation: spinRing 8s linear infinite;">
+                            <circle cx="110" cy="110" r="106" fill="none"
+                                stroke="#00BFFF"
+                                stroke-width="1"
+                                stroke-dasharray="12 28"
+                                opacity="0.25"/>
+                        </g>
                     </svg>
                     <div class="rank-ring-label-epic">
                         <span class="ring-rank-letter-epic" id="rango-letra">E</span>
@@ -330,6 +341,16 @@
     </div>
 
     <style>
+    @keyframes spinRing {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    .ring-spinner-group {
+      animation: spinRing 8s linear infinite;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+
     @keyframes bonusGlow {
       0% { box-shadow: 0 0 20px #00BFFF, inset 0 0 20px rgba(0,191,255,0.05); }
       100% { box-shadow: 0 0 50px #00BFFF, 0 0 80px rgba(0,191,255,0.3), inset 0 0 30px rgba(0,191,255,0.1); }

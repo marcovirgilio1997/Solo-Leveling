@@ -195,21 +195,52 @@ body {
     padding: 30px;
     margin-bottom: 20px;
     position: relative;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
 }
 
+/* Líneas diagonales de fondo */
 .status-section::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(45deg, transparent 49%, rgba(0, 191, 255, 0.05) 50%, transparent 51%);
+    inset: 0;
+    background: repeating-linear-gradient(
+        45deg,
+        transparent 0px,
+        transparent 40px,
+        rgba(0, 191, 255, 0.018) 40px,
+        rgba(0, 191, 255, 0.018) 41px
+    );
     pointer-events: none;
+    z-index: 0;
+}
+
+/* Línea de escaneo */
+.status-section::after {
+    content: '';
+    position: absolute;
+    top: -40%;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(0, 255, 255, 0.03) 40%,
+        rgba(0, 255, 255, 0.07) 50%,
+        rgba(0, 255, 255, 0.03) 60%,
+        transparent 100%
+    );
+    animation: scanLine 4s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 1;
+}
+
+@keyframes scanLine {
+    0%   { top: -40%; }
+    100% { top: 120%; }
 }
 
 /* Nombre del Cazador */
@@ -2883,35 +2914,56 @@ h2 {
 }
 
 /* ============================================================
-   EFECTO LÍNEA DE ESCANEO — Status Section
+   ESQUINAS TÁCTICAS
    ============================================================ */
-
-.status-section {
-    position: relative;
-    overflow: hidden;
-}
-
-.status-section::after {
-    content: '';
+.status-section .corner {
     position: absolute;
-    top: -100%;
-    left: 0;
-    width: 100%;
-    height: 40%;
-    background: linear-gradient(
-        180deg,
-        transparent 0%,
-        rgba(0, 255, 255, 0.03) 40%,
-        rgba(0, 255, 255, 0.07) 50%,
-        rgba(0, 255, 255, 0.03) 60%,
-        transparent 100%
-    );
-    animation: scanLine 4s ease-in-out infinite;
+    width: 22px;
+    height: 22px;
+    z-index: 5;
     pointer-events: none;
-    z-index: 20;
+}
+.status-section .corner-tl { top: 10px;  left: 10px;  border-top: 2px solid #00BFFF; border-left: 2px solid #00BFFF; }
+.status-section .corner-tr { top: 10px;  right: 10px; border-top: 2px solid #00BFFF; border-right: 2px solid #00BFFF; }
+.status-section .corner-bl { bottom: 10px; left: 10px;  border-bottom: 2px solid #00BFFF; border-left: 2px solid #00BFFF; }
+.status-section .corner-br { bottom: 10px; right: 10px; border-bottom: 2px solid #00BFFF; border-right: 2px solid #00BFFF; }
+
+.status-section .corner {
+    animation: cornerGlow 2.5s ease-in-out infinite alternate;
+}
+.status-section .corner-tl { animation-delay: 0s; }
+.status-section .corner-tr { animation-delay: 0.6s; }
+.status-section .corner-bl { animation-delay: 1.2s; }
+.status-section .corner-br { animation-delay: 1.8s; }
+
+@keyframes cornerGlow {
+    0%   { border-color: #003A5A; box-shadow: none; }
+    100% { border-color: #00FFFF; box-shadow: 0 0 10px #00FFFF, inset 0 0 6px rgba(0,255,255,0.2); }
 }
 
-@keyframes scanLine {
-    0%   { top: -40%; }
-    100% { top: 120%; }
+/* ============================================================
+   SEGUNDO ANILLO GIRATORIO
+   ============================================================ */
+.ring-spinner {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.ring-spinner svg {
+    width: 100%;
+    height: 100%;
+    animation: spinRing 8s linear infinite;
+}
+
+@keyframes spinRing {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* Barra más gruesa */
+#rankRingProgress,
+.rank-ring-bg-epic {
+    stroke-width: 22 !important;
 }
