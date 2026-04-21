@@ -590,10 +590,10 @@ body::after {
    MISSIONS PANEL
 ══════════════════════════════════════════════════ */
 .missions-list {
-  padding: 0 16px 16px;
+  padding: 0 16px 14px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .mission-item {
@@ -602,74 +602,93 @@ body::after {
   justify-content: space-between;
   padding: 14px 16px;
   border: 1px solid rgba(0,245,255,0.15);
-  border-left: 3px solid transparent;
   background: rgba(0,10,25,0.6);
   transition: all 0.25s ease;
   gap: 12px;
   border-radius: 4px;
+  min-height: 60px;
 }
 .mission-item:hover {
   background: rgba(0,245,255,0.06);
   border-color: rgba(0,245,255,0.25);
-  border-left-color: var(--cyan);
   box-shadow: 0 0 12px rgba(0,245,255,0.08);
-  transform: translateX(3px);
+  transform: translateY(-2px);
 }
 
-.mission-bullet {
-  color: var(--cyan);
-  font-size: 1.2em;
-  text-shadow: 0 0 6px var(--cyan);
+.mission-icon {
+  font-size: 1.6em;
   flex-shrink: 0;
+  width: 32px;
+  text-align: center;
+  color: var(--cyan);
+  text-shadow: 0 0 8px var(--cyan);
 }
-.mission-text {
+
+.mission-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mission-text {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 0.95em;
-  font-weight: 500;
-  color: rgba(255,255,255,0.75);
-  letter-spacing: 0.3px;
+  font-size: 1em;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 0.5px;
 }
 .mission-text.completed {
   color: var(--cyan);
   text-shadow: 0 0 8px rgba(0,245,255,0.4);
 }
+
+.mission-exp {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.8em;
+  color: var(--cyan);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
 .mission-exp-text {
-  margin-top: 10px;
-  margin-left: 16px;
-  margin-right: 16px;
-  padding: 8px 0;
+  margin-top: 8px;
+  padding: 8px 16px 0;
   text-align: right;
   color: rgba(0,245,255,0.4);
   font-family: 'Rajdhani', sans-serif;
-  font-size: 0.82em;
+  font-size: 0.8em;
   font-weight: 600;
   letter-spacing: 1px;
   border-top: 1px solid rgba(0,245,255,0.06);
 }
 
-/* Custom Checkbox */
+/* Custom Checkbox — círculo estilo mockup */
 .mission-checkbox {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   cursor: pointer;
-  width: 22px; height: 22px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
 }
 .mission-checkbox input[type="checkbox"] { display: none; }
 .checkbox-mark {
   position: absolute;
   inset: 0;
-  background: rgba(0,10,25,0.8);
-  border: 1px solid rgba(0,245,255,0.3);
+  background: transparent;
+  border: 2px solid rgba(0,245,255,0.4);
+  border-radius: 50%;
   transition: all 0.25s;
 }
 .checkbox-mark::after {
   content: '';
   position: absolute;
   display: none;
-  left: 6px; top: 3px;
-  width: 6px; height: 10px;
+  left: 7px; top: 3px;
+  width: 6px; height: 11px;
   border: solid var(--cyan);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
