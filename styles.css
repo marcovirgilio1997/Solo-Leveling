@@ -444,36 +444,37 @@ body::after {
 .stats-panel,
 .missions-panel,
 .panel {
-  background: var(--panel);
-  border: 1px solid var(--border);
+  background: transparent;
+  border: none;
   position: relative;
   overflow: hidden;
 }
 
 .panel-header {
-  background: rgba(0,20,40,0.6);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 18px;
+  background: transparent;
+  border-bottom: none;
+  padding: 16px 0 12px;
   text-align: center;
   position: relative;
+  margin: 0 16px;
 }
 .panel-header::after {
   content: '';
   position: absolute;
-  bottom: 0; left: 25%; right: 25%;
+  bottom: 0; left: 0; right: 0;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
 .panel-title {
   font-family: 'Orbitron', monospace;
-  font-size: 0.75em;
+  font-size: 0.7em;
   font-weight: 700;
-  color: rgba(255,255,255,0.8);
+  color: rgba(255,255,255,0.5);
   text-transform: uppercase;
-  letter-spacing: 5px;
-  text-shadow: 0 0 10px rgba(0,245,255,0.4);
+  letter-spacing: 6px;
+  text-shadow: none;
 }
 
 /* ══════════════════════════════════════════════════
@@ -589,42 +590,44 @@ body::after {
    MISSIONS PANEL
 ══════════════════════════════════════════════════ */
 .missions-list {
-  padding: 14px 16px;
+  padding: 0 16px 16px;
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 8px;
 }
 
 .mission-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 13px 12px;
-  border-bottom: 1px solid rgba(0,245,255,0.07);
+  padding: 14px 16px;
+  border: 1px solid rgba(0,245,255,0.15);
   border-left: 3px solid transparent;
-  transition: background 0.2s, border-left-color 0.2s, box-shadow 0.2s, transform 0.2s;
-  gap: 10px;
+  background: rgba(0,10,25,0.6);
+  transition: all 0.25s ease;
+  gap: 12px;
+  border-radius: 4px;
 }
-.mission-item:last-child { border-bottom: none; }
 .mission-item:hover {
-  background: rgba(0,245,255,0.05);
+  background: rgba(0,245,255,0.06);
+  border-color: rgba(0,245,255,0.25);
   border-left-color: var(--cyan);
-  box-shadow: inset 0 0 20px rgba(0,245,255,0.04);
-  transform: translateX(2px);
+  box-shadow: 0 0 12px rgba(0,245,255,0.08);
+  transform: translateX(3px);
 }
 
 .mission-bullet {
   color: var(--cyan);
-  font-size: 1.1em;
+  font-size: 1.2em;
   text-shadow: 0 0 6px var(--cyan);
   flex-shrink: 0;
 }
 .mission-text {
   flex: 1;
   font-family: 'Rajdhani', sans-serif;
-  font-size: 0.97em;
+  font-size: 0.95em;
   font-weight: 500;
-  color: rgba(255,255,255,0.8);
+  color: rgba(255,255,255,0.75);
   letter-spacing: 0.3px;
 }
 .mission-text.completed {
@@ -633,14 +636,16 @@ body::after {
 }
 .mission-exp-text {
   margin-top: 10px;
-  padding: 8px 12px;
+  margin-left: 16px;
+  margin-right: 16px;
+  padding: 8px 0;
   text-align: right;
-  color: rgba(0,245,255,0.5);
+  color: rgba(0,245,255,0.4);
   font-family: 'Rajdhani', sans-serif;
-  font-size: 0.88em;
+  font-size: 0.82em;
   font-weight: 600;
   letter-spacing: 1px;
-  border-top: 1px solid rgba(0,245,255,0.08);
+  border-top: 1px solid rgba(0,245,255,0.06);
 }
 
 /* Custom Checkbox */
@@ -679,69 +684,89 @@ body::after {
 /* ══════════════════════════════════════════════════
    CALENDAR
 ══════════════════════════════════════════════════ */
-.panel { background: var(--panel); border: 1px solid var(--border); }
+.panel { background: transparent; border: none; }
 
 #cal-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 16px;
+  padding: 12px 0;
+  margin: 0 16px;
 }
 .cal-btn {
-  background: rgba(0,20,40,0.8);
-  border: 1px solid rgba(0,245,255,0.25);
+  background: transparent;
+  border: 1px solid rgba(0,245,255,0.2);
   color: var(--cyan);
-  padding: 6px 14px;
+  padding: 6px 12px;
   cursor: pointer;
   font-family: 'Orbitron', monospace;
   font-size: 0.75em;
   transition: all 0.2s;
 }
 .cal-btn:hover {
-  background: rgba(0,245,255,0.1);
+  background: rgba(0,245,255,0.08);
   border-color: var(--cyan);
-  box-shadow: 0 0 10px rgba(0,245,255,0.3);
+  box-shadow: 0 0 10px rgba(0,245,255,0.2);
 }
 #cal-title {
-  color: var(--cyan);
+  color: rgba(255,255,255,0.6);
   font-family: 'Orbitron', monospace;
-  font-size: 0.78em;
+  font-size: 0.75em;
   letter-spacing: 3px;
-  text-shadow: 0 0 10px rgba(0,245,255,0.5);
 }
 .cal-hdr {
-  color: rgba(0,245,255,0.4);
+  color: rgba(0,245,255,0.3);
   text-align: center;
-  font-size: 0.62em;
+  font-size: 0.6em;
   font-family: 'Orbitron', monospace;
   letter-spacing: 1px;
   padding: 4px 0;
 }
+#cal-headers {
+  display: grid;
+  grid-template-columns: repeat(7,1fr);
+  gap: 2px;
+  padding: 8px 16px 6px;
+  margin: 0;
+}
+#cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7,1fr);
+  gap: 2px;
+  padding: 0 16px 12px;
+  margin: 0;
+}
 .cal-cell {
-  background: rgba(0,10,25,0.8);
-  border: 1px solid rgba(0,245,255,0.07);
+  background: rgba(0,15,35,0.5);
+  border: 1px solid rgba(0,245,255,0.08);
   padding: 7px 4px;
-  min-height: 44px;
-  color: rgba(255,255,255,0.7);
-  font-size: 0.82em;
+  min-height: 40px;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.8em;
   font-family: 'Rajdhani', sans-serif;
   font-weight: 600;
   cursor: pointer;
   text-align: center;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: all 0.2s;
+  border-radius: 3px;
 }
-.cal-cell:hover { border-color: var(--cyan); box-shadow: 0 0 8px rgba(0,245,255,0.2); }
-.cal-empty { background: transparent; }
+.cal-cell:hover { 
+  border-color: rgba(0,245,255,0.3);
+  background: rgba(0,245,255,0.05);
+  box-shadow: 0 0 8px rgba(0,245,255,0.15);
+}
+.cal-empty { background: transparent; border: none; }
 
 #cal-detail {
-  margin: 0 14px 14px;
-  padding: 12px;
-  background: rgba(0,10,25,0.7);
-  border: 1px solid rgba(0,245,255,0.1);
-  color: rgba(255,255,255,0.6);
-  font-size: 0.88em;
-  min-height: 58px;
-  line-height: 1.7;
+  margin: 12px 16px;
+  padding: 12px 14px;
+  background: rgba(0,15,35,0.5);
+  border: 1px solid rgba(0,245,255,0.08);
+  color: rgba(255,255,255,0.5);
+  font-size: 0.85em;
+  min-height: 56px;
+  line-height: 1.6;
+  border-radius: 3px;
 }
 
 /* ══════════════════════════════════════════════════
