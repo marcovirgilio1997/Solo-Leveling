@@ -1373,3 +1373,15 @@ body::after {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+.rsm-rank-letter {
+  font-family: 'Orbitron', monospace;
+  font-size: 2.2em;
+  font-weight: 900;
+  width: 44px;
+  text-align: center;
+  flex-shrink: 0;
+  line-height: 1;
+  background: none !important;
+  border: none !important;
+  padding: 0;
+}

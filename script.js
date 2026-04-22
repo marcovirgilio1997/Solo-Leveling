@@ -238,10 +238,13 @@ function openRankSystemModal() {
       const isCurrent = idx === currentIdx;
       const row = document.createElement('div');
       row.className = 'rsm-rank-row' + (isCurrent ? ' rsm-current' : '');
-      row.style.border = `1px solid ${rc.color}55`;
-      row.style.boxShadow = `0 0 10px ${rc.color}22`;
+      row.style.borderLeft = `3px solid ${rc.color}`;
+      row.style.borderTop = `1px solid ${rc.color}22`;
+      row.style.borderRight = `1px solid ${rc.color}22`;
+      row.style.borderBottom = `1px solid ${rc.color}22`;
+      row.style.boxShadow = '';
       row.innerHTML = `
-        <div class="rsm-rank-letter" style="color:#FFFFFF;text-shadow:0 0 15px #FFFFFF, 0 0 30px ${rc.color}, 0 0 60px ${rc.color}66;">${rank}</div>
+        <div class="rsm-rank-letter" style="color:#FFFFFF;text-shadow:0 0 20px #FFFFFF, 0 0 40px ${rc.color};">${rank}</div>
         <div class="rsm-rank-info">
           <div class="rsm-rank-name" style="color:#FFFFFF;">${RANK_NAMES[rank]}</div>
           <div class="rsm-rank-exp">${t.threshold.toLocaleString()} EXP</div>
