@@ -462,7 +462,7 @@ body::after {
   content: '';
   position: absolute;
   top: 50%; left: 0;
-  width: 30%; height: 1px;
+  width: 20%; height: 1px;
   background: linear-gradient(90deg, transparent, rgba(0,245,255,0.4));
   transform: translateY(-50%);
 }
@@ -470,7 +470,7 @@ body::after {
   content: '';
   position: absolute;
   top: 50%; right: 0;
-  width: 30%; height: 1px;
+  width: 20%; height: 1px;
   background: linear-gradient(270deg, transparent, rgba(0,245,255,0.4));
   transform: translateY(-50%);
 }
@@ -483,6 +483,17 @@ body::after {
   text-transform: uppercase;
   letter-spacing: 6px;
   text-shadow: 0 0 12px rgba(0,245,255,0.6), 0 0 24px rgba(0,245,255,0.2);
+  display: inline-block;
+  padding: 0 12px;
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
+@media (max-width: 480px) {
+  .panel-header::before,
+  .panel-header::after { width: 12%; }
+  .panel-title { font-size: 0.62em; letter-spacing: 4px; }
 }
 
 /* ══════════════════════════════════════════════════
@@ -955,7 +966,11 @@ body::after {
 }
 .rsm-rank-letter {
   font-family: 'Orbitron', monospace; font-size: 2em; font-weight: 900;
-  width: 44px; text-align: center; flex-shrink: 0; line-height: 1;
+  width: 44px; height: 44px; text-align: center; flex-shrink: 0; line-height: 44px;
+  color: #FFFFFF;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  text-shadow: 0 0 10px rgba(255,255,255,0.4);
 }
 .rsm-rank-info { flex: 1; min-width: 0; }
 .rsm-rank-name {
