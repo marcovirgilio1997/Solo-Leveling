@@ -17,7 +17,7 @@ const RANK_THRESHOLDS = [
   { rank: 'A', threshold: 35000 },
   { rank: 'S', threshold: 60000 }
 ];
-const MISSION_EXP = 150;
+const MISSION_EXP = { nutricion: 150, entrenamiento: 150, suplementos: 100 };
 const FULL_CLEAR_BONUS = 100;
 const BONUS_MISSION_EXP = 100;
 const ZERO_MISSION_PENALTY = -75;
@@ -136,7 +136,7 @@ function calcularEXPTotal() {
     const fechaStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
     const esHoy = fechaStr === todayStr;
     const count = (data.nutricion ? 1 : 0) + (data.entrenamiento ? 1 : 0) + (data.suplementos ? 1 : 0);
-    const dailyExp = count * MISSION_EXP + (count === 3 ? FULL_CLEAR_BONUS : 0) + (data.bonusMission ? BONUS_MISSION_EXP : 0);
+    const dailyExp = (data.nutricion ? MISSION_EXP.nutricion : 0) + (data.entrenamiento ? MISSION_EXP.entrenamiento : 0) + (data.suplementos ? MISSION_EXP.suplementos : 0) + (count === 3 ? FULL_CLEAR_BONUS : 0) + (data.bonusMission ? BONUS_MISSION_EXP : 0);
 
     let penalty = 0;
     if (!esHoy) {
@@ -368,7 +368,7 @@ function updateUI() {
   }
 
   const countHoy = (data.nutricion ? 1 : 0) + (data.entrenamiento ? 1 : 0) + (data.suplementos ? 1 : 0);
-  const expHoy = countHoy * MISSION_EXP + (countHoy === 3 ? FULL_CLEAR_BONUS : 0) + (data.bonusMission ? BONUS_MISSION_EXP : 0);
+  const expHoy = (data.nutricion ? MISSION_EXP.nutricion : 0) + (data.entrenamiento ? MISSION_EXP.entrenamiento : 0) + (data.suplementos ? MISSION_EXP.suplementos : 0) + (countHoy === 3 ? FULL_CLEAR_BONUS : 0) + (data.bonusMission ? BONUS_MISSION_EXP : 0);
   const recompensa = document.getElementById('recompensa-diaria');
   if (recompensa) recompensa.textContent = `Recompensa diaria estimada: ${expHoy} EXP`;
 
@@ -589,7 +589,7 @@ function openHistorialModal() {
   let tableHTML = '';
   for (const { fecha, data } of display) {
     const count = (data.nutricion ? 1 : 0) + (data.entrenamiento ? 1 : 0) + (data.suplementos ? 1 : 0);
-    const expGanada = count * MISSION_EXP + (count === 3 ? FULL_CLEAR_BONUS : 0) + (data.bonusMission ? BONUS_MISSION_EXP : 0);
+    const expGanada = (data.nutricion ? MISSION_EXP.nutricion : 0) + (data.entrenamiento ? MISSION_EXP.entrenamiento : 0) + (data.suplementos ? MISSION_EXP.suplementos : 0) + (count === 3 ? FULL_CLEAR_BONUS : 0) + (data.bonusMission ? BONUS_MISSION_EXP : 0);
     const penalty = penaltyMap[fecha] || 0;
     const total = expGanada + penalty;
 
