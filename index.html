@@ -53,34 +53,7 @@
                                 <stop offset="90%"  stop-color="#00f5ff"/>
                                 <stop offset="100%" stop-color="#ffffff"/>
                             </linearGradient>
-                            <!-- Shimmer gradient animation -->
-                            <linearGradient id="expGradient" x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="userSpaceOnUse">
-                                <stop offset="0%"   stop-color="#00BFFF"/>
-                                <stop offset="30%"  stop-color="#00FFFF"/>
-                                <stop offset="50%"  stop-color="#FFFFFF"/>
-                                <stop offset="70%"  stop-color="#00FFFF"/>
-                                <stop offset="100%" stop-color="#00BFFF"/>
-                                <animateTransform attributeName="gradientTransform"
-                                    type="translate"
-                                    from="-220 0"
-                                    to="220 0"
-                                    dur="2s"
-                                    repeatCount="indefinite"/>
-                            </linearGradient>
                         </defs>
-
-                        <!-- Dark fill background -->
-                        <circle cx="110" cy="110" r="106" class="rank-ring-inner-bg-epic"/>
-
-                        <!-- Outer decorative dashed ring (spinning) -->
-                        <g class="ring-spinner-group">
-                            <circle cx="110" cy="110" r="106" fill="none"
-                                stroke="#00BFFF" stroke-width="1"
-                                stroke-dasharray="10 24" opacity="0.2"/>
-                        </g>
-
-                        <!-- Halo decorativo -->
-                        <circle cx="110" cy="110" r="104" fill="none" stroke="#00BFFF" stroke-width="0.5" stroke-dasharray="4 8" opacity="0.15"/>
 
                         <!-- Track -->
                         <circle cx="110" cy="110" r="92" class="rank-ring-bg-epic"/>
@@ -89,13 +62,10 @@
                         <circle cx="110" cy="110" r="92" fill="none"
                             id="rankRingProgress"
                             stroke="url(#lolFluidGradient)"
-                            stroke-width="14"
+                            stroke-width="20"
                             stroke-linecap="round"
                             stroke-dasharray="578.05 578.05"
                             stroke-dashoffset="578.05"/>
-
-                        <!-- Inner decorative ring -->
-                        <circle cx="110" cy="110" r="74" fill="none" stroke="#00BFFF" stroke-width="0.5" opacity="0.08"/>
                     </svg>
 
                     <div class="rank-ring-label-epic">
@@ -182,7 +152,7 @@
                     </label>
                     <div class="mission-content">
                         <span class="mission-text" id="mission3Text">Suplementos</span>
-                        <span class="mission-exp">+100 EXP</span>
+                        <span class="mission-exp">+150 EXP</span>
                     </div>
                 </div>
                 <div class="mission-item" id="bonusMissionContainer" style="display:none;">

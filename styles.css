@@ -346,25 +346,25 @@ body::after {
 /* Ring track */
 .rank-ring-bg-epic {
   fill: none;
-  stroke: rgba(0,40,70,0.7);
-  stroke-width: 14;
+  stroke: rgba(0,40,70,0.5);
+  stroke-width: 20;
 }
 
 /* Ring progress — LoL fluid gradient */
 #rankRingProgress {
   fill: none;
   stroke: url(#lolFluidGradient);
-  stroke-width: 14;
+  stroke-width: 20;
   stroke-linecap: round;
   stroke-dasharray: 578.05 578.05;
   stroke-dashoffset: 578.05;
   transition: stroke-dashoffset 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  filter: drop-shadow(0 0 6px rgba(0,245,255,0.8)) drop-shadow(0 0 14px rgba(0,191,255,0.5));
+  filter: drop-shadow(0 0 8px rgba(0,245,255,0.9)) drop-shadow(0 0 20px rgba(0,191,255,0.6));
   animation: ringGlowPulse 2.5s ease-in-out infinite alternate;
 }
 @keyframes ringGlowPulse {
-  0%   { filter: drop-shadow(0 0 5px rgba(0,245,255,0.7))  drop-shadow(0 0 12px rgba(0,191,255,0.4)); }
-  100% { filter: drop-shadow(0 0 12px rgba(0,245,255,1))   drop-shadow(0 0 28px rgba(0,191,255,0.8)) drop-shadow(0 0 50px rgba(0,245,255,0.3)); }
+  0%   { filter: drop-shadow(0 0 6px rgba(0,245,255,0.7))  drop-shadow(0 0 16px rgba(0,191,255,0.5)); }
+  100% { filter: drop-shadow(0 0 16px rgba(0,245,255,1))   drop-shadow(0 0 36px rgba(0,191,255,0.9)) drop-shadow(0 0 70px rgba(0,245,255,0.4)); }
 }
 
 /* Decorative inner circle */
@@ -1372,16 +1372,4 @@ body::after {
 @keyframes fadeSlideIn {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
-}
-.rsm-rank-letter {
-  font-family: 'Orbitron', monospace;
-  font-size: 2.2em;
-  font-weight: 900;
-  width: 44px;
-  text-align: center;
-  flex-shrink: 0;
-  line-height: 1;
-  background: none !important;
-  border: none !important;
-  padding: 0;
 }
