@@ -438,18 +438,11 @@ function renderCalendar() {
 // SISTEMA DE MISIONES BONUS
 // ============================================================
 const BONUS_POOL = [
-  'Hacé 30 flexiones',
-  'Hacé 30 abdominales',
-  'Hacé 40 sentadillas',
-  'Mantené plancha 60 segundos',
-  'Hacé 20 fondos entre sillas',
-  'Hacé 15 burpees',
   'Caminá 20 minutos sin parar',
-  'Hacé 50 saltos de tijera',
-  'Estirá todo el cuerpo 10 minutos',
-  'Hacé 3 series de 10 flexiones diamante',
-  'Hacé 25 elevaciones de cadera',
-  'Hacé 20 sentadillas con salto'
+  'Mantené plancha 60 segundos',
+  'Hacé 40 sentadillas',
+  'Hacé 30 flexiones',
+  'Hacé 3 series de 10 flexiones diamante'
 ];
 
 function getBonusMisionDelDia() {
