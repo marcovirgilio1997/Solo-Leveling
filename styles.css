@@ -32,49 +32,123 @@ body {
 }
 
 /* ══════════════════════════════════════════════════
-   BACKGROUND LAYERS
+   EPIC BACKGROUND
 ══════════════════════════════════════════════════ */
+body {
+  background:
+    radial-gradient(ellipse 100% 60% at 50% 0%,    rgba(0,150,220,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 50% at 50% 100%,   rgba(0,80,160,0.10)  0%, transparent 60%),
+    radial-gradient(circle at 20% 30%,             rgba(0,200,255,0.04) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%,             rgba(100,0,200,0.04) 0%, transparent 40%),
+    linear-gradient(180deg, #010810 0%, #02101c 50%, #010810 100%);
+  background-attachment: fixed;
+}
+
 .background-circuitry {
   position: fixed;
   inset: 0;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% 0%,  rgba(0,120,200,0.12) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 40% at 15% 80%, rgba(0,50,120,0.08)  0%, transparent 60%),
-    radial-gradient(ellipse 40% 30% at 85% 55%, rgba(0,200,255,0.05) 0%, transparent 50%);
   z-index: 0;
   pointer-events: none;
-  animation: bgPulse 12s ease-in-out infinite alternate;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 50%, rgba(0,150,220,0.08) 0%, transparent 70%);
+  animation: bgPulse 8s ease-in-out infinite alternate;
 }
 @keyframes bgPulse {
-  0%   { opacity: 0.8; }
-  100% { opacity: 1; }
+  0%   { opacity: 0.5; transform: scale(1); }
+  100% { opacity: 1;   transform: scale(1.05); }
 }
 
-/* Grid circuit lines */
-.background-circuitry::after {
+/* Grid lines */
+.background-circuitry::before {
   content: '';
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(var(--border2) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border2) 1px, transparent 1px);
+    linear-gradient(rgba(0,245,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,245,255,0.05) 1px, transparent 1px);
   background-size: 60px 60px;
   animation: gridDrift 30s linear infinite;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 90%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 90%);
 }
 @keyframes gridDrift {
   0%   { background-position: 0 0; }
   100% { background-position: 60px 60px; }
 }
 
-.metallic-column { display: none; }
+/* Diagonal scan lines */
+.background-circuitry::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(45deg,
+      transparent 0px, transparent 80px,
+      rgba(0,245,255,0.015) 80px, rgba(0,245,255,0.015) 81px);
+  animation: diagonalShift 60s linear infinite;
+}
+@keyframes diagonalShift {
+  0%   { background-position: 0 0; }
+  100% { background-position: 200px 200px; }
+}
+
+/* Floating particles */
+.metallic-column {
+  display: block !important;
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+  width: 4px;
+  height: 4px;
+  background: rgba(0,245,255,0.6);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(0,245,255,0.8), 0 0 16px rgba(0,245,255,0.4);
+  background-image: none !important;
+  border: none !important;
+  top: auto !important;
+  bottom: auto !important;
+}
+.metallic-column.left {
+  left: 15%;
+  animation: floatParticle 14s ease-in-out infinite;
+}
+.metallic-column.right {
+  right: 20%;
+  animation: floatParticle 18s ease-in-out infinite reverse;
+  animation-delay: -7s;
+}
+@keyframes floatParticle {
+  0%, 100% { transform: translate(0, 100vh) scale(0.5); opacity: 0; }
+  10%      { opacity: 1; }
+  50%      { transform: translate(40px, 50vh) scale(1); }
+  90%      { opacity: 0.8; }
+}
+
+/* Mist layer */
 .blue-mist {
   position: fixed;
   inset: 0;
   z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 30% 60% at 0% 50%,   rgba(0,191,255,0.04) 0%, transparent 70%),
-    radial-gradient(ellipse 30% 60% at 100% 50%,  rgba(0,191,255,0.04) 0%, transparent 70%);
+    radial-gradient(ellipse 50% 40% at 10% 20%, rgba(0,191,255,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 90% 80%, rgba(80,0,200,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 30% at 50% 50%, rgba(0,245,255,0.03) 0%, transparent 70%);
+  animation: mistFloat 15s ease-in-out infinite alternate;
+}
+@keyframes mistFloat {
+  0%   { transform: translate(0, 0)   scale(1); opacity: 0.7; }
+  100% { transform: translate(20px, -10px) scale(1.05); opacity: 1; }
+}
+
+/* Vignette */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(ellipse 100% 80% at 50% 50%, transparent 40%, rgba(0,0,0,0.6) 100%);
 }
 
 /* Scan line */
