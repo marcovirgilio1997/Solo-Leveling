@@ -407,7 +407,8 @@ function renderCalendar() {
     if (data) {
       const count = (data.nutricion ? 1 : 0) + (data.entrenamiento ? 1 : 0) + (data.suplementos ? 1 : 0);
       if (count === 3) { cell.style.background = '#003300'; cell.style.borderColor = '#00ff00'; }
-      else if (count > 0) { cell.style.background = '#2a1a00'; cell.style.borderColor = '#FFB300'; }
+      else if (count === 2) { cell.style.background = '#2a2400'; cell.style.borderColor = '#FFD700'; }
+      else if (count === 1) { cell.style.background = '#2a1500'; cell.style.borderColor = '#FF8800'; }
       else { cell.style.background = '#1a0505'; cell.style.borderColor = '#3a0000'; }
     } else if (isPast) {
       cell.style.background = '#1a0505'; cell.style.borderColor = '#3a0000';
