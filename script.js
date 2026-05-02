@@ -17,7 +17,7 @@ const RANK_THRESHOLDS = [
   { rank: 'A', threshold: 35000 },
   { rank: 'S', threshold: 60000 }
 ];
-const MISSION_EXP = { nutricion: 150, entrenamiento: 150, suplementos: 100 };
+const MISSION_EXP = { nutricion: 150, entrenamiento: 150, suplementos: 75 };
 const FULL_CLEAR_BONUS = 100;
 const BONUS_MISSION_EXP = 100;
 const ZERO_MISSION_PENALTY = -75;
@@ -410,6 +410,13 @@ function renderCalendar() {
       else if (count === 2) { cell.style.background = '#2a2400'; cell.style.borderColor = '#FFD700'; }
       else if (count === 1) { cell.style.background = '#2a1500'; cell.style.borderColor = '#FF8800'; }
       else { cell.style.background = '#1a0505'; cell.style.borderColor = '#3a0000'; }
+      if (data.bonusMission) {
+        cell.style.position = 'relative';
+        const mark = document.createElement('span');
+        mark.className = 'cal-bonus-mark';
+        mark.textContent = '⚡';
+        cell.appendChild(mark);
+      }
     } else if (isPast) {
       cell.style.background = '#1a0505'; cell.style.borderColor = '#3a0000';
     } else {
@@ -426,7 +433,8 @@ function renderCalendar() {
         return;
       }
       const icon = v => v ? '<span style="color:#00ff00">✓</span>' : '<span style="color:#ff4444">✗</span>';
-      detail.innerHTML = `<span style="color:#00BFFF;font-weight:bold">${d} DE ${MONTHS_ES[calMonth]} DE ${calYear}</span><br>${icon(data.nutricion)} [NUTRICIÓN]<br>${icon(data.entrenamiento)} [ENTRENAMIENTO]<br>${icon(data.suplementos)} [SUPLEMENTOS]`;
+      const bonusLine = data.bonusMission ? '<br><span style="color:#FFD700">⚡ MISIÓN BONUS COMPLETADA</span>' : '';
+      detail.innerHTML = `<span style="color:#00BFFF;font-weight:bold">${d} DE ${MONTHS_ES[calMonth]} DE ${calYear}</span><br>${icon(data.nutricion)} [NUTRICIÓN]<br>${icon(data.entrenamiento)} [ENTRENAMIENTO]<br>${icon(data.suplementos)} [SUPLEMENTOS]${bonusLine}`;
     });
 
     grid.appendChild(cell);
