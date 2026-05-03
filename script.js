@@ -600,8 +600,10 @@ function openHistorialModal() {
 
     const [y, m, d] = fecha.split('-');
     const fechaDisplay = `${d}/${m}/${y}`;
-    const badges = (count === 3 ? ' <span class="hist-badge-gold">✦</span>' : '') +
-                   (data.bonusMission ? ' <span class="hist-badge-bolt">⚡</span>' : '');
+    const badges = (count === 3 ? ' <span class="hist-badge-gold">✦</span>' : '');
+    const bonusCol = data.bonusMission === true
+      ? '<span class="hist-badge-bolt" title="Misión Bonus completada">⚡</span>'
+      : '<span class="hist-badge-bolt-off" title="Bonus no completada">⚡</span>';
     const expStr    = `<span class="hist-exp">+${expGanada} EXP</span>`;
     const penStr    = penalty < 0 ? `<span class="hist-neg">${penalty} EXP</span>` : `<span class="hist-neutral">—</span>`;
     const totalStr  = total >= 0 ? `<span class="hist-pos">+${total} EXP</span>` : `<span class="hist-neg">${total} EXP</span>`;
@@ -609,6 +611,7 @@ function openHistorialModal() {
     tableHTML += `<tr class="hist-row">
       <td class="hist-fecha">${fechaDisplay}${badges}</td>
       <td class="hist-misiones">${count}/3</td>
+      <td style="text-align:center;">${bonusCol}</td>
       <td>${expStr}</td>
       <td>${penStr}</td>
       <td>${totalStr}</td>
@@ -617,11 +620,13 @@ function openHistorialModal() {
 
   const expTotal = calcularEXPTotal();
   const fmtFecha = f => f ? f.split('-').reverse().join('/') : '—';
+  const bonusCount = display.filter(({ data }) => data.bonusMission === true).length;
 
   document.getElementById('histExpTotal').textContent = `${expTotal.toLocaleString()} EXP`;
   document.getElementById('histMejorDia').textContent = bestDia ? `${fmtFecha(bestDia)}  (+${bestExp} EXP)` : '—';
   document.getElementById('histUltimaDespeje').textContent = fmtFecha(lastDespeje);
-  document.getElementById('histTableBody').innerHTML = tableHTML || '<tr><td colspan="5" style="text-align:center;color:#334455;padding:20px;">Sin registros</td></tr>';
+  document.getElementById('histBonusCount').textContent = bonusCount;
+  document.getElementById('histTableBody').innerHTML = tableHTML || '<tr><td colspan="6" style="text-align:center;color:#334455;padding:20px;">Sin registros</td></tr>';
 
   document.getElementById('historialModal').style.display = 'flex';
 }

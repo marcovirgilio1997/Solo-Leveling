@@ -1178,6 +1178,7 @@ body::after {
 .hist-exp   { color: var(--green); }
 .hist-badge-gold { color: var(--gold); text-shadow: 0 0 8px var(--gold); }
 .hist-badge-bolt { color: var(--cyan); text-shadow: 0 0 8px var(--cyan); }
+.hist-badge-bolt-off { color: rgba(100,100,120,0.5); text-shadow: none; filter: grayscale(1); }
 .hist-legend { margin-top: 14px; font-family: 'Rajdhani', sans-serif; font-size: 0.78em; color: rgba(60,80,100,0.8); text-align: center; }
 
 /* ══════════════════════════════════════════════════
