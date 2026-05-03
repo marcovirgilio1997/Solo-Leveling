@@ -192,8 +192,8 @@
 
     <!-- Bottom buttons -->
     <div class="rsm-btn-container">
-        <button class="rsm-trigger-btn" id="btnRankSystem">⚔ VER SISTEMA DE RANGOS</button>
-        <button class="rsm-trigger-btn hist-trigger-btn" id="btnHistorial">📊 HISTORIAL DE EXP</button>
+        <button class="rsm-trigger-btn" id="btnRankSystem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px;filter:drop-shadow(0 0 4px currentColor);"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg>VER SISTEMA DE RANGOS</button>
+        <button class="rsm-trigger-btn hist-trigger-btn" id="btnHistorial"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px;filter:drop-shadow(0 0 4px currentColor);"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>HISTORIAL DE EXP</button>
     </div>
 
     <!-- Modal Historial -->
@@ -236,7 +236,7 @@
     <!-- Bonus corner notif -->
     <div id="bonusCornerNotif" class="bonus-corner-notif">
       <div class="bonus-corner-inner">
-        <span class="bonus-corner-icon">⚠</span>
+        <span class="bonus-corner-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;filter:drop-shadow(0 0 6px currentColor);"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
         <div class="bonus-corner-texts">
           <div class="bonus-corner-text">MISIÓN DISPONIBLE</div>
         </div>
@@ -249,7 +249,7 @@
       <div class="bonus-epic-content">
         <div class="bonus-electric-bar left"></div>
         <div class="bonus-electric-bar right"></div>
-        <div class="bonus-epic-header" id="bonusEpicHeader">⚠ NOTIFICACIÓN DEL SISTEMA</div>
+        <div class="bonus-epic-header" id="bonusEpicHeader"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;filter:drop-shadow(0 0 6px currentColor);"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>NOTIFICACIÓN DEL SISTEMA</div>
         <div class="bonus-epic-body">
 <div class="bonus-epic-mission-label">Misión del Día:</div>
           <div class="bonus-epic-mission-name" id="bonusModalMision"></div>
@@ -267,7 +267,7 @@
     <!-- Coward modal -->
     <div id="cowardModal" class="coward-overlay" style="display:none;">
       <div class="coward-content">
-        <div class="coward-header">⚠ ADVERTENCIA DEL SISTEMA ⚠</div>
+        <div class="coward-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;filter:drop-shadow(0 0 6px currentColor);"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>ADVERTENCIA DEL SISTEMA<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-left:6px;filter:drop-shadow(0 0 6px currentColor);"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
         <div class="coward-body">El Sistema registrará tu cobardía.<span class="coward-penalty">-50 EXP</span></div>
         <button id="btnConfirmarCobardia" class="coward-confirm-btn">CONFIRMAR</button>
       </div>
@@ -288,12 +288,12 @@
         <div class="rsm-section">
           <div class="rsm-section-title">SISTEMA DE EXP</div>
           <div class="rsm-exp-rules">
-            <div class="rsm-rule rsm-pos"><span class="rsm-icon">✅</span><span class="rsm-desc">Misión diaria completada</span><span class="rsm-val pos">+150 EXP</span></div>
-            <div class="rsm-rule rsm-pos"><span class="rsm-icon">🏆</span><span class="rsm-desc">Despeje Total (3/3 misiones)</span><span class="rsm-val pos">+100 EXP</span></div>
-            <div class="rsm-rule rsm-pos"><span class="rsm-icon">⚡</span><span class="rsm-desc">Misión Bonus completada</span><span class="rsm-val pos">+100 EXP</span></div>
-            <div class="rsm-rule rsm-neg"><span class="rsm-icon">❌</span><span class="rsm-desc">0 misiones en el día</span><span class="rsm-val neg">−75 EXP</span></div>
-            <div class="rsm-rule rsm-neg"><span class="rsm-icon">⚠️</span><span class="rsm-desc">Solo 1 misión completada</span><span class="rsm-val neg">−25 EXP</span></div>
-            <div class="rsm-rule rsm-crit"><span class="rsm-icon">💀</span><span class="rsm-desc">3 días consecutivos sin nada</span><span class="rsm-val crit">−200 EXP</span></div>
+            <div class="rsm-rule rsm-pos"><span class="rsm-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;filter:drop-shadow(0 0 4px currentColor);"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></span><span class="rsm-desc">Misión diaria completada</span><span class="rsm-val pos">+150 EXP</span></div>
+            <div class="rsm-rule rsm-pos"><span class="rsm-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;filter:drop-shadow(0 0 4px currentColor);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><span class="rsm-desc">Despeje Total (3/3 misiones)</span><span class="rsm-val pos">+100 EXP</span></div>
+            <div class="rsm-rule rsm-pos"><span class="rsm-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;filter:drop-shadow(0 0 4px currentColor);"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><span class="rsm-desc">Misión Bonus completada</span><span class="rsm-val pos">+100 EXP</span></div>
+            <div class="rsm-rule rsm-neg"><span class="rsm-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;filter:drop-shadow(0 0 4px currentColor);"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></span><span class="rsm-desc">0 misiones en el día</span><span class="rsm-val neg">−75 EXP</span></div>
+            <div class="rsm-rule rsm-neg"><span class="rsm-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;filter:drop-shadow(0 0 4px currentColor);"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><span class="rsm-desc">Solo 1 misión completada</span><span class="rsm-val neg">−25 EXP</span></div>
+            <div class="rsm-rule rsm-crit"><span class="rsm-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;filter:drop-shadow(0 0 4px currentColor);"><path d="M12 2a9 9 0 00-9 9c0 3.18 1.66 5.99 4.17 7.6V21h9.67v-2.4C19.34 17 21 14.18 21 11a9 9 0 00-9-9z"/><line x1="9" y1="17" x2="9" y2="21"/><line x1="15" y1="17" x2="15" y2="21"/><circle cx="9" cy="11" r="1" fill="currentColor"/><circle cx="15" cy="11" r="1" fill="currentColor"/></svg></span><span class="rsm-desc">3 días consecutivos sin nada</span><span class="rsm-val crit">−200 EXP</span></div>
           </div>
         </div>
         <div class="rsm-section">
