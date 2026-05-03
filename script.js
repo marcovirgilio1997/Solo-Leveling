@@ -22,7 +22,7 @@ const FULL_CLEAR_BONUS = 100;
 const BONUS_MISSION_EXP = 100;
 const ZERO_MISSION_PENALTY = -75;
 const ONE_MISSION_PENALTY = -25;
-const THREE_DAY_STREAK_PENALTY = -200;
+const TWO_DAY_STREAK_PENALTY = -200;
 const MIN_EXP_TOTAL = 0;
 const MONTHS_ES = [
   'ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO',
@@ -150,7 +150,7 @@ function calcularEXPTotal() {
       zeroStreak = 0;
     }
 
-    if (!esHoy && zeroStreak === 3) penalty += THREE_DAY_STREAK_PENALTY;
+    if (!esHoy && zeroStreak === 2) penalty += TWO_DAY_STREAK_PENALTY;
 
     total += dailyExp + penalty;
     previousDate = date;
@@ -578,7 +578,7 @@ function openHistorialModal() {
     } else {
       zeroStreak = 0;
     }
-    if (zeroStreak === 3) penalty += THREE_DAY_STREAK_PENALTY;
+    if (zeroStreak === 2) penalty += TWO_DAY_STREAK_PENALTY;
     penaltyMap[fecha] = penalty;
     previousDate = date;
   }
