@@ -564,21 +564,23 @@ function openHistorialModal() {
     .map(([fecha, data]) => ({ date: new Date(fecha + 'T00:00:00'), fecha, data }))
     .sort((a, b) => a.date - b.date);
 
-  // Calcular penalización real por día (incluye racha de 3 días en 0)
+  // Calcular penalización real por día (incluye racha de 2 días en 0)
   const penaltyMap = {};
+  const todayStr = getTodayStr();
   let zeroStreak = 0;
   let previousDate = null;
   for (const { date, fecha, data } of allEntries) {
+    const esHoy = fecha === todayStr;
     const count = (data.nutricion ? 1 : 0) + (data.entrenamiento ? 1 : 0) + (data.suplementos ? 1 : 0);
     let penalty = 0;
-    if (count === 0) penalty += ZERO_MISSION_PENALTY;
-    if (count === 1) penalty += ONE_MISSION_PENALTY;
+    if (!esHoy && count === 0) penalty += ZERO_MISSION_PENALTY;
+    if (!esHoy && count === 1) penalty += ONE_MISSION_PENALTY;
     if (count === 0) {
       zeroStreak = (previousDate && date - previousDate === 86400000) ? zeroStreak + 1 : 1;
     } else {
       zeroStreak = 0;
     }
-    if (zeroStreak === 2) penalty += TWO_DAY_STREAK_PENALTY;
+    if (!esHoy && zeroStreak === 2) penalty += TWO_DAY_STREAK_PENALTY;
     penaltyMap[fecha] = penalty;
     previousDate = date;
   }
@@ -761,9 +763,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('fechaInicio');
       await db.from('config').delete().eq('key', 'fechaInicio');
     }
-    updateUI();
-    // Refrescar el panel "TU PROGRESO" dentro del modal con los nuevos datos
-    openRankSystemModal();
+    location.reload();
   });
 
   document.getElementById('btnHistorial')?.addEventListener('click', openHistorialModal);
