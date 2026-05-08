@@ -308,11 +308,11 @@ body::after {
    STATUS SECTION (Profile)
 ══════════════════════════════════════════════════ */
 .status-section {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  padding: 28px 20px 32px;
+  background: transparent;
+  border: none;
+  padding: 32px 16px 40px;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -323,19 +323,9 @@ body::after {
 .status-section::after,
 .status-inner-frame::before,
 .status-inner-frame::after {
-  content: '';
-  position: absolute;
-  width: 16px; height: 16px;
-  border-color: var(--cyan);
-  border-style: solid;
-  opacity: 0.8;
-  z-index: 2;
+  display: none;
 }
-.status-section::before  { top: 0; left: 0;  border-width: 2px 0 0 2px; }
-.status-section::after   { top: 0; right: 0; border-width: 2px 2px 0 0; }
-.status-inner-frame::before { bottom: 0; left: 0;  border-width: 0 0 2px 2px; }
-.status-inner-frame::after  { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
-.status-inner-frame { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.status-inner-frame { display: none; }
 
 /* Scan line inside status */
 .status-section > *:not(.status-inner-frame) { position: relative; z-index: 3; }
@@ -343,20 +333,34 @@ body::after {
 /* Ambient glow inside panel */
 .status-section > .scan-ambient {
   position: absolute;
-  top: -40%; left: 0; width: 100%; height: 40%;
-  background: linear-gradient(180deg,
-    transparent 0%,
-    rgba(0,245,255,0.025) 40%,
-    rgba(0,245,255,0.05) 50%,
-    rgba(0,245,255,0.025) 60%,
-    transparent 100%);
-  animation: scanLine 5s ease-in-out infinite;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 120%;
+  background:
+    radial-gradient(circle at 50% 60%, rgba(0,200,255,0.18) 0%, rgba(0,150,220,0.10) 25%, transparent 60%),
+    radial-gradient(circle at 50% 60%, rgba(0,80,180,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: energyBreathe 4s ease-in-out infinite alternate;
+  filter: blur(25px);
+}
+@keyframes energyBreathe {
+  0%   { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 1;   transform: translate(-50%, -50%) scale(1.12); }
+}
+.status-section .scan-line-overlay {
+  position: absolute;
+  inset: 0;
   pointer-events: none;
   z-index: 1;
+  background: linear-gradient(180deg, transparent 45%, rgba(0,245,255,0.06) 50%, transparent 55%);
+  background-size: 100% 200%;
+  animation: scanSweep 5s linear infinite;
 }
-@keyframes scanLine {
-  0%   { top: -40%; }
-  100% { top: 120%; }
+@keyframes scanSweep {
+  0%   { background-position: 0 -100%; }
+  100% { background-position: 0 100%; }
 }
 
 /* Hunter name */
@@ -393,13 +397,13 @@ body::after {
   position: absolute;
   border-radius: 50%;
   background: transparent;
-  border: 1px solid rgba(0,245,255,0.1);
+  border: 1px solid rgba(0,245,255,0.3);
   top: -10px; left: -10px; right: -10px; bottom: -10px;
   animation: outerRingPulse 3s ease-in-out infinite;
 }
 .rank-ring-card-epic::after {
   top: -22px; left: -22px; right: -22px; bottom: -22px;
-  border-color: rgba(0,245,255,0.05);
+  border-color: rgba(0,245,255,0.15);
   animation-delay: 1.5s;
 }
 @keyframes outerRingPulse {
@@ -1430,6 +1434,9 @@ body::after {
   .rank-ring-epic { width: 200px; height: 200px; }
   .ring-rank-letter-epic { font-size: 3.2em; }
   .profile-stats-grid { grid-template-columns: 1fr; }
+  #rankRingProgress {
+    filter: drop-shadow(0 0 12px rgba(0,245,255,1)) drop-shadow(0 0 28px rgba(0,191,255,0.7)) drop-shadow(0 0 50px rgba(0,245,255,0.3)) !important;
+  }
 }
 @media (max-width: 400px) {
   .stats-grid { grid-template-columns: 1fr; }
