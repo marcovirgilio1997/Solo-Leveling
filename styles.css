@@ -385,29 +385,38 @@ body::after {
 ══════════════════════════════════════════════════ */
 .rank-ring-card-epic {
   position: relative;
-  width: 220px;
-  height: 220px;
+  width: 280px;
+  height: 280px;
   margin: 16px auto 0;
 }
 
-/* Outer pulse rings */
-.rank-ring-card-epic::before {
+/* HUD dash markers */
+.rank-ring-card-epic::before,
+.rank-ring-card-epic::after {
   content: '';
   position: absolute;
-  border-radius: 50%;
-  background: transparent;
-  border: 1px solid rgba(0,245,255,0.3);
-  top: -10px; left: -10px; right: -10px; bottom: -10px;
-  animation: outerRingPulse 3s ease-in-out infinite;
+  width: 18px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  box-shadow: 0 0 12px var(--cyan), 0 0 24px rgba(0,245,255,0.5);
+  animation: dashPulse 2s ease-in-out infinite alternate;
 }
-@keyframes outerRingPulse {
-  0%,100% { transform: scale(1);    opacity: 0.5; }
-  50%      { transform: scale(1.03); opacity: 1; }
+.rank-ring-card-epic::before {
+  top: 50%; left: -28px;
+  transform: translateY(-50%);
+}
+.rank-ring-card-epic::after {
+  top: 50%; right: -28px;
+  transform: translateY(-50%);
+}
+@keyframes dashPulse {
+  0%   { opacity: 0.4; width: 14px; }
+  100% { opacity: 1; width: 22px; box-shadow: 0 0 18px var(--cyan), 0 0 36px rgba(0,245,255,0.7); }
 }
 
 .rank-ring-epic {
-  width: 220px;
-  height: 220px;
+  width: 280px;
+  height: 280px;
   transform: rotate(-90deg);
   display: block;
   position: relative;
@@ -1424,9 +1433,9 @@ body::after {
   .system-title { font-size: 1.6em; }
   .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
   .stat-value { font-size: 1.25em; }
-  .rank-ring-card-epic { width: 200px; height: 200px; }
-  .rank-ring-epic { width: 200px; height: 200px; }
-  .ring-rank-letter-epic { font-size: 3.2em; }
+  .rank-ring-card-epic { width: 260px; height: 260px; }
+  .rank-ring-epic { width: 260px; height: 260px; }
+  .ring-rank-letter-epic { font-size: 4.2em; }
   .profile-stats-grid { grid-template-columns: 1fr; }
   #rankRingProgress {
     filter: drop-shadow(0 0 12px rgba(0,245,255,1)) drop-shadow(0 0 28px rgba(0,191,255,0.7)) drop-shadow(0 0 50px rgba(0,245,255,0.3)) !important;
