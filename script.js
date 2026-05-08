@@ -23,6 +23,7 @@ const BONUS_MISSION_EXP = 100;
 const ZERO_MISSION_PENALTY = -75;
 const ONE_MISSION_PENALTY = -25;
 const TWO_DAY_STREAK_PENALTY = -200;
+const BONUS_REJECTED_PENALTY = -50;
 const MIN_EXP_TOTAL = 0;
 const MONTHS_ES = [
   'ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO',
@@ -71,7 +72,8 @@ async function cargarDesdeSupabase() {
       nutricion: !!row.nutricion,
       entrenamiento: !!row.entrenamiento,
       suplementos: !!row.suplementos,
-      bonusMission: !!row.bonus_mission
+      bonusMission: !!row.bonus_mission,
+      bonusRejected: !!row.bonus_rejected
     };
   }
   const { data: configData } = await db.from('config').select('*');
@@ -151,6 +153,7 @@ function calcularEXPTotal() {
     }
 
     if (!esHoy && zeroStreak === 2) penalty += TWO_DAY_STREAK_PENALTY;
+    if (!esHoy && data.bonusRejected) penalty += BONUS_REJECTED_PENALTY;
 
     total += dailyExp + penalty;
     previousDate = date;
@@ -529,7 +532,7 @@ function aceptarBonus() {
   if (texto) texto.textContent = `[BONUS] ${localStorage.getItem('bonusMision')}`;
 }
 
-function rechazarBonus() {
+async function rechazarBonus() {
   // Cerrar modal épico
   const modal = document.getElementById('bonusEpicModal');
   if (modal) {
@@ -540,6 +543,17 @@ function rechazarBonus() {
   const hoy = getTodayStr();
   localStorage.setItem('bonusDate', hoy);
   localStorage.setItem('bonusStatus', 'rechazada');
+
+  const existing = misionesCache[hoy] || { nutricion: false, entrenamiento: false, suplementos: false, bonusMission: false };
+  misionesCache[hoy] = { ...existing, bonusRejected: true };
+  await db.from('missions').upsert({
+    fecha: hoy,
+    nutricion: existing.nutricion,
+    entrenamiento: existing.entrenamiento,
+    suplementos: existing.suplementos,
+    bonus_mission: existing.bonusMission,
+    bonus_rejected: true
+  }, { onConflict: 'fecha' });
 
   // Mostrar modal cobardía con delay
   setTimeout(() => {
@@ -581,7 +595,8 @@ function openHistorialModal() {
       zeroStreak = 0;
     }
     if (!esHoy && zeroStreak === 2) penalty += TWO_DAY_STREAK_PENALTY;
-    penaltyMap[fecha] = penalty;
+    if (!esHoy && data.bonusRejected) penalty += BONUS_REJECTED_PENALTY;
+    penaltyMap[fecha] = { total: penalty, hadStreakBreak: !esHoy && zeroStreak === 2 };
     previousDate = date;
   }
 
@@ -594,7 +609,8 @@ function openHistorialModal() {
   for (const { fecha, data } of display) {
     const count = (data.nutricion ? 1 : 0) + (data.entrenamiento ? 1 : 0) + (data.suplementos ? 1 : 0);
     const expGanada = (data.nutricion ? MISSION_EXP.nutricion : 0) + (data.entrenamiento ? MISSION_EXP.entrenamiento : 0) + (data.suplementos ? MISSION_EXP.suplementos : 0) + (count === 3 ? FULL_CLEAR_BONUS : 0) + (data.bonusMission ? BONUS_MISSION_EXP : 0);
-    const penalty = penaltyMap[fecha] || 0;
+    const penEntry = penaltyMap[fecha] || { total: 0, hadStreakBreak: false };
+    const penalty = penEntry.total;
     const total = expGanada + penalty;
 
     if (expGanada > bestExp) { bestExp = expGanada; bestDia = fecha; }
@@ -606,17 +622,30 @@ function openHistorialModal() {
     const bonusCol = data.bonusMission === true
       ? '<span class="hist-badge-bolt" title="Misión Bonus completada">⚡</span>'
       : '<span class="hist-badge-bolt-off" title="Bonus no completada">⚡</span>';
-    const expStr    = `<span class="hist-exp">+${expGanada} EXP</span>`;
-    const penStr    = penalty < 0 ? `<span class="hist-neg">${penalty} EXP</span>` : `<span class="hist-neutral">—</span>`;
-    const totalStr  = total >= 0 ? `<span class="hist-pos">+${total} EXP</span>` : `<span class="hist-neg">${total} EXP</span>`;
+    const expStr   = `<span class="hist-exp">+${expGanada} EXP</span>`;
+    const penStr   = penalty < 0 ? `<span class="hist-neg">${penalty} EXP</span>` : `<span class="hist-neutral">—</span>`;
+    const totalStr = total >= 0 ? `<span class="hist-pos">+${total} EXP</span>` : `<span class="hist-neg">${total} EXP</span>`;
 
-    tableHTML += `<tr class="hist-row">
+    const esHoyRow = fecha === todayStr;
+    const penDetails = [];
+    if (!esHoyRow && count === 0) penDetails.push('0 misiones: -75 EXP');
+    if (!esHoyRow && count === 1) penDetails.push('1 misión: -25 EXP');
+    if (!esHoyRow && data.bonusRejected) penDetails.push('Bonus rechazada: -50 EXP');
+    if (penEntry.hadStreakBreak) penDetails.push('Racha 2 días en 0: -200 EXP');
+    const breakdownStr = penDetails.length > 0 ? penDetails.join(' · ') : 'Sin penalizaciones';
+
+    tableHTML += `<tr class="hist-row" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'table-row' ? 'none' : 'table-row';" style="cursor:pointer;">
       <td class="hist-fecha">${fechaDisplay}${badges}</td>
       <td class="hist-misiones">${count}/3</td>
       <td style="text-align:center;">${bonusCol}</td>
       <td>${expStr}</td>
       <td>${penStr}</td>
       <td>${totalStr}</td>
+    </tr>
+    <tr class="hist-detail-row" style="display:none;background:rgba(0,245,255,0.04);">
+      <td colspan="6" style="padding:10px 14px;font-size:0.88em;color:#99AABB;">
+        <strong style="color:#00FFFF;">Desglose:</strong> ${breakdownStr}
+      </td>
     </tr>`;
   }
 
