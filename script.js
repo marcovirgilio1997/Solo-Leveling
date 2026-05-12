@@ -96,8 +96,9 @@ async function guardarMision() {
   const bonusMission = document.getElementById('bonusMissionCheckbox')?.checked || false;
   const fecha = getTodayStr();
 
-  // Actualizar cache local inmediatamente
-  misionesCache[fecha] = { nutricion, entrenamiento, suplementos, bonusMission };
+  // Actualizar cache local inmediatamente (preservar bonusRejected si ya existía)
+  const prev = misionesCache[fecha] || {};
+  misionesCache[fecha] = { ...prev, nutricion, entrenamiento, suplementos, bonusMission };
 
   // Guardar en Supabase (upsert = insert o update si ya existe)
   const { error } = await db.from('missions').upsert({
@@ -153,7 +154,7 @@ function calcularEXPTotal() {
     }
 
     if (!esHoy && zeroStreak === 2) penalty += TWO_DAY_STREAK_PENALTY;
-    if (!esHoy && data.bonusRejected) penalty += BONUS_REJECTED_PENALTY;
+    if (data.bonusRejected) penalty += BONUS_REJECTED_PENALTY;
 
     total += dailyExp + penalty;
     previousDate = date;
@@ -595,7 +596,7 @@ function openHistorialModal() {
       zeroStreak = 0;
     }
     if (!esHoy && zeroStreak === 2) penalty += TWO_DAY_STREAK_PENALTY;
-    if (!esHoy && data.bonusRejected) penalty += BONUS_REJECTED_PENALTY;
+    if (data.bonusRejected) penalty += BONUS_REJECTED_PENALTY;
     penaltyMap[fecha] = { total: penalty, hadStreakBreak: !esHoy && zeroStreak === 2 };
     previousDate = date;
   }
@@ -630,7 +631,7 @@ function openHistorialModal() {
     const penDetails = [];
     if (!esHoyRow && count === 0) penDetails.push('0 misiones: -75 EXP');
     if (!esHoyRow && count === 1) penDetails.push('1 misión: -25 EXP');
-    if (!esHoyRow && data.bonusRejected) penDetails.push('Bonus rechazada: -50 EXP');
+    if (data.bonusRejected) penDetails.push('Bonus rechazada: -50 EXP');
     if (penEntry.hadStreakBreak) penDetails.push('Racha 2 días en 0: -200 EXP');
     const breakdownStr = penDetails.length > 0 ? penDetails.join(' · ') : 'Sin penalizaciones';
 
