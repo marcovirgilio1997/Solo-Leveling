@@ -1604,25 +1604,7 @@ body::after {
 .status-section { position: relative; }
 .status-section > *:not(.halo-respira) { position: relative; z-index: 1; }
 
-/* Track del anillo (300x300, r=120) */
-.rank-ring-bg-epic {
-  fill: none;
-  stroke: rgba(0, 191, 255, 0.10);
-  stroke-width: 24;
-}
-
-#rankRingProgress {
-  transform: rotate(-90deg);
-  transform-origin: 150px 150px;
-}
-
-#rankRingWaves,
-#rankRingBubbles {
-  transform: rotate(-90deg);
-  transform-origin: 150px 150px;
-}
-
-/* Forzar tamaño visual del anillo (que no estire el layout) */
+/* Tamaño del SVG — fija el layout y achica margen superior */
 .rank-ring-epic {
   width: 260px;
   height: 260px;
@@ -1630,9 +1612,29 @@ body::after {
   margin: 0 auto;
 }
 
-/* Track más oscuro */
+/* Track de fondo */
 .rank-ring-bg-epic {
   fill: none;
-  stroke: rgba(0, 191, 255, 0.10);
-  stroke-width: 28;
+  stroke: rgba(0, 191, 255, 0.06);
+  stroke-width: 22;
+}
+
+/* Progreso rotado para empezar arriba */
+#rankRingProgress {
+  transform: rotate(-90deg);
+  transform-origin: 150px 150px;
+}
+
+/* Burbujas rotadas igual que el progreso */
+#rankRingBubbles {
+  transform: rotate(-90deg);
+  transform-origin: 150px 150px;
+}
+
+/* Ajuste del espacio entre el título "MARCO" y el anillo */
+.profile-status-center {
+  margin-top: 8px;
+}
+.hunter-name-display {
+  margin-bottom: 16px;
 }

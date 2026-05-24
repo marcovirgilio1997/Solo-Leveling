@@ -48,10 +48,10 @@
                                 <stop offset="0%" stop-color="#001530">
                                     <animate attributeName="stop-color" values="#001530;#002850;#003d6e;#001530" dur="6s" repeatCount="indefinite"/>
                                 </stop>
-                                <stop offset="35%" stop-color="#004477">
+                                <stop offset="40%" stop-color="#004477">
                                     <animate attributeName="stop-color" values="#004477;#0066aa;#0088cc;#004477" dur="6s" repeatCount="indefinite"/>
                                 </stop>
-                                <stop offset="70%" stop-color="#0099dd">
+                                <stop offset="75%" stop-color="#0099dd">
                                     <animate attributeName="stop-color" values="#0099dd;#00bbee;#00ccff;#0099dd" dur="6s" repeatCount="indefinite"/>
                                 </stop>
                                 <stop offset="100%" stop-color="#00f5ff">
@@ -61,7 +61,7 @@
                             </linearGradient>
 
                             <filter id="ringGlow" x="-50%" y="-50%" width="200%" height="200%">
-                                <feGaussianBlur stdDeviation="4" result="blur"/>
+                                <feGaussianBlur stdDeviation="3.5" result="blur"/>
                                 <feMerge>
                                     <feMergeNode in="blur"/>
                                     <feMergeNode in="SourceGraphic"/>
@@ -70,7 +70,7 @@
 
                             <mask id="ringMaskAQ">
                                 <rect width="300" height="300" fill="black"/>
-                                <circle cx="150" cy="150" r="120" fill="none" stroke="white" stroke-width="28"/>
+                                <circle cx="150" cy="150" r="120" fill="none" stroke="white" stroke-width="22"/>
                             </mask>
                         </defs>
 
@@ -79,22 +79,11 @@
                         <circle cx="150" cy="150" r="120" fill="none"
                             id="rankRingProgress"
                             stroke="url(#lolFluidGradient)"
-                            stroke-width="28"
+                            stroke-width="22"
                             stroke-linecap="round"
                             stroke-dasharray="753.98 753.98"
                             stroke-dashoffset="753.98"
                             filter="url(#ringGlow)"/>
-
-                        <g mask="url(#ringMaskAQ)" id="rankRingWaves" style="opacity:0.55;">
-                            <path d="M-100,150 Q-50,144 0,150 T100,150 T200,150 T300,150 T400,150" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5">
-                                <animate attributeName="d" values="M-100,150 Q-50,144 0,150 T100,150 T200,150 T300,150 T400,150;M-100,150 Q-50,156 0,150 T100,150 T200,150 T300,150 T400,150;M-100,150 Q-50,144 0,150 T100,150 T200,150 T300,150 T400,150" dur="2.5s" repeatCount="indefinite"/>
-                                <animateTransform attributeName="transform" type="translate" from="0 0" to="60 0" dur="3s" repeatCount="indefinite"/>
-                            </path>
-                            <path d="M-100,158 Q-30,152 40,158 T180,158 T320,158 T460,158" fill="none" stroke="rgba(0,255,255,0.35)" stroke-width="1">
-                                <animate attributeName="d" values="M-100,158 Q-30,152 40,158 T180,158 T320,158 T460,158;M-100,158 Q-30,164 40,158 T180,158 T320,158 T460,158;M-100,158 Q-30,152 40,158 T180,158 T320,158 T460,158" dur="3.2s" repeatCount="indefinite"/>
-                                <animateTransform attributeName="transform" type="translate" from="0 0" to="-60 0" dur="4s" repeatCount="indefinite"/>
-                            </path>
-                        </g>
 
                         <g mask="url(#ringMaskAQ)" id="rankRingBubbles">
                             <circle r="1.5" fill="rgba(255,255,255,0.9)">
@@ -111,6 +100,9 @@
                                 <animate attributeName="opacity" values="0;0.8;0.8;0" dur="4.5s" repeatCount="indefinite" begin="2.8s"/>
                             </circle>
                         </g>
+
+                        <circle cx="150" cy="150" r="132" fill="none" stroke="rgba(0,191,255,0.85)" stroke-width="1.2" style="filter:drop-shadow(0 0 3px rgba(0,191,255,0.7));"/>
+                        <circle cx="150" cy="150" r="108" fill="none" stroke="rgba(0,191,255,0.65)" stroke-width="1" style="filter:drop-shadow(0 0 2px rgba(0,191,255,0.5));"/>
 
                         <circle cx="150" cy="30" r="5" id="rankRingTip" class="ring-tip"/>
                     </svg>
