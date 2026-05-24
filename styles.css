@@ -1638,3 +1638,28 @@ body::after {
 .hunter-name-display {
   margin-bottom: 16px;
 }
+
+.status-section {
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 16px 0 !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.profile-status-center {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.hunter-name-display {
+  margin: 0 0 16px 0 !important;
+  padding: 0 !important;
+}
+
+.rank-ring-card-epic {
+  margin: 0 !important;
+  padding: 0 !important;
+}
