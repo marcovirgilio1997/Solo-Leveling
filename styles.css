@@ -1567,3 +1567,54 @@ body::after {
   color: rgba(255,255,255,0.45);
   letter-spacing: 1px;
 }
+
+/* ============= FIX SAFARI iOS — halo no debe ocupar espacio en flexbox ============= */
+.status-section {
+  position: relative !important;
+  display: block !important;
+  text-align: center !important;
+  padding: 20px 0 24px !important;
+  min-height: 0 !important;
+  height: auto !important;
+}
+
+.halo-respira {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  width: 460px !important;
+  height: 460px !important;
+  max-width: 130vw !important;
+  max-height: 130vw !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+.hunter-name-display {
+  position: relative !important;
+  z-index: 2 !important;
+  margin: 0 0 20px 0 !important;
+  text-align: center !important;
+}
+
+.profile-status-center {
+  position: relative !important;
+  z-index: 2 !important;
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.rank-ring-card-epic {
+  position: relative !important;
+  width: 280px !important;
+  height: 280px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+.rank-ring-card-epic::before,
+.rank-ring-card-epic::after {
+  display: none !important;
+}
