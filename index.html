@@ -34,8 +34,7 @@
 
         <!-- STATUS -->
         <div class="status-section">
-            <div class="scan-ambient"></div>
-            <div class="scan-line-overlay"></div>
+            <div class="halo-respira"></div>
 
             <div class="hunter-name-display">
                 <div class="hunter-name" id="hunterNameDisplay">MARCO</div>
@@ -43,29 +42,36 @@
 
             <div class="profile-status-center">
                 <div class="rank-ring-card-epic">
-                    <svg class="rank-ring-epic" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="rank-ring-epic" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
                         <defs>
-                            <!-- LoL fluid gradient: deep blue → electric cyan → white tip -->
                             <linearGradient id="lolFluidGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%"   stop-color="#003d6e"/>
-                                <stop offset="35%"  stop-color="#0088cc"/>
-                                <stop offset="70%"  stop-color="#00ccff"/>
-                                <stop offset="90%"  stop-color="#00f5ff"/>
+                                <stop offset="40%"  stop-color="#0088cc"/>
+                                <stop offset="75%"  stop-color="#00ccff"/>
+                                <stop offset="95%"  stop-color="#00f5ff"/>
                                 <stop offset="100%" stop-color="#ffffff"/>
                             </linearGradient>
+                            <filter id="ringGlow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="3" result="blur"/>
+                                <feMerge>
+                                    <feMergeNode in="blur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
                         </defs>
 
-                        <!-- Track -->
-                        <circle cx="110" cy="110" r="92" class="rank-ring-bg-epic"/>
+                        <circle cx="140" cy="140" r="118" class="rank-ring-bg-epic"/>
 
-                        <!-- Progress ring — gradient applied via CSS id -->
-                        <circle cx="110" cy="110" r="92" fill="none"
+                        <circle cx="140" cy="140" r="118" fill="none"
                             id="rankRingProgress"
                             stroke="url(#lolFluidGradient)"
-                            stroke-width="20"
+                            stroke-width="14"
                             stroke-linecap="round"
-                            stroke-dasharray="578.05 578.05"
-                            stroke-dashoffset="578.05"/>
+                            stroke-dasharray="741.42 741.42"
+                            stroke-dashoffset="741.42"
+                            filter="url(#ringGlow)"/>
+
+                        <circle cx="140" cy="22" r="4.5" id="rankRingTip" class="ring-tip"/>
                     </svg>
 
                     <div class="rank-ring-label-epic">

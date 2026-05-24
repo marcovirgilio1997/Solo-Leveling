@@ -202,17 +202,31 @@ function cargarNombreCazador() {
 
 function updateRankRing(expTotal) {
   const ring = document.getElementById('rankRingProgress');
+  const tip = document.getElementById('rankRingTip');
   const rango = calcularRango(expTotal);
   const idx = RANK_THRESHOLDS.findIndex(r => r.rank === rango);
   const cur = RANK_THRESHOLDS[idx]?.threshold || 0;
   const nxt = idx < RANK_THRESHOLDS.length - 1 ? RANK_THRESHOLDS[idx + 1].threshold : cur;
   const progress = rango === 'S' ? 100 : nxt > cur ? ((expTotal - cur) / (nxt - cur)) * 100 : 0;
   const clamped = Math.min(Math.max(progress, 0), 100);
+
+  const radius = 118;
+  const circumference = 2 * Math.PI * radius;
+
   if (ring) {
-    const circumference = 2 * Math.PI * 92;
     const offset = circumference - (clamped / 100) * circumference;
     ring.style.strokeDasharray = `${circumference} ${circumference}`;
     ring.style.strokeDashoffset = `${offset}`;
+  }
+
+  if (tip) {
+    const angleDeg = (clamped / 100) * 360 - 90;
+    const angleRad = angleDeg * Math.PI / 180;
+    const cx = 140 + radius * Math.cos(angleRad);
+    const cy = 140 + radius * Math.sin(angleRad);
+    tip.setAttribute('cx', cx);
+    tip.setAttribute('cy', cy);
+    tip.style.opacity = clamped > 1 ? 1 : 0;
   }
 }
 

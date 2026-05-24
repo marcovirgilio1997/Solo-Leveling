@@ -1564,3 +1564,47 @@ body::after {
   line-height: 1;
   pointer-events: none;
 }
+
+/* ============= HALO RESPIRA (reemplaza scan-ambient/scan-line-overlay) ============= */
+.halo-respira {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  transform: translate(-50%, -50%);
+  width: 560px;
+  height: 560px;
+  max-width: 140vw;
+  max-height: 140vw;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 191, 255, 0.14) 0%,
+    rgba(0, 140, 220, 0.05) 35%,
+    transparent 65%
+  );
+  animation: haloRespira 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes haloRespira {
+  0%, 100% { transform: translate(-50%, -50%) scale(1);    opacity: 0.55; }
+  50%      { transform: translate(-50%, -50%) scale(1.10); opacity: 0.95; }
+}
+
+/* Track del anillo */
+.rank-ring-bg-epic {
+  fill: none;
+  stroke: rgba(0, 191, 255, 0.10);
+  stroke-width: 14;
+}
+
+/* Tip blanco que se desliza */
+.ring-tip {
+  fill: #ffffff;
+  filter: drop-shadow(0 0 8px #00f5ff) drop-shadow(0 0 14px #00ccff);
+  transition: cx 0.8s cubic-bezier(0.4, 0, 0.2, 1), cy 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Status section: contenido por encima del halo */
+.status-section { position: relative; }
+.status-section > *:not(.halo-respira) { position: relative; z-index: 1; }
