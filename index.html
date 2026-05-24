@@ -42,36 +42,77 @@
 
             <div class="profile-status-center">
                 <div class="rank-ring-card-epic">
-                    <svg class="rank-ring-epic" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="rank-ring-epic" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <linearGradient id="lolFluidGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%"   stop-color="#003d6e"/>
-                                <stop offset="40%"  stop-color="#0088cc"/>
-                                <stop offset="75%"  stop-color="#00ccff"/>
-                                <stop offset="95%"  stop-color="#00f5ff"/>
-                                <stop offset="100%" stop-color="#ffffff"/>
+                                <stop offset="0%" stop-color="#001a3d">
+                                    <animate attributeName="stop-color" values="#001a3d;#003d6e;#0088cc;#001a3d" dur="6s" repeatCount="indefinite"/>
+                                </stop>
+                                <stop offset="30%" stop-color="#0066aa">
+                                    <animate attributeName="stop-color" values="#0066aa;#00aaee;#00ccff;#0066aa" dur="6s" repeatCount="indefinite"/>
+                                </stop>
+                                <stop offset="65%" stop-color="#00ccff">
+                                    <animate attributeName="stop-color" values="#00ccff;#00f5ff;#88ddff;#00ccff" dur="6s" repeatCount="indefinite"/>
+                                </stop>
+                                <stop offset="100%" stop-color="#ffffff">
+                                    <animate attributeName="stop-color" values="#ffffff;#aaeeff;#ffffff;#ffffff" dur="6s" repeatCount="indefinite"/>
+                                </stop>
+                                <animateTransform attributeName="gradientTransform" type="rotate" from="0 0.5 0.5" to="360 0.5 0.5" dur="12s" repeatCount="indefinite"/>
                             </linearGradient>
+
                             <filter id="ringGlow" x="-50%" y="-50%" width="200%" height="200%">
-                                <feGaussianBlur stdDeviation="3" result="blur"/>
+                                <feGaussianBlur stdDeviation="4" result="blur"/>
                                 <feMerge>
                                     <feMergeNode in="blur"/>
                                     <feMergeNode in="SourceGraphic"/>
                                 </feMerge>
                             </filter>
+
+                            <mask id="ringMaskAQ">
+                                <rect width="300" height="300" fill="black"/>
+                                <circle cx="150" cy="150" r="120" fill="none" stroke="white" stroke-width="24"/>
+                            </mask>
                         </defs>
 
-                        <circle cx="140" cy="140" r="118" class="rank-ring-bg-epic"/>
+                        <circle cx="150" cy="150" r="120" class="rank-ring-bg-epic"/>
 
-                        <circle cx="140" cy="140" r="118" fill="none"
+                        <circle cx="150" cy="150" r="120" fill="none"
                             id="rankRingProgress"
                             stroke="url(#lolFluidGradient)"
-                            stroke-width="14"
+                            stroke-width="24"
                             stroke-linecap="round"
-                            stroke-dasharray="741.42 741.42"
-                            stroke-dashoffset="741.42"
+                            stroke-dasharray="753.98 753.98"
+                            stroke-dashoffset="753.98"
                             filter="url(#ringGlow)"/>
 
-                        <circle cx="140" cy="22" r="4.5" id="rankRingTip" class="ring-tip"/>
+                        <g mask="url(#ringMaskAQ)" id="rankRingWaves" style="opacity:0.55;">
+                            <path d="M-100,150 Q-50,144 0,150 T100,150 T200,150 T300,150 T400,150" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5">
+                                <animate attributeName="d" values="M-100,150 Q-50,144 0,150 T100,150 T200,150 T300,150 T400,150;M-100,150 Q-50,156 0,150 T100,150 T200,150 T300,150 T400,150;M-100,150 Q-50,144 0,150 T100,150 T200,150 T300,150 T400,150" dur="2.5s" repeatCount="indefinite"/>
+                                <animateTransform attributeName="transform" type="translate" from="0 0" to="60 0" dur="3s" repeatCount="indefinite"/>
+                            </path>
+                            <path d="M-100,158 Q-30,152 40,158 T180,158 T320,158 T460,158" fill="none" stroke="rgba(0,255,255,0.35)" stroke-width="1">
+                                <animate attributeName="d" values="M-100,158 Q-30,152 40,158 T180,158 T320,158 T460,158;M-100,158 Q-30,164 40,158 T180,158 T320,158 T460,158;M-100,158 Q-30,152 40,158 T180,158 T320,158 T460,158" dur="3.2s" repeatCount="indefinite"/>
+                                <animateTransform attributeName="transform" type="translate" from="0 0" to="-60 0" dur="4s" repeatCount="indefinite"/>
+                            </path>
+                        </g>
+
+                        <g mask="url(#ringMaskAQ)" id="rankRingBubbles">
+                            <circle r="1.5" fill="rgba(255,255,255,0.9)">
+                                <animateMotion path="M 150 30 A 120 120 0 0 1 270 150" dur="4s" repeatCount="indefinite" begin="0s"/>
+                                <animate attributeName="opacity" values="0;0.9;0.9;0" dur="4s" repeatCount="indefinite" begin="0s"/>
+                                <animate attributeName="r" values="0.5;2;1.5;0.5" dur="4s" repeatCount="indefinite" begin="0s"/>
+                            </circle>
+                            <circle r="1" fill="rgba(255,255,255,0.7)">
+                                <animateMotion path="M 150 30 A 120 120 0 0 1 270 150" dur="5s" repeatCount="indefinite" begin="1.5s"/>
+                                <animate attributeName="opacity" values="0;0.7;0.7;0" dur="5s" repeatCount="indefinite" begin="1.5s"/>
+                            </circle>
+                            <circle r="1.2" fill="rgba(170,238,255,0.8)">
+                                <animateMotion path="M 150 30 A 120 120 0 0 1 270 150" dur="4.5s" repeatCount="indefinite" begin="2.8s"/>
+                                <animate attributeName="opacity" values="0;0.8;0.8;0" dur="4.5s" repeatCount="indefinite" begin="2.8s"/>
+                            </circle>
+                        </g>
+
+                        <circle cx="150" cy="30" r="5" id="rankRingTip" class="ring-tip"/>
                     </svg>
 
                     <div class="rank-ring-label-epic">

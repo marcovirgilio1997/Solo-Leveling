@@ -1343,12 +1343,7 @@ body::after {
 /* ══════════════════════════════════════════════════
    LEGACY / HIDDEN ELEMENTS
 ══════════════════════════════════════════════════ */
-.status-bars, .bar-icon, .bar-fill-container, .rank-fill, .exp-fill,
-.exp-panel, .rank-ring-card, .rank-ring,
-.profile-modal, .penalty-modal, .modal-metallic-column,
-.log-panel, .error-message { /* kept functional, just invisible by default */ }
-
-.hunter-profile-modal-wrap, #hunterProfileModal, #penaltyModal { /* existing modals */ }
+/* legacy selectors sin estilos propios — heredan o están ocultos por defecto */
 
 /* Profile modal (existing) */
 .profile-modal {
@@ -1422,8 +1417,8 @@ body::after {
 /* ══════════════════════════════════════════════════
    EXP BAR elements (used in script.js via expFill id — kept for compat)
 ══════════════════════════════════════════════════ */
-.exp-panel-bar, .exp-panel-fill, .exp-shimmer, .exp-tip-glow,
-.exp-panel-label, .exp-panel-text { /* legacy — hidden or unused in new layout */ }
+/* .exp-panel-bar, .exp-panel-fill, .exp-shimmer, .exp-tip-glow,
+   .exp-panel-label, .exp-panel-text — legacy, sin estilos propios */
 
 /* ══════════════════════════════════════════════════
    RESPONSIVE
@@ -1608,3 +1603,21 @@ body::after {
 /* Status section: contenido por encima del halo */
 .status-section { position: relative; }
 .status-section > *:not(.halo-respira) { position: relative; z-index: 1; }
+
+/* Track del anillo (300x300, r=120) */
+.rank-ring-bg-epic {
+  fill: none;
+  stroke: rgba(0, 191, 255, 0.10);
+  stroke-width: 24;
+}
+
+#rankRingProgress {
+  transform: rotate(-90deg);
+  transform-origin: 150px 150px;
+}
+
+#rankRingWaves,
+#rankRingBubbles {
+  transform: rotate(-90deg);
+  transform-origin: 150px 150px;
+}

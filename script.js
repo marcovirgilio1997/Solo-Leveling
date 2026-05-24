@@ -210,7 +210,9 @@ function updateRankRing(expTotal) {
   const progress = rango === 'S' ? 100 : nxt > cur ? ((expTotal - cur) / (nxt - cur)) * 100 : 0;
   const clamped = Math.min(Math.max(progress, 0), 100);
 
-  const radius = 118;
+  const radius = 120;
+  const cxCenter = 150;
+  const cyCenter = 150;
   const circumference = 2 * Math.PI * radius;
 
   if (ring) {
@@ -222,8 +224,8 @@ function updateRankRing(expTotal) {
   if (tip) {
     const angleDeg = (clamped / 100) * 360 - 90;
     const angleRad = angleDeg * Math.PI / 180;
-    const cx = 140 + radius * Math.cos(angleRad);
-    const cy = 140 + radius * Math.sin(angleRad);
+    const cx = cxCenter + radius * Math.cos(angleRad);
+    const cy = cyCenter + radius * Math.sin(angleRad);
     tip.setAttribute('cx', cx);
     tip.setAttribute('cy', cy);
     tip.style.opacity = clamped > 1 ? 1 : 0;
