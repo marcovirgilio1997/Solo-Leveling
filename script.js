@@ -378,6 +378,7 @@ function updateUI() {
 
   updateRankRing(expTotal);
   renderCalendar();
+  renderSysLog();
 }
 
 function renderCalendar() {
@@ -805,6 +806,17 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('historialModal').style.display = 'none';
   });
 
+  document.getElementById('btnStats')?.addEventListener('click', () => {
+    document.getElementById('statsModal').style.display = 'flex';
+  });
+  document.getElementById('btnCerrarStats')?.addEventListener('click', () => {
+    document.getElementById('statsModal').style.display = 'none';
+  });
+  document.getElementById('statsModal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('statsModal'))
+      document.getElementById('statsModal').style.display = 'none';
+  });
+
   document.getElementById('btnVerMision')?.addEventListener('click', mostrarEpicModal);
 
   document.getElementById('bonusEpicModal')?.addEventListener('click', (e) => {
@@ -825,3 +837,83 @@ document.addEventListener('DOMContentLoaded', () => {
   checkBonusStatus();
   setTimeout(mostrarBonusModal, 1500);
 });
+
+// ============================================================
+// REGISTRO DEL SISTEMA (terminal de eventos hoy + ayer)
+// ============================================================
+function generarEventosSistema() {
+  const todayStr = getTodayStr();
+  const ayer = new Date();
+  ayer.setDate(ayer.getDate() - 1);
+  const ayerStr = dateToStr(ayer);
+
+  const eventos = [];
+
+  function eventosDelDia(fechaStr, label) {
+    const d = misionesCache[fechaStr];
+    if (!d) return;
+    const count = (d.nutricion?1:0) + (d.entrenamiento?1:0) + (d.suplementos?1:0);
+
+    if (d.nutricion)     eventos.push({ t: label, txt: `+150 EXP — Nutrición completada`, cls: 'sl-pos' });
+    if (d.entrenamiento) eventos.push({ t: label, txt: `+150 EXP — Entrenamiento completado`, cls: 'sl-pos' });
+    if (d.suplementos)   eventos.push({ t: label, txt: `+75 EXP — Suplementos completado`, cls: 'sl-pos' });
+    if (count === 3)     eventos.push({ t: label, txt: `+100 EXP — DESPEJE TOTAL ✦`, cls: 'sl-gold' });
+    if (d.bonusMission)  eventos.push({ t: label, txt: `+100 EXP — Misión Bonus completada ⚡`, cls: 'sl-gold' });
+    if (d.bonusRejected) eventos.push({ t: label, txt: `-50 EXP — Bonus rechazada`, cls: 'sl-neg' });
+
+    const esHoy = fechaStr === todayStr;
+    if (!esHoy && count === 0) eventos.push({ t: label, txt: `-75 EXP — Día sin misiones`, cls: 'sl-neg' });
+    if (!esHoy && count === 1) eventos.push({ t: label, txt: `-25 EXP — Solo 1 misión`, cls: 'sl-neg' });
+  }
+
+  eventosDelDia(ayerStr, 'AYER');
+  eventosDelDia(todayStr, 'HOY');
+
+  return eventos;
+}
+
+function renderSysLog() {
+  const container = document.getElementById('syslogLines');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const eventos = generarEventosSistema();
+  if (eventos.length === 0) {
+    container.innerHTML = '<div class="syslog-empty">> Sin actividad registrada</div>';
+    return;
+  }
+
+  let lineIdx = 0;
+
+  function escribirSiguiente() {
+    if (lineIdx >= eventos.length) return;
+    const ev = eventos[lineIdx];
+    const line = document.createElement('div');
+    line.className = 'syslog-line typing';
+    container.appendChild(line);
+
+    const fullText = `> [${ev.t}] ${ev.txt}`;
+    let charIdx = 0;
+
+    function escribirChar() {
+      if (charIdx <= fullText.length) {
+        const partial = fullText.slice(0, charIdx);
+        const m = partial.match(/^(> \[[^\]]*\] )(.*)$/);
+        if (m) {
+          line.innerHTML = `<span class="sl-time">${m[1]}</span><span class="${ev.cls}">${m[2]}</span>`;
+        } else {
+          line.textContent = partial;
+        }
+        charIdx++;
+        setTimeout(escribirChar, 18);
+      } else {
+        line.classList.remove('typing');
+        lineIdx++;
+        setTimeout(escribirSiguiente, 120);
+      }
+    }
+    escribirChar();
+  }
+
+  escribirSiguiente();
+}

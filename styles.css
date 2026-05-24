@@ -1459,6 +1459,101 @@ body::after {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ============= REGISTRO DEL SISTEMA ============= */
+.syslog-panel {
+  margin: 24px 16px;
+  border: 1px solid rgba(0, 191, 255, 0.25);
+  background: rgba(5, 13, 26, 0.6);
+  position: relative;
+}
+.syslog-screen {
+  position: relative;
+  padding: 18px 20px;
+  min-height: 140px;
+  background:
+    linear-gradient(180deg, rgba(0,30,60,0.4), rgba(0,10,20,0.6)),
+    repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(0,191,255,0.025) 2px, rgba(0,191,255,0.025) 3px);
+  overflow: hidden;
+  font-family: 'Rajdhani', 'Courier New', monospace;
+}
+.syslog-scanline {
+  position: absolute; left: 0; right: 0; top: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0,191,255,0.8), transparent);
+  animation: syslogScan 4s linear infinite;
+  pointer-events: none;
+}
+@keyframes syslogScan {
+  0%   { transform: translateY(0); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(140px); opacity: 0; }
+}
+.syslog-lines { position: relative; z-index: 1; }
+.syslog-line {
+  display: block;
+  color: #7FD8FF;
+  font-size: 0.95em;
+  letter-spacing: 0.5px;
+  padding: 3px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: 2px solid transparent;
+}
+.syslog-line.typing {
+  border-right-color: #00FFFF;
+  animation: syslogCaret 0.6s steps(1) infinite;
+}
+@keyframes syslogCaret {
+  50% { border-right-color: transparent; }
+}
+.syslog-line .sl-time   { color: #4A8FB8; margin-right: 8px; }
+.syslog-line .sl-tag    { color: #00FFFF; text-shadow: 0 0 4px rgba(0,255,255,0.5); }
+.syslog-line .sl-pos    { color: #00FF88; text-shadow: 0 0 4px rgba(0,255,136,0.4); }
+.syslog-line .sl-neg    { color: #FF5577; text-shadow: 0 0 4px rgba(255,85,119,0.4); }
+.syslog-line .sl-gold   { color: #FFD700; text-shadow: 0 0 4px rgba(255,215,0,0.5); }
+.syslog-empty {
+  color: #4A6680;
+  font-style: italic;
+  text-align: center;
+  padding: 30px 0;
+}
+
+/* ============= STATS MODAL ============= */
+.stats-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0, 5, 15, 0.92);
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(6px);
+}
+.stats-modal-content {
+  position: relative;
+  width: min(560px, 92vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: linear-gradient(180deg, rgba(5,15,30,0.98), rgba(0,8,20,0.98));
+  border: 1px solid rgba(0,191,255,0.4);
+  box-shadow: 0 0 40px rgba(0,191,255,0.3);
+  padding: 24px;
+}
+.stats-modal-header {
+  text-align: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1em;
+  letter-spacing: 3px;
+  color: #00FFFF;
+  text-shadow: 0 0 10px rgba(0,255,255,0.6);
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid rgba(0,191,255,0.3);
+}
+.stats-close {
+  position: absolute; top: 12px; right: 14px;
+  background: none; border: none;
+  color: #00BFFF; font-size: 1.4em; cursor: pointer;
+  text-shadow: 0 0 6px currentColor;
+}
+.stats-trigger-btn { color: #00BFFF; }
+
 .cal-bonus-mark {
   position: absolute;
   top: 2px;
