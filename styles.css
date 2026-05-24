@@ -1618,3 +1618,54 @@ body::after {
 .rank-ring-card-epic::after {
   display: none !important;
 }
+
+/* ============= UNIFICAR PANELES (Registro/Misiones/Calendario) ============= */
+
+/* Wrapper común para los 3 paneles */
+.syslog-panel,
+.missions-panel,
+.panel {
+  margin: 18px 16px !important;
+  border: 1px solid rgba(0, 191, 255, 0.25) !important;
+  background: rgba(5, 13, 26, 0.6) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 2px;
+}
+
+/* Header común a los 3 */
+.syslog-panel .panel-header,
+.missions-panel .panel-header,
+.panel .panel-header {
+  margin: 0 !important;
+  padding: 14px 16px !important;
+  border-bottom: 1px solid rgba(0, 191, 255, 0.15) !important;
+  background: rgba(0, 30, 60, 0.25) !important;
+}
+
+/* Sacar las líneas decorativas viejas del panel-header (las del ::before/::after) */
+.syslog-panel .panel-header::before,
+.syslog-panel .panel-header::after,
+.missions-panel .panel-header::before,
+.missions-panel .panel-header::after,
+.panel .panel-header::before,
+.panel .panel-header::after {
+  display: none !important;
+}
+
+/* Eliminar la línea de escaneo del registro */
+.syslog-scanline {
+  display: none !important;
+}
+
+/* Ajustes internos para que respiren bien */
+.syslog-screen {
+  background: transparent !important;
+  padding: 16px 18px !important;
+}
+
+.missions-list {
+  padding: 14px 14px 16px !important;
+}
+
+/* El calendario tenía padding propio en los hijos, lo dejamos */
