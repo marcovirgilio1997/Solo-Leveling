@@ -1621,3 +1621,18 @@ body::after {
   transform: rotate(-90deg);
   transform-origin: 150px 150px;
 }
+
+/* Forzar tamaño visual del anillo (que no estire el layout) */
+.rank-ring-epic {
+  width: 260px;
+  height: 260px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Track más oscuro */
+.rank-ring-bg-epic {
+  fill: none;
+  stroke: rgba(0, 191, 255, 0.10);
+  stroke-width: 28;
+}
