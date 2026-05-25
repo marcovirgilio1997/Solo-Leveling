@@ -68,19 +68,20 @@
                                 </feMerge>
                             </filter>
 
+                            <linearGradient id="trackFluidGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="rgba(0,40,80,0.4)"/>
+                                <stop offset="100%" stop-color="rgba(0,80,140,0.3)"/>
+                            </linearGradient>
+
                             <mask id="ringMaskAQ">
                                 <rect width="320" height="320" fill="black"/>
                                 <circle cx="160" cy="160" r="128" fill="none" stroke="white" stroke-width="30"/>
                             </mask>
                         </defs>
 
-                        <circle cx="160" cy="160" r="128" class="rank-ring-bg-epic"/>
-
                         <circle cx="160" cy="160" r="128" fill="none"
-                            stroke="rgba(0,191,255,0.08)"
-                            stroke-width="30"
-                            stroke-dasharray="2 6"
-                            style="opacity:0.5;"/>
+                            stroke="url(#trackFluidGradient)"
+                            stroke-width="30"/>
 
                         <circle cx="160" cy="160" r="128" fill="none"
                             id="rankRingProgress"
