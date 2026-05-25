@@ -1704,3 +1704,14 @@ body::after {
 #rankRingBubbles {
   transform-origin: 160px 160px !important;
 }
+
+/* Track más visible — define el canal completo */
+.rank-ring-bg-epic {
+  stroke: rgba(0, 191, 255, 0.18) !important;
+  stroke-width: 30 !important;
+}
+
+/* Track adicional con líneas internas para dar sensación de "canal vacío" */
+#rankRingProgress {
+  filter: drop-shadow(0 0 8px rgba(0,191,255,0.7)) drop-shadow(0 0 18px rgba(0,191,255,0.4)) !important;
+}
