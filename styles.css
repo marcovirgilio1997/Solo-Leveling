@@ -1669,3 +1669,38 @@ body::after {
 }
 
 /* El calendario tenía padding propio en los hijos, lo dejamos */
+
+/* ============= ANILLO v2 — stroke grueso + tip con doble glow ============= */
+
+/* Anillo más grueso */
+.rank-ring-bg-epic {
+  stroke-width: 30 !important;
+}
+
+/* Tip más grande con doble glow */
+.ring-tip {
+  fill: #ffffff;
+  filter: drop-shadow(0 0 12px #00f5ff) drop-shadow(0 0 24px #00ccff) drop-shadow(0 0 40px rgba(0,191,255,0.6));
+  transition: cx 0.8s cubic-bezier(0.4, 0, 0.2, 1), cy 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#rankRingTipHalo {
+  transition: cx 0.8s cubic-bezier(0.4, 0, 0.2, 1), cy 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Anillo respira sincronizado con el halo */
+.rank-ring-card-epic {
+  animation: ringBreatheCard 5s ease-in-out infinite;
+}
+@keyframes ringBreatheCard {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.015); }
+}
+
+/* Ajustar transform-origin del progress al nuevo centro 160,160 */
+#rankRingProgress {
+  transform-origin: 160px 160px !important;
+}
+#rankRingBubbles {
+  transform-origin: 160px 160px !important;
+}
