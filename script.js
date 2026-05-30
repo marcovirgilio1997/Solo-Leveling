@@ -402,6 +402,7 @@ function updateUI() {
   updateRankRing(expTotal);
   renderCalendar();
   renderSysLog();
+  renderSistema();
 }
 
 function renderCalendar() {
@@ -939,4 +940,139 @@ function renderSysLog() {
   }
 
   escribirSiguiente();
+}
+
+// ============================================================
+// EL SISTEMA — mentor + quest del día (flavor, sin EXP por ahora)
+// ============================================================
+const SISTEMA_EVAL = {
+  0: [
+    "El día recién empieza y el tablero está en cero. Bien: cero es el lugar desde donde se empuja. Mové la primera ficha, Cazador.",
+    "Todavía no registraste nada hoy. No es una falla, es una invitación. El que arranca ya le ganó al que sigue dudando.",
+    "Cero por ahora. La fuerza no aparece de golpe: se construye desde el primer movimiento. Hacelo y el resto sigue."
+  ],
+  1: [
+    "Una misión adentro. El primer paso siempre es el más caro, y ya lo pagaste. Ahora no te enfríes: seguí.",
+    "Arrancaste. Pequeño, pero real. Convertí ese impulso en las dos que faltan antes de que el día se escape.",
+    "Una hecha. El que mantiene el movimiento nunca se apaga. Vas bien, no pares acá."
+  ],
+  2: [
+    "Dos de tres. Estás a un solo movimiento de la cima de hoy. El último tramo es el que define todo: terminalo.",
+    "Casi. Y 'casi' tiene un filo: usalo para cerrar el día completo. Te falta una sola.",
+    "Dos adentro. Justo la que más te cuesta es la que te vuelve fuerte. Andá a buscarla."
+  ],
+  3: [
+    "Tres de tres. Hoy no fue talento ni suerte: fue voluntad pura, y eso nadie te lo quita. Así se rompe un límite.",
+    "Despeje total. El Cazador de hoy le ganó al de ayer. Grabate esta sensación: es la prueba de que podés.",
+    "Completaste todo. Esto no es el techo, es tu nuevo piso. Desde acá se sube más alto."
+  ]
+};
+const SISTEMA_BONUS_OK = " Y todavía pediste más con la bonus — esa hambre es lo que separa rangos.";
+const SISTEMA_BONUS_NO = " Rechazaste la bonus, y el miedo también deja huella. (-50 EXP)";
+
+const SISTEMA_MAXIMS = [
+  "No naciste fuerte. Mejor: cada gramo de poder que tengas, lo vas a haber ganado vos.",
+  "El dolor de la disciplina pesa gramos. El de la rendición pesa toneladas.",
+  "No subas de rango para que te vean. Subí hasta no necesitar que nadie te vea.",
+  "Los días que no querés entrenar son los que más te cambian.",
+  "La constancia no es glamorosa. Por eso casi nadie la sostiene.",
+  "Tu única competencia es el reflejo que te mira mañana a la mañana.",
+  "Caer es física. Levantarse es decisión.",
+  "El que aguanta un día más le gana al que abandona un día antes.",
+  "El límite que sentís hoy es el piso de mañana si no aflojás.",
+  "Nadie va a remar por vos. Y está bien: este barco es tuyo."
+];
+
+const QUEST_POOL = [
+  { t: 'PROTOCOLO DE HIERRO',    d: 'Antes del mediodía, completá tu entrenamiento.',          w: 'El que domina la mañana, domina el día.' },
+  { t: 'AYUNO DE DISTRACCIONES', d: 'Pasá la primera hora del día sin pantallas.',             w: 'La mente afilada se gana en silencio.' },
+  { t: 'CARGA EXTRA',            d: 'Sumá 10 repeticiones por encima de tu rutina habitual.',  w: 'El crecimiento vive justo después de tu límite.' },
+  { t: 'DISCIPLINA NOCTURNA',    d: 'Apagá todo y dormí antes de medianoche.',                 w: 'El que descansa con intención, ataca con energía.' },
+  { t: 'PURGA DEL AZÚCAR',       d: 'Cero azúcar añadido en todas tus comidas de hoy.',        w: 'Lo que comés también entrena tu voluntad.' },
+  { t: 'HIDRATACIÓN TOTAL',      d: 'Tomá al menos 3 litros de agua durante el día.',          w: 'Un cuerpo seco no puede dar batalla.' },
+  { t: 'CAMINO DEL ACERO',       d: 'Acumulá 5 minutos de plancha antes de dormir.',           w: 'La fuerza del núcleo sostiene todo lo demás.' },
+  { t: 'MENTE EN SILENCIO',      d: 'Dedicá 10 minutos a respiración o meditación.',           w: 'El que controla su mente controla su día.' },
+  { t: 'CACERÍA TEMPRANA',       d: 'Iniciá tu primera misión antes de las 9:00.',             w: 'El temprano nunca corre detrás del día.' },
+  { t: 'RESISTENCIA FINAL',      d: 'Cerrá el día con las 3 misiones completas, sin excusas.', w: 'El final es donde se separan los rangos.' },
+  { t: 'CÓDIGO DEL CAZADOR',     d: 'Dejá preparadas tus comidas de mañana.',                  w: 'La victoria se planifica la noche anterior.' },
+  { t: 'AVANCE FORZADO',         d: 'Agregá 15 minutos de cardio a tu jornada.',               w: 'El corazón fuerte aguanta cualquier mazmorra.' },
+  { t: 'VOTO DE CONSTANCIA',     d: 'Registrá actividad hoy sí o sí, sin romper la racha.',    w: 'La cadena se rompe en el eslabón más cómodo.' },
+  { t: 'DOMINIO DEL CUERPO',     d: 'Estirá 10 minutos al despertar.',                         w: 'El cuerpo que se activa temprano responde mejor.' },
+  { t: 'POSTURA DE COMBATE',     d: 'Mantené la espalda recta cada vez que te sientes hoy.',   w: 'La postura es la armadura silenciosa.' },
+  { t: 'RESPIRO DE GUERRERO',    d: 'Hacé 3 pausas de 1 minuto para respirar profundo.',       w: 'Recuperar también es parte del entrenamiento.' },
+  { t: 'LUZ DEL SOL',            d: 'Tomá 15 minutos de sol antes del mediodía.',              w: 'La energía del día empieza por la piel.' },
+  { t: 'AYUNO DE QUEJAS',        d: 'Pasá el día entero sin quejarte una sola vez.',           w: 'La mente del cazador no gasta fuerza en lamentos.' },
+  { t: 'GOLPE MATINAL',          d: 'Hacé 30 sentadillas apenas te levantes.',                 w: 'El primer esfuerzo marca el tono de todo.' },
+  { t: 'ORDEN DEL TERRITORIO',   d: 'Ordená tu espacio de entrenamiento o trabajo.',           w: 'El caos afuera se vuelve caos adentro.' },
+  { t: 'PASO LARGO',             d: 'Caminá 8.000 pasos hoy.',                                 w: 'El movimiento constante derrota al sedentarismo.' },
+  { t: 'COMIDA LIMPIA',          d: 'Una comida del día 100% sin ultraprocesados.',            w: 'Cada plato es una decisión sobre quién querés ser.' },
+  { t: 'FOCO ABSOLUTO',          d: 'Trabajá 25 minutos sin tocar el teléfono.',               w: 'La concentración es un músculo que casi nadie ejercita.' },
+  { t: 'FUERZA DE AGARRE',       d: 'Hacé una serie máxima de flexiones.',                     w: 'Hasta donde podés es donde empieza el progreso.' },
+  { t: 'GRATITUD DEL CAZADOR',   d: 'Anotá 3 cosas que lograste o agradecés hoy.',             w: 'El que reconoce su avance encuentra fuerza para el próximo.' },
+  { t: 'CIERRE PERFECTO',        d: 'Revisá tus misiones antes de dormir y planeá mañana.',    w: 'El día termina cuando preparás el siguiente.' }
+];
+
+function sistemaSeedIndex(arr, salt) {
+  const base = getTodayStr() + (salt || '');
+  let hash = 0;
+  for (let i = 0; i < base.length; i++) hash = (hash * 31 + base.charCodeAt(i)) >>> 0;
+  return hash % arr.length;
+}
+function getQuestDelDia()  { return QUEST_POOL[sistemaSeedIndex(QUEST_POOL, 'quest')]; }
+function getMaximaDelDia() { return SISTEMA_MAXIMS[sistemaSeedIndex(SISTEMA_MAXIMS, 'maxim')]; }
+
+function sistemaEvalTexto() {
+  const data = getTodayMissionData();
+  const done = (data.nutricion ? 1 : 0) + (data.entrenamiento ? 1 : 0) + (data.suplementos ? 1 : 0);
+  const pool = SISTEMA_EVAL[done];
+  let txt = pool[sistemaSeedIndex(pool, 'eval' + done)];
+  if (data.bonusMission) txt += SISTEMA_BONUS_OK;
+  else if (data.bonusRejected) txt += SISTEMA_BONUS_NO;
+  return txt;
+}
+
+function sistemaQuestHTML() {
+  const q = getQuestDelDia();
+  const sword = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/></svg>';
+  return '<div class="sistema-div"></div>' +
+    '<div class="sistema-quest-label">' + sword + 'QUEST DEL DÍA</div>' +
+    '<div class="sistema-quest-title">' + q.t + '</div>' +
+    '<div class="sistema-quest-desc">' + q.d + '</div>' +
+    '<div class="sistema-quest-why">' + q.w + '</div>';
+}
+
+let sistemaPrimerRender = true;
+function renderSistema() {
+  const cont = document.getElementById('sistemaContent');
+  if (!cont) return;
+  const evalTxt = sistemaEvalTexto();
+  const questHTML = sistemaQuestHTML();
+  const maximHTML = '<div class="sistema-maxim-text">"' + getMaximaDelDia() + '"</div>';
+
+  if (sistemaPrimerRender) {
+    sistemaPrimerRender = false;
+    cont.innerHTML =
+      '<div class="sistema-eval" id="sistemaEval"></div>' +
+      '<div class="sistema-quest sistema-reveal" id="sistemaQuest">' + questHTML + '</div>' +
+      '<div class="sistema-maxim sistema-reveal" id="sistemaMaxim">' + maximHTML + '</div>';
+    const evalEl = document.getElementById('sistemaEval');
+    let i = 0;
+    evalEl.classList.add('sistema-caret');
+    const t = setInterval(() => {
+      evalEl.textContent = evalTxt.slice(0, ++i);
+      if (i >= evalTxt.length) {
+        clearInterval(t);
+        evalEl.classList.remove('sistema-caret');
+        const q1 = document.getElementById('sistemaQuest');
+        const m1 = document.getElementById('sistemaMaxim');
+        if (q1) setTimeout(() => q1.classList.add('sistema-shown'), 100);
+        if (m1) setTimeout(() => m1.classList.add('sistema-shown'), 340);
+      }
+    }, 16);
+  } else {
+    cont.innerHTML =
+      '<div class="sistema-eval">' + evalTxt + '</div>' +
+      '<div class="sistema-quest sistema-reveal sistema-shown">' + questHTML + '</div>' +
+      '<div class="sistema-maxim sistema-reveal sistema-shown">' + maximHTML + '</div>';
+  }
 }
