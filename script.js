@@ -947,28 +947,90 @@ function renderSysLog() {
 // ============================================================
 const SISTEMA_EVAL = {
   0: [
+    "Cero. Pero el más fuerte del mundo también empezó así un día.",
     "El tablero está en cero. Mové la primera ficha, Cazador.",
-    "Todavía nada hoy. El que arranca ya le ganó al que duda.",
-    "Cero por ahora. La fuerza se construye desde el primer movimiento."
+    "Nadie va a hacerlo por vos. Bien: nadie lo haría mejor.",
+    "El cero no pesa. Lo que pesa es quedarse mirándolo.",
+    "Levantate. El piso es solo el lugar desde donde se empuja.",
+    "Nadie nace fuerte. Se elige, una mañana a la vez.",
+    "El primer movimiento es el más caro y el que más vale.",
+    "Hoy el límite te mira de frente. Que parpadee él primero.",
+    "No esperes ganas. Tené disciplina, y las ganas te alcanzan.",
+    "El que arranca cansado y avanza igual ya ganó algo hoy.",
+    "Cero es una hoja en blanco. Escribí algo de lo que estar orgulloso.",
+    "Despertá. La fuerza no viene a buscarte: vas vos.",
+    "Todavía nada, y está bien. El que empieza ya le ganó al que duda.",
+    "Hoy elegís quién sos. Empezá y demostralo."
   ],
   1: [
-    "Una adentro. No te enfríes: seguí mientras tengas el impulso.",
-    "El primer paso ya está pago. Ahora no aflojes.",
-    "Una hecha. El que mantiene el movimiento no se apaga."
+    "Una adentro. Recién empezás a despertar tu poder.",
+    "Un paso, y ya sos más fuerte que el que dudó en darlo.",
+    "Una hecha. El que mantiene el movimiento no se apaga.",
+    "Encendiste el motor. Ahora no lo dejes enfriar.",
+    "Pequeño, pero tuyo. Así se construye todo lo grande.",
+    "La primera rompe el hielo. Las que siguen vienen más fáciles.",
+    "Ya estás en movimiento. Frenar ahora sería traicionarte.",
+    "Una menos. El hambre de más es lo que te lleva lejos.",
+    "Diste el primer golpe. No sueltes el ritmo.",
+    "Arrancaste cuando era cómodo no hacerlo. Eso ya te define.",
+    "Una hecha, y el día todavía es tuyo. Andá por la segunda.",
+    "El que empieza está adelante del que solo lo piensa.",
+    "Sentiste lo difícil que era arrancar. Ahora sabés que podés.",
+    "Primer eslabón puesto. La cadena se arma sin soltar."
   ],
   2: [
-    "Dos de tres. Superá tu límite ahora mismo y cerrá el día.",
-    "Te falta la que más cuesta. Ese miedo es la señal de avanzar.",
-    "Casi. El último tramo define todo: andá a buscarlo."
+    "Dos de tres. Superá tu límite ahora mismo.",
+    "Te falta la que más cuesta. Justo ahí se forja el orgullo.",
+    "Casi. El que llega hasta acá no se rinde en el último golpe.",
+    "Dos adentro. El último tramo es donde se separan los rangos.",
+    "Estás a un movimiento de ganarle al día. No aflojes.",
+    "El miedo a la última es la señal de que vale la pena.",
+    "Llegaste lejos para frenar acá. Cerralo.",
+    "La tercera es la prueba. Superala y demostrate qué sos.",
+    "Dos no es nada hasta que sea tres. Terminá lo que empezaste.",
+    "Cuando duele un poco más, ahí está el crecimiento. Empujá.",
+    "El orgullo no se grita: se gana cerrando el día completo.",
+    "Una sola te separa de la cima de hoy. Subila.",
+    "El que rompe su propio techo no le teme a nadie.",
+    "Falta el golpe final. Dalo con todo, Cazador."
   ],
   3: [
-    "Tres de tres. No fue suerte: fue voluntad. Así se rompe un límite.",
-    "Despeje total. El de hoy le ganó al de ayer.",
-    "Completaste todo. Esto no es el techo: es tu nuevo piso."
+    "Tres de tres. Hoy te volviste alguien que ayer no podías mirar de frente.",
+    "Despeje total. Que el universo entero se entere de lo que sos.",
+    "Completaste todo. No fue suerte: fue voluntad.",
+    "Tres de tres. Esto no es el techo: es tu nuevo piso.",
+    "Le ganaste al de ayer. Mañana otra vez. Hoy, disfrutá.",
+    "Despeje total. El que entrena en silencio brilla sin pedir permiso.",
+    "Hoy fuiste imparable. Recordá esto cuando dudes.",
+    "Tres de tres. Así se construye un rango que nadie regala.",
+    "Cumpliste todo. El orgullo de hoy es combustible para mañana.",
+    "Día despejado. Sos la prueba de que la constancia gana.",
+    "Tres de tres. El Cazador que querías ser está naciendo.",
+    "Lo lograste entero. No te conformes: apuntá más alto.",
+    "Despeje total. Hoy elegiste ser fuerte, y se nota.",
+    "Día perfecto. Que se vuelva costumbre, no excepción."
   ]
 };
-const SISTEMA_BONUS_OK = " Y todavía pediste más con la bonus — esa hambre es lo que separa rangos.";
-const SISTEMA_BONUS_NO = " Rechazaste la bonus, y el miedo también deja huella. (-50 EXP)";
+const SISTEMA_BONUS_OK = [
+  " Y todavía pediste más con la bonus: esa hambre separa rangos.",
+  " Hiciste la bonus también. El que busca más nunca se estanca.",
+  " Sumaste la bonus. Así piensa el que apunta a la cima.",
+  " No te alcanzó con cumplir: querés superarte. Bonus incluida.",
+  " Y encima la bonus. Ese extra es lo que te vuelve distinto.",
+  " Bonus hecha. El hambre de más es la marca de los grandes.",
+  " Pediste más con la bonus. El límite te queda chico.",
+  " Bonus completada. El que da el extra hoy domina mañana."
+];
+const SISTEMA_BONUS_NO = [
+  " Rechazaste la bonus, y el miedo también deja huella. (-50 EXP)",
+  " Esquivaste la bonus. La próxima, animate al extra. (-50 EXP)",
+  " Dijiste que no a la bonus. El Sistema lo registra. (-50 EXP)",
+  " Sin bonus hoy. El que evita el desafío también elige. (-50 EXP)",
+  " Rechazaste el extra. Mañana tenés revancha. (-50 EXP)",
+  " Bonus rechazada. La comodidad cuesta más de lo que parece. (-50 EXP)",
+  " No tomaste la bonus. La fuerza está del otro lado del miedo. (-50 EXP)",
+  " Bonus esquivada. El Sistema no olvida, pero perdona si volvés. (-50 EXP)"
+];
 
 const SISTEMA_MAXIMS = [
   "No naciste fuerte. Mejor: cada gramo de poder que tengas, lo vas a haber ganado vos.",
@@ -1026,8 +1088,8 @@ function sistemaEvalTexto() {
   const done = (data.nutricion ? 1 : 0) + (data.entrenamiento ? 1 : 0) + (data.suplementos ? 1 : 0);
   const pool = SISTEMA_EVAL[done];
   let txt = pool[sistemaSeedIndex(pool, 'eval' + done)];
-  if (data.bonusMission) txt += SISTEMA_BONUS_OK;
-  else if (data.bonusRejected) txt += SISTEMA_BONUS_NO;
+  if (data.bonusMission) txt += SISTEMA_BONUS_OK[sistemaSeedIndex(SISTEMA_BONUS_OK, 'bok')];
+  else if (data.bonusRejected) txt += SISTEMA_BONUS_NO[sistemaSeedIndex(SISTEMA_BONUS_NO, 'bno')];
   return txt;
 }
 
