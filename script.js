@@ -947,24 +947,24 @@ function renderSysLog() {
 // ============================================================
 const SISTEMA_EVAL = {
   0: [
-    "El día recién empieza y el tablero está en cero. Bien: cero es el lugar desde donde se empuja. Mové la primera ficha, Cazador.",
-    "Todavía no registraste nada hoy. No es una falla, es una invitación. El que arranca ya le ganó al que sigue dudando.",
-    "Cero por ahora. La fuerza no aparece de golpe: se construye desde el primer movimiento. Hacelo y el resto sigue."
+    "El tablero está en cero. Mové la primera ficha, Cazador.",
+    "Todavía nada hoy. El que arranca ya le ganó al que duda.",
+    "Cero por ahora. La fuerza se construye desde el primer movimiento."
   ],
   1: [
-    "Una misión adentro. El primer paso siempre es el más caro, y ya lo pagaste. Ahora no te enfríes: seguí.",
-    "Arrancaste. Pequeño, pero real. Convertí ese impulso en las dos que faltan antes de que el día se escape.",
-    "Una hecha. El que mantiene el movimiento nunca se apaga. Vas bien, no pares acá."
+    "Una adentro. No te enfríes: seguí mientras tengas el impulso.",
+    "El primer paso ya está pago. Ahora no aflojes.",
+    "Una hecha. El que mantiene el movimiento no se apaga."
   ],
   2: [
-    "Dos de tres. Estás a un solo movimiento de la cima de hoy. El último tramo es el que define todo: terminalo.",
-    "Casi. Y 'casi' tiene un filo: usalo para cerrar el día completo. Te falta una sola.",
-    "Dos adentro. Justo la que más te cuesta es la que te vuelve fuerte. Andá a buscarla."
+    "Dos de tres. Superá tu límite ahora mismo y cerrá el día.",
+    "Te falta la que más cuesta. Ese miedo es la señal de avanzar.",
+    "Casi. El último tramo define todo: andá a buscarlo."
   ],
   3: [
-    "Tres de tres. Hoy no fue talento ni suerte: fue voluntad pura, y eso nadie te lo quita. Así se rompe un límite.",
-    "Despeje total. El Cazador de hoy le ganó al de ayer. Grabate esta sensación: es la prueba de que podés.",
-    "Completaste todo. Esto no es el techo, es tu nuevo piso. Desde acá se sube más alto."
+    "Tres de tres. No fue suerte: fue voluntad. Así se rompe un límite.",
+    "Despeje total. El de hoy le ganó al de ayer.",
+    "Completaste todo. Esto no es el techo: es tu nuevo piso."
   ]
 };
 const SISTEMA_BONUS_OK = " Y todavía pediste más con la bonus — esa hambre es lo que separa rangos.";
@@ -1037,8 +1037,7 @@ function sistemaQuestHTML() {
   return '<div class="sistema-div"></div>' +
     '<div class="sistema-quest-label">' + sword + 'QUEST DEL DÍA</div>' +
     '<div class="sistema-quest-title">' + q.t + '</div>' +
-    '<div class="sistema-quest-desc">' + q.d + '</div>' +
-    '<div class="sistema-quest-why">' + q.w + '</div>';
+    '<div class="sistema-quest-desc">' + q.d + '</div>';
 }
 
 let sistemaPrimerRender = true;
@@ -1047,14 +1046,12 @@ function renderSistema() {
   if (!cont) return;
   const evalTxt = sistemaEvalTexto();
   const questHTML = sistemaQuestHTML();
-  const maximHTML = '<div class="sistema-maxim-text">"' + getMaximaDelDia() + '"</div>';
 
   if (sistemaPrimerRender) {
     sistemaPrimerRender = false;
     cont.innerHTML =
       '<div class="sistema-eval" id="sistemaEval"></div>' +
-      '<div class="sistema-quest sistema-reveal" id="sistemaQuest">' + questHTML + '</div>' +
-      '<div class="sistema-maxim sistema-reveal" id="sistemaMaxim">' + maximHTML + '</div>';
+      '<div class="sistema-quest sistema-reveal" id="sistemaQuest">' + questHTML + '</div>';
     const evalEl = document.getElementById('sistemaEval');
     let i = 0;
     evalEl.classList.add('sistema-caret');
@@ -1064,15 +1061,12 @@ function renderSistema() {
         clearInterval(t);
         evalEl.classList.remove('sistema-caret');
         const q1 = document.getElementById('sistemaQuest');
-        const m1 = document.getElementById('sistemaMaxim');
         if (q1) setTimeout(() => q1.classList.add('sistema-shown'), 100);
-        if (m1) setTimeout(() => m1.classList.add('sistema-shown'), 340);
       }
     }, 16);
   } else {
     cont.innerHTML =
       '<div class="sistema-eval">' + evalTxt + '</div>' +
-      '<div class="sistema-quest sistema-reveal sistema-shown">' + questHTML + '</div>' +
-      '<div class="sistema-maxim sistema-reveal sistema-shown">' + maximHTML + '</div>';
+      '<div class="sistema-quest sistema-reveal sistema-shown">' + questHTML + '</div>';
   }
 }
