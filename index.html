@@ -135,16 +135,19 @@
             </div>
             <div class="sistema-screen">
                 <div id="bonusInline" class="qi-inline" style="display:none;">
-                    <div class="qi-inline-head">
+                    <button id="bonusToggle" class="qi-trigger">
                         <div class="qi-diamond-sm"><span>!</span></div>
-                        <span class="qi-inline-title">QUEST INFO</span>
-                    </div>
-                    <div class="qi-mission" id="bonusModalMision"></div>
-                    <div class="qi-reward">+100 EXP</div>
-                    <div class="qi-warning">El rechazo será penalizado <b>−50 EXP</b></div>
-                    <div class="qi-buttons">
-                        <button id="btnAceptarBonus" class="bonus-btn-accept">ACEPTAR</button>
-                        <button id="btnRechazarBonus" class="bonus-btn-reject">RECHAZAR</button>
+                        <span class="qi-trigger-text">MISIÓN DISPONIBLE</span>
+                        <span class="qi-chevron"></span>
+                    </button>
+                    <div class="qi-detail">
+                        <div class="qi-mission" id="bonusModalMision"></div>
+                        <div class="qi-reward">+100 EXP</div>
+                        <div class="qi-warning">El rechazo será penalizado <b>−50 EXP</b></div>
+                        <div class="qi-buttons">
+                            <button id="btnAceptarBonus" class="bonus-btn-accept">ACEPTAR</button>
+                            <button id="btnRechazarBonus" class="bonus-btn-reject">RECHAZAR</button>
+                        </div>
                     </div>
                 </div>
                 <div class="sistema-quest">

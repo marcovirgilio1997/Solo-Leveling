@@ -504,14 +504,17 @@ function mostrarBonusInline() {
   const box = document.getElementById('bonusInline');
   if (!box) return;
   box.style.display = 'block';
-  requestAnimationFrame(() => requestAnimationFrame(() => box.classList.add('open')));
+  requestAnimationFrame(() => requestAnimationFrame(() => box.classList.add('visible')));
 }
 
 function cerrarBonusInline() {
   const box = document.getElementById('bonusInline');
   if (!box) return;
   box.classList.remove('open');
-  setTimeout(() => { box.style.display = 'none'; }, 750);
+  setTimeout(() => {
+    box.classList.remove('visible');
+    setTimeout(() => { box.style.display = 'none'; }, 500);
+  }, 350);
 }
 
 function aceptarBonus() {
@@ -816,6 +819,9 @@ document.addEventListener('DOMContentLoaded', () => {
   iniciarTimerMision();
   checkBonusStatus();
   renderQuestDia();
+  document.getElementById('bonusToggle')?.addEventListener('click', () => {
+    document.getElementById('bonusInline')?.classList.toggle('open');
+  });
   setTimeout(mostrarBonusInline, 1200);
 });
 
