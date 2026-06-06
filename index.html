@@ -128,13 +128,30 @@
             </div>
         </div>
 
-        <!-- EL SISTEMA (mentor + quest del día) -->
+        <!-- EL SISTEMA -->
         <div class="sistema-panel">
             <div class="panel-header">
                 <span class="panel-title">EL SISTEMA</span>
             </div>
             <div class="sistema-screen">
-                <div id="sistemaContent" class="sistema-content"></div>
+                <div id="bonusInline" class="qi-inline" style="display:none;">
+                    <div class="qi-inline-head">
+                        <div class="qi-diamond-sm"><span>!</span></div>
+                        <span class="qi-inline-title">QUEST INFO</span>
+                    </div>
+                    <div class="qi-mission" id="bonusModalMision"></div>
+                    <div class="qi-reward">+100 EXP</div>
+                    <div class="qi-warning">El rechazo será penalizado <b>−50 EXP</b></div>
+                    <div class="qi-buttons">
+                        <button id="btnAceptarBonus" class="bonus-btn-accept">ACEPTAR</button>
+                        <button id="btnRechazarBonus" class="bonus-btn-reject">RECHAZAR</button>
+                    </div>
+                </div>
+                <div class="sistema-quest">
+                    <div class="sistema-quest-label">QUEST DEL DÍA</div>
+                    <div class="sistema-quest-title" id="questDiaTitle"></div>
+                    <div class="sistema-quest-desc" id="questDiaDesc"></div>
+                </div>
             </div>
         </div>
 
@@ -264,37 +281,6 @@
         <div class="hist-legend">
           <span class="hist-badge-gold">✦</span> Despeje Total &nbsp;&nbsp;
           <span class="hist-badge-bolt">⚡</span> Misión Bonus completada
-        </div>
-      </div>
-    </div>
-
-    <!-- Bonus corner notif -->
-    <div id="bonusCornerNotif" class="bonus-corner-notif">
-      <div class="bonus-corner-inner">
-        <div class="ping-diamond"><span>!</span></div>
-        <div class="bonus-corner-text">PING</div>
-        <button id="btnVerMision" class="bonus-corner-btn">ABRIR</button>
-      </div>
-    </div>
-
-    <!-- Bonus epic modal — QUEST INFO -->
-    <div id="bonusEpicModal" class="bonus-epic-overlay" style="display:none;">
-      <div class="bonus-epic-content">
-        <span class="qi-corner tl"></span><span class="qi-corner tr"></span>
-        <span class="qi-corner bl"></span><span class="qi-corner br"></span>
-        <div class="qi-diamond"><span>!</span></div>
-
-        <div class="qi-title" id="bonusEpicHeader">QUEST INFO</div>
-        <div class="qi-divider"></div>
-
-        <div class="qi-mission" id="bonusModalMision"></div>
-        <div class="qi-reward">+100 EXP</div>
-
-        <div class="qi-warning">El rechazo será penalizado <b>−50 EXP</b></div>
-
-        <div class="bonus-epic-buttons">
-          <button id="btnAceptarBonus" class="bonus-btn-accept">ACEPTAR</button>
-          <button id="btnRechazarBonus" class="bonus-btn-reject">RECHAZAR</button>
         </div>
       </div>
     </div>

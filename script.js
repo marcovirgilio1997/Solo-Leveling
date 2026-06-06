@@ -491,45 +491,27 @@ function getBonusMisionDelDia() {
   return BONUS_POOL[hash % BONUS_POOL.length];
 }
 
-function mostrarBonusModal() {
+function mostrarBonusInline() {
   const hoy = getTodayStr();
   if (localStorage.getItem('bonusDate') === hoy) return;
 
   const mision = getBonusMisionDelDia();
   localStorage.setItem('bonusMision', mision);
 
-  const notif = document.getElementById('bonusCornerNotif');
-  if (notif) {
-    notif.style.display = 'block';
-    requestAnimationFrame(() => requestAnimationFrame(() => notif.classList.add('visible')));
-  }
-}
-
-function mostrarEpicModal() {
-  const mision = localStorage.getItem('bonusMision') || getBonusMisionDelDia();
   const el = document.getElementById('bonusModalMision');
   if (el) el.textContent = mision;
 
-  // Ocultar notificación de esquina
-  const notif = document.getElementById('bonusCornerNotif');
-  if (notif) {
-    notif.classList.remove('visible');
-    setTimeout(() => { notif.style.display = 'none'; }, 500);
-  }
+  const box = document.getElementById('bonusInline');
+  if (!box) return;
+  box.style.display = 'block';
+  requestAnimationFrame(() => requestAnimationFrame(() => box.classList.add('open')));
+}
 
-  // Mostrar modal épico con animación
-  const modal = document.getElementById('bonusEpicModal');
-  if (!modal) return;
-  modal.style.display = 'flex';
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    modal.classList.add('active');
-    // Efecto glitch en el header durante 1 segundo
-    const header = document.getElementById('bonusEpicHeader');
-    if (header) {
-      header.classList.add('glitch');
-      setTimeout(() => header.classList.remove('glitch'), 1000);
-    }
-  }));
+function cerrarBonusInline() {
+  const box = document.getElementById('bonusInline');
+  if (!box) return;
+  box.classList.remove('open');
+  setTimeout(() => { box.style.display = 'none'; }, 750);
 }
 
 function aceptarBonus() {
@@ -537,21 +519,14 @@ function aceptarBonus() {
   localStorage.setItem('bonusDate', hoy);
   localStorage.setItem('bonusStatus', 'aceptada');
 
-  // Destello blanco
   const flash = document.getElementById('bonusFlash');
   if (flash) {
     flash.classList.add('on');
     setTimeout(() => flash.classList.remove('on'), 180);
   }
 
-  // Cerrar modal épico
-  const modal = document.getElementById('bonusEpicModal');
-  if (modal) {
-    modal.classList.remove('active');
-    setTimeout(() => { modal.style.display = 'none'; }, 400);
-  }
+  cerrarBonusInline();
 
-  // Mostrar misión en pantalla principal
   const container = document.getElementById('bonusMissionContainer');
   const texto = document.getElementById('bonusMissionText');
   if (container) container.style.display = 'flex';
@@ -559,12 +534,7 @@ function aceptarBonus() {
 }
 
 async function rechazarBonus() {
-  // Cerrar modal épico
-  const modal = document.getElementById('bonusEpicModal');
-  if (modal) {
-    modal.classList.remove('active');
-    setTimeout(() => { modal.style.display = 'none'; }, 400);
-  }
+  cerrarBonusInline();
 
   const hoy = getTodayStr();
   localStorage.setItem('bonusDate', hoy);
@@ -581,11 +551,10 @@ async function rechazarBonus() {
     bonus_rejected: true
   }, { onConflict: 'fecha' });
 
-  // Mostrar modal cobardía con delay
   setTimeout(() => {
     const coward = document.getElementById('cowardModal');
     if (coward) coward.style.display = 'flex';
-  }, 420);
+  }, 780);
 }
 
 function confirmarCobardia() {
@@ -841,25 +810,13 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('statsModal').style.display = 'none';
   });
 
-  document.getElementById('btnVerMision')?.addEventListener('click', mostrarEpicModal);
-
-  document.getElementById('bonusEpicModal')?.addEventListener('click', (e) => {
-    if (e.target !== document.getElementById('bonusEpicModal')) return;
-    const modal = document.getElementById('bonusEpicModal');
-    modal.classList.remove('active');
-    setTimeout(() => { modal.style.display = 'none'; }, 400);
-    const notif = document.getElementById('bonusCornerNotif');
-    if (notif) {
-      notif.style.display = 'block';
-      requestAnimationFrame(() => requestAnimationFrame(() => notif.classList.add('visible')));
-    }
-  });
   document.getElementById('btnAceptarBonus')?.addEventListener('click', aceptarBonus);
   document.getElementById('btnRechazarBonus')?.addEventListener('click', rechazarBonus);
   document.getElementById('btnConfirmarCobardia')?.addEventListener('click', confirmarCobardia);
   iniciarTimerMision();
   checkBonusStatus();
-  setTimeout(mostrarBonusModal, 1500);
+  renderQuestDia();
+  setTimeout(mostrarBonusInline, 1200);
 });
 
 // ============================================================
@@ -1046,32 +1003,32 @@ const SISTEMA_MAXIMS = [
 ];
 
 const QUEST_POOL = [
-  { t: 'PROTOCOLO DE HIERRO',    d: 'Antes del mediodía, completá tu entrenamiento.',          w: 'El que domina la mañana, domina el día.' },
-  { t: 'AYUNO DE DISTRACCIONES', d: 'Pasá la primera hora del día sin pantallas.',             w: 'La mente afilada se gana en silencio.' },
-  { t: 'CARGA EXTRA',            d: 'Sumá 10 repeticiones por encima de tu rutina habitual.',  w: 'El crecimiento vive justo después de tu límite.' },
-  { t: 'DISCIPLINA NOCTURNA',    d: 'Apagá todo y dormí antes de medianoche.',                 w: 'El que descansa con intención, ataca con energía.' },
-  { t: 'PURGA DEL AZÚCAR',       d: 'Cero azúcar añadido en todas tus comidas de hoy.',        w: 'Lo que comés también entrena tu voluntad.' },
-  { t: 'HIDRATACIÓN TOTAL',      d: 'Tomá al menos 3 litros de agua durante el día.',          w: 'Un cuerpo seco no puede dar batalla.' },
-  { t: 'CAMINO DEL ACERO',       d: 'Acumulá 5 minutos de plancha antes de dormir.',           w: 'La fuerza del núcleo sostiene todo lo demás.' },
-  { t: 'MENTE EN SILENCIO',      d: 'Dedicá 10 minutos a respiración o meditación.',           w: 'El que controla su mente controla su día.' },
-  { t: 'CACERÍA TEMPRANA',       d: 'Iniciá tu primera misión antes de las 9:00.',             w: 'El temprano nunca corre detrás del día.' },
-  { t: 'RESISTENCIA FINAL',      d: 'Cerrá el día con las 3 misiones completas, sin excusas.', w: 'El final es donde se separan los rangos.' },
-  { t: 'CÓDIGO DEL CAZADOR',     d: 'Dejá preparadas tus comidas de mañana.',                  w: 'La victoria se planifica la noche anterior.' },
-  { t: 'AVANCE FORZADO',         d: 'Agregá 15 minutos de cardio a tu jornada.',               w: 'El corazón fuerte aguanta cualquier mazmorra.' },
-  { t: 'VOTO DE CONSTANCIA',     d: 'Registrá actividad hoy sí o sí, sin romper la racha.',    w: 'La cadena se rompe en el eslabón más cómodo.' },
-  { t: 'DOMINIO DEL CUERPO',     d: 'Estirá 10 minutos al despertar.',                         w: 'El cuerpo que se activa temprano responde mejor.' },
-  { t: 'POSTURA DE COMBATE',     d: 'Mantené la espalda recta cada vez que te sientes hoy.',   w: 'La postura es la armadura silenciosa.' },
-  { t: 'RESPIRO DE GUERRERO',    d: 'Hacé 3 pausas de 1 minuto para respirar profundo.',       w: 'Recuperar también es parte del entrenamiento.' },
-  { t: 'LUZ DEL SOL',            d: 'Tomá 15 minutos de sol antes del mediodía.',              w: 'La energía del día empieza por la piel.' },
-  { t: 'AYUNO DE QUEJAS',        d: 'Pasá el día entero sin quejarte una sola vez.',           w: 'La mente del cazador no gasta fuerza en lamentos.' },
-  { t: 'GOLPE MATINAL',          d: 'Hacé 30 sentadillas apenas te levantes.',                 w: 'El primer esfuerzo marca el tono de todo.' },
-  { t: 'ORDEN DEL TERRITORIO',   d: 'Ordená tu espacio de entrenamiento o trabajo.',           w: 'El caos afuera se vuelve caos adentro.' },
-  { t: 'PASO LARGO',             d: 'Caminá 8.000 pasos hoy.',                                 w: 'El movimiento constante derrota al sedentarismo.' },
-  { t: 'COMIDA LIMPIA',          d: 'Una comida del día 100% sin ultraprocesados.',            w: 'Cada plato es una decisión sobre quién querés ser.' },
-  { t: 'FOCO ABSOLUTO',          d: 'Trabajá 25 minutos sin tocar el teléfono.',               w: 'La concentración es un músculo que casi nadie ejercita.' },
-  { t: 'FUERZA DE AGARRE',       d: 'Hacé una serie máxima de flexiones.',                     w: 'Hasta donde podés es donde empieza el progreso.' },
-  { t: 'GRATITUD DEL CAZADOR',   d: 'Anotá 3 cosas que lograste o agradecés hoy.',             w: 'El que reconoce su avance encuentra fuerza para el próximo.' },
-  { t: 'CIERRE PERFECTO',        d: 'Revisá tus misiones antes de dormir y planeá mañana.',    w: 'El día termina cuando preparás el siguiente.' }
+  { t: 'PROTOCOLO DE HIERRO',    d: 'Antes del mediodía, completá tu entrenamiento.' },
+  { t: 'AYUNO DE DISTRACCIONES', d: 'Pasá la primera hora del día sin pantallas.' },
+  { t: 'CARGA EXTRA',            d: 'Sumá 10 repeticiones por encima de tu rutina habitual.' },
+  { t: 'DISCIPLINA NOCTURNA',    d: 'Apagá todo y dormí antes de medianoche.' },
+  { t: 'PURGA DEL AZÚCAR',       d: 'Cero azúcar añadido en todas tus comidas de hoy.' },
+  { t: 'HIDRATACIÓN TOTAL',      d: 'Tomá al menos 3 litros de agua durante el día.' },
+  { t: 'CAMINO DEL ACERO',       d: 'Acumulá 5 minutos de plancha antes de dormir.' },
+  { t: 'MENTE EN SILENCIO',      d: 'Dedicá 10 minutos a respiración o meditación.' },
+  { t: 'CACERÍA TEMPRANA',       d: 'Iniciá tu primera misión antes de las 9:00.' },
+  { t: 'RESISTENCIA FINAL',      d: 'Cerrá el día con las 3 misiones completas.' },
+  { t: 'CÓDIGO DEL CAZADOR',     d: 'Dejá preparadas tus comidas de mañana.' },
+  { t: 'AVANCE FORZADO',         d: 'Agregá 15 minutos de cardio a tu jornada.' },
+  { t: 'VOTO DE CONSTANCIA',     d: 'Registrá actividad hoy sí o sí.' },
+  { t: 'DOMINIO DEL CUERPO',     d: 'Estirá 10 minutos al despertar.' },
+  { t: 'POSTURA DE COMBATE',     d: 'Espalda recta cada vez que te sientes hoy.' },
+  { t: 'RESPIRO DE GUERRERO',    d: 'Hacé 3 pausas de 1 minuto para respirar profundo.' },
+  { t: 'LUZ DEL SOL',            d: 'Tomá 15 minutos de sol antes del mediodía.' },
+  { t: 'AYUNO DE QUEJAS',        d: 'Pasá el día entero sin quejarte una sola vez.' },
+  { t: 'GOLPE MATINAL',          d: 'Hacé 30 sentadillas apenas te levantes.' },
+  { t: 'ORDEN DEL TERRITORIO',   d: 'Ordená tu espacio de entrenamiento o trabajo.' },
+  { t: 'PASO LARGO',             d: 'Caminá 8.000 pasos hoy.' },
+  { t: 'COMIDA LIMPIA',          d: 'Una comida del día 100% sin ultraprocesados.' },
+  { t: 'FOCO ABSOLUTO',          d: 'Trabajá 25 minutos sin tocar el teléfono.' },
+  { t: 'FUERZA DE AGARRE',       d: 'Hacé una serie máxima de flexiones.' },
+  { t: 'GRATITUD DEL CAZADOR',   d: 'Anotá 3 cosas que lograste hoy.' },
+  { t: 'CIERRE PERFECTO',        d: 'Revisá tus misiones antes de dormir y planeá mañana.' }
 ];
 
 function sistemaSeedIndex(arr, salt) {
@@ -1131,4 +1088,16 @@ function renderSistema() {
       '<div class="sistema-eval">' + evalTxt + '</div>' +
       '<div class="sistema-quest sistema-reveal sistema-shown">' + questHTML + '</div>';
   }
+}
+
+// ============================================================
+// QUEST DEL DÍA (flavor, fija por fecha)
+// ============================================================
+function renderQuestDia() {
+  const t = document.getElementById('questDiaTitle');
+  const d = document.getElementById('questDiaDesc');
+  if (!t || !d) return;
+  const q = getQuestDelDia();
+  t.textContent = q.t;
+  d.textContent = q.d;
 }
