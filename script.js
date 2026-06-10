@@ -45,7 +45,6 @@ const RANK_NAMES = {
 let calMonth = new Date().getMonth();
 let calYear = new Date().getFullYear();
 
-// Cache global: { 'YYYY-MM-DD': { nutricion, entrenamiento, suplementos, bonusMission } }
 let misionesCache = {};
 
 // ============================================================
@@ -96,11 +95,9 @@ async function guardarMision() {
   const bonusMission = document.getElementById('bonusMissionCheckbox')?.checked || false;
   const fecha = getTodayStr();
 
-  // Actualizar cache local inmediatamente (preservar bonusRejected si ya existía)
   const prev = misionesCache[fecha] || {};
   misionesCache[fecha] = { ...prev, nutricion, entrenamiento, suplementos, bonusMission };
 
-  // Guardar en Supabase (upsert = insert o update si ya existe)
   const { error } = await db.from('missions').upsert({
     fecha,
     nutricion,
@@ -167,9 +164,8 @@ function calcularRacha() {
   const fechaInicio = localStorage.getItem('fechaInicio') || null;
   let racha = 0;
   const hoy = new Date();
-  const todayStr = getTodayStr();
 
-  for (let i = 1; i < 365; i++) {  // empieza en 1, saltea hoy
+  for (let i = 1; i < 365; i++) {
     const d = new Date(hoy);
     d.setDate(hoy.getDate() - i);
     const key = dateToStr(d);
@@ -220,6 +216,7 @@ function updateRankRing(expTotal) {
     const offset = circumference - (clamped / 100) * circumference;
     ring.style.strokeDasharray = `${circumference} ${circumference}`;
     ring.style.strokeDashoffset = `${offset}`;
+    ring.style.transform = 'rotate(-90deg)';
   }
 
   const angleDeg = (clamped / 100) * 360 - 90;
@@ -244,13 +241,11 @@ function openRankSystemModal() {
   const rangoActual = calcularRango(expTotal);
   const currentIdx = RANK_THRESHOLDS.findIndex(r => r.rank === rangoActual);
 
-  // Tabla de rangos
   const rankTable = document.getElementById('rankTable');
   if (rankTable) {
     rankTable.innerHTML = '';
     RANK_THRESHOLDS.forEach((t, idx) => {
       const rank = t.rank;
-      const rc = RANK_COLORS[rank];
       const nxtThreshold = idx < RANK_THRESHOLDS.length - 1 ? RANK_THRESHOLDS[idx + 1].threshold : null;
       let pct;
       if (idx < currentIdx) {
@@ -265,18 +260,13 @@ function openRankSystemModal() {
       const isCurrent = idx === currentIdx;
       const row = document.createElement('div');
       row.className = 'rsm-rank-row' + (isCurrent ? ' rsm-current' : '');
-      row.style.borderLeft = `3px solid ${rc.color}`;
-      row.style.borderTop = `1px solid ${rc.color}22`;
-      row.style.borderRight = `1px solid ${rc.color}22`;
-      row.style.borderBottom = `1px solid ${rc.color}22`;
-      row.style.boxShadow = '';
       row.innerHTML = `
-        <div class="rsm-rank-letter" style="color:#FFFFFF;text-shadow:0 0 20px #FFFFFF, 0 0 40px ${rc.color};">${rank}</div>
+        <div class="rsm-rank-letter">${rank}</div>
         <div class="rsm-rank-info">
-          <div class="rsm-rank-name" style="color:#FFFFFF;">${RANK_NAMES[rank]}</div>
+          <div class="rsm-rank-name">${RANK_NAMES[rank]}</div>
           <div class="rsm-rank-exp">${t.threshold.toLocaleString()} EXP</div>
           <div class="rsm-rank-bar-container">
-            <div class="rsm-rank-bar-fill" style="width:${Math.round(pct)}%;background:${rc.color};box-shadow:0 0 6px ${rc.color};"></div>
+            <div class="rsm-rank-bar-fill" style="width:${Math.round(pct)}%;"></div>
           </div>
         </div>
         ${isCurrent ? '<div class="rsm-current-badge">ACTUAL</div>' : ''}
@@ -285,24 +275,21 @@ function openRankSystemModal() {
     });
   }
 
-  // Mi progreso
   const myProg = document.getElementById('myRankProgress');
   if (myProg) {
     const cur = RANK_THRESHOLDS[currentIdx].threshold;
     const nxt = currentIdx < RANK_THRESHOLDS.length - 1 ? RANK_THRESHOLDS[currentIdx + 1] : null;
-    const rc = RANK_COLORS[rangoActual];
     const pct = nxt ? Math.min(100, ((expTotal - cur) / (nxt.threshold - cur)) * 100) : 100;
     const falta = nxt ? Math.max(0, nxt.threshold - expTotal) : 0;
-    const rcNxt = nxt ? RANK_COLORS[nxt.rank] : rc;
 
     myProg.innerHTML = `
       <div class="rsm-prog-row">
         <span class="rsm-prog-label">EXP TOTAL</span>
-        <span class="rsm-prog-value" style="color:${rc.color};text-shadow:0 0 8px ${rc.color};">${expTotal.toLocaleString()}</span>
+        <span class="rsm-prog-value">${expTotal.toLocaleString()}</span>
       </div>
       <div class="rsm-prog-row">
         <span class="rsm-prog-label">RANGO ACTUAL</span>
-        <span class="rsm-prog-value" style="color:${rc.color};text-shadow:0 0 8px ${rc.color};">${rangoActual} — ${RANK_NAMES[rangoActual]}</span>
+        <span class="rsm-prog-value">${rangoActual} — ${RANK_NAMES[rangoActual]}</span>
       </div>
       ${nxt ? `
       <div class="rsm-prog-row">
@@ -311,24 +298,23 @@ function openRankSystemModal() {
       </div>
       <div class="rsm-prog-row">
         <span class="rsm-prog-label">EXP FALTANTE</span>
-        <span class="rsm-prog-value" style="color:#FF6B6B;">${falta.toLocaleString()} EXP</span>
+        <span class="rsm-prog-value">${falta.toLocaleString()} EXP</span>
       </div>
       <div style="margin-top:6px;">
         <div class="rsm-prog-bar-wrap">
-          <div class="rsm-prog-bar-fill" style="width:${Math.round(pct)}%;background:linear-gradient(90deg,${rc.color},${rcNxt.color});box-shadow:0 0 10px ${rc.color};"></div>
+          <div class="rsm-prog-bar-fill" style="width:${Math.round(pct)}%;"></div>
           <div class="rsm-prog-bar-label">${Math.round(pct)}% HACIA RANGO ${nxt.rank}</div>
         </div>
       </div>
       ` : `
       <div class="rsm-prog-row">
         <span class="rsm-prog-label">ESTADO</span>
-        <span class="rsm-prog-value" style="color:${rc.color};text-shadow:0 0 10px ${rc.color};">RANGO MÁXIMO ALCANZADO ✦</span>
+        <span class="rsm-prog-value">RANGO MÁXIMO ALCANZADO</span>
       </div>
       `}
     `;
   }
 
-  // Cargar fecha de inicio guardada
   const inputFecha = document.getElementById('inputFechaInicio');
   if (inputFecha) inputFecha.value = localStorage.getItem('fechaInicio') || '';
 
@@ -354,25 +340,12 @@ function updateUI() {
   const nxt = idx < RANK_THRESHOLDS.length - 1 ? RANK_THRESHOLDS[idx + 1].threshold : cur;
   const rangeSize = (nxt - cur) || 1;
   const expEnRango = expTotal - cur;
-  const fillPercent = rango === 'S' ? 100 : Math.min(Math.max((expEnRango / rangeSize) * 100, 0), 100);
 
-  const barraExp = document.getElementById('expFill');
   const textoExp = document.getElementById('exp-text');
-  if (barraExp) {
-    barraExp.style.width = `${fillPercent}%`;
-    const tip = barraExp.querySelector('.exp-tip-glow');
-    if (tip) tip.style.display = fillPercent > 1 ? 'block' : 'none';
-  }
   if (textoExp) textoExp.textContent = rango === 'S' ? `${expEnRango} EXP` : `${expEnRango} / ${rangeSize} EXP`;
 
   const anilloTexto = document.getElementById('rango-letra');
-  if (anilloTexto) {
-    anilloTexto.textContent = rango;
-    const rc = RANK_COLORS[rango] || RANK_COLORS['E'];
-    anilloTexto.style.color = '#FFFFFF';
-    anilloTexto.style.webkitTextStroke = '';
-    anilloTexto.style.textShadow = `0 0 20px #FFFFFF, 0 0 40px ${rc.color}, 0 0 80px ${rc.color}66`;
-  }
+  if (anilloTexto) anilloTexto.textContent = rango;
   const anilloTitulo = document.getElementById('rango-titulo');
   if (anilloTitulo) anilloTitulo.textContent = RANK_NAMES[rango] || '';
 
@@ -397,14 +370,16 @@ function updateUI() {
   const countHoy = (data.nutricion ? 1 : 0) + (data.entrenamiento ? 1 : 0) + (data.suplementos ? 1 : 0);
   const expHoy = (data.nutricion ? MISSION_EXP.nutricion : 0) + (data.entrenamiento ? MISSION_EXP.entrenamiento : 0) + (data.suplementos ? MISSION_EXP.suplementos : 0) + (countHoy === 3 ? FULL_CLEAR_BONUS : 0) + (data.bonusMission ? BONUS_MISSION_EXP : 0);
   const recompensa = document.getElementById('recompensa-diaria');
-  if (recompensa) recompensa.textContent = `Recompensa diaria estimada: ${expHoy} EXP`;
+  if (recompensa) recompensa.textContent = `RECOMPENSA ESTIMADA · ${expHoy} EXP`;
 
   updateRankRing(expTotal);
   renderCalendar();
   renderSysLog();
-  renderSistema();
 }
 
+// ============================================================
+// CALENDARIO (nuevo: clases en vez de inline styles)
+// ============================================================
 function renderCalendar() {
   const grid = document.getElementById('cal-grid');
   const title = document.getElementById('cal-title');
@@ -415,6 +390,7 @@ function renderCalendar() {
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const totalDays = new Date(calYear, calMonth + 1, 0).getDate();
   const todayStr = getTodayStr();
+  const today = new Date();
 
   for (let i = 0; i < firstDay; i++) {
     const empty = document.createElement('div');
@@ -427,43 +403,48 @@ function renderCalendar() {
     const key = dateToStr(date);
     const data = misionesCache[key] || null;
     const isToday = key === todayStr;
-    const isPast = date <= new Date();
+    const isFuture = date > today && !isToday;
 
     const cell = document.createElement('div');
     cell.className = 'cal-cell';
     cell.textContent = d;
 
-    if (data) {
+    if (isFuture) {
+      cell.classList.add('cal-future');
+    } else if (data) {
       const count = (data.nutricion ? 1 : 0) + (data.entrenamiento ? 1 : 0) + (data.suplementos ? 1 : 0);
-      if (count === 3) { cell.style.background = '#003300'; cell.style.borderColor = '#00ff00'; }
-      else if (count === 2) { cell.style.background = '#2a2400'; cell.style.borderColor = '#FFD700'; }
-      else if (count === 1) { cell.style.background = '#2a1500'; cell.style.borderColor = '#FF8800'; }
-      else { cell.style.background = '#1a0505'; cell.style.borderColor = '#3a0000'; }
+      const bar = document.createElement('span');
+      bar.className = 'cal-bar';
+      const inner = document.createElement('i');
+      if (count === 0) {
+        cell.classList.add('cal-z');
+        inner.style.width = '100%';
+      } else {
+        inner.style.width = `${Math.round(count / 3 * 100)}%`;
+      }
+      bar.appendChild(inner);
+      cell.appendChild(bar);
       if (data.bonusMission) {
-        cell.style.position = 'relative';
         const mark = document.createElement('span');
         mark.className = 'cal-bonus-mark';
         mark.textContent = '⚡';
         cell.appendChild(mark);
       }
-    } else if (isPast) {
-      cell.style.background = '#1a0505'; cell.style.borderColor = '#3a0000';
-    } else {
-      cell.style.color = '#444'; cell.style.cursor = 'default';
     }
 
-    if (isToday) { cell.style.border = '2px solid #00BFFF'; cell.style.boxShadow = '0 0 8px #00BFFF'; }
+    if (isToday) cell.classList.add('cal-today');
 
     cell.addEventListener('click', () => {
       const detail = document.getElementById('cal-detail');
       if (!detail) return;
+      if (isFuture) { detail.innerHTML = ''; return; }
       if (!data) {
-        detail.innerHTML = `<span style="color:#00BFFF;font-weight:bold">${d} DE ${MONTHS_ES[calMonth]} DE ${calYear}</span><br><span style="color:#666">Sin misiones registradas</span>`;
+        detail.innerHTML = `<span style="color:var(--cyan);font-weight:600;letter-spacing:1px;">${d} DE ${MONTHS_ES[calMonth]} DE ${calYear}</span><br><span style="color:var(--tx-faint);">Sin misiones registradas</span>`;
         return;
       }
-      const icon = v => v ? '<span style="color:#00ff00">✓</span>' : '<span style="color:#ff4444">✗</span>';
-      const bonusLine = data.bonusMission ? '<br><span style="color:#FFD700">⚡ MISIÓN BONUS COMPLETADA</span>' : '';
-      detail.innerHTML = `<span style="color:#00BFFF;font-weight:bold">${d} DE ${MONTHS_ES[calMonth]} DE ${calYear}</span><br>${icon(data.nutricion)} [NUTRICIÓN]<br>${icon(data.entrenamiento)} [ENTRENAMIENTO]<br>${icon(data.suplementos)} [SUPLEMENTOS]${bonusLine}`;
+      const icon = v => v ? '<span style="color:var(--pos);">✓</span>' : '<span style="color:var(--neg);">✗</span>';
+      const bonusLine = data.bonusMission ? '<br><span style="color:var(--cyan);">⚡ MISIÓN BONUS COMPLETADA</span>' : '';
+      detail.innerHTML = `<span style="color:var(--cyan);font-weight:600;letter-spacing:1px;">${d} DE ${MONTHS_ES[calMonth]} DE ${calYear}</span><br>${icon(data.nutricion)} NUTRICIÓN<br>${icon(data.entrenamiento)} ENTRENAMIENTO<br>${icon(data.suplementos)} SUPLEMENTOS${bonusLine}`;
     });
 
     grid.appendChild(cell);
@@ -471,8 +452,6 @@ function renderCalendar() {
 }
 
 // ============================================================
-// INIT
-// ============================================================// ============================================================
 // SISTEMA DE MISIONES BONUS
 // ============================================================
 const BONUS_POOL = [
@@ -485,7 +464,6 @@ const BONUS_POOL = [
 
 function getBonusMisionDelDia() {
   const hoy = getTodayStr();
-  // Usamos la fecha como seed para que sea siempre la misma del día
   let hash = 0;
   for (let i = 0; i < hoy.length; i++) hash += hoy.charCodeAt(i);
   return BONUS_POOL[hash % BONUS_POOL.length];
@@ -576,7 +554,6 @@ function openHistorialModal() {
     .map(([fecha, data]) => ({ date: new Date(fecha + 'T00:00:00'), fecha, data }))
     .sort((a, b) => a.date - b.date);
 
-  // Calcular penalización real por día (incluye racha de 2 días en 0)
   const penaltyMap = {};
   const todayStr = getTodayStr();
   let zeroStreak = 0;
@@ -598,7 +575,6 @@ function openHistorialModal() {
     previousDate = date;
   }
 
-  // Mostrar del más reciente al más antiguo, máx 30
   const display = [...allEntries].sort((a, b) => b.date - a.date).slice(0, 30);
 
   let bestExp = -Infinity, bestDia = null, lastDespeje = null;
@@ -616,23 +592,23 @@ function openHistorialModal() {
 
     const [y, m, d] = fecha.split('-');
     const fechaDisplay = `${d}/${m}/${y}`;
-    const badges = (count === 3 ? ' <span class="hist-badge-gold">✦</span>' : '');
+    const badges = (count === 3 ? ' <span class="hist-badge-gold">◆</span>' : '');
     const bonusCol = data.bonusMission === true
-      ? '<span class="hist-badge-bolt" title="Misión Bonus completada">⚡</span>'
-      : '<span class="hist-badge-bolt-off" title="Bonus no completada">⚡</span>';
-    const expStr   = `<span class="hist-exp">+${expGanada} EXP</span>`;
-    const penStr   = penalty < 0 ? `<span class="hist-neg">${penalty} EXP</span>` : `<span class="hist-neutral">—</span>`;
-    const totalStr = total >= 0 ? `<span class="hist-pos">+${total} EXP</span>` : `<span class="hist-neg">${total} EXP</span>`;
+      ? '<span class="hist-badge-bolt">⚡</span>'
+      : '<span class="hist-badge-bolt-off">⚡</span>';
+    const expStr   = `<span class="hist-exp">+${expGanada}</span>`;
+    const penStr   = penalty < 0 ? `<span class="hist-neg">${penalty}</span>` : `<span class="hist-neutral">—</span>`;
+    const totalStr = total >= 0 ? `<span class="hist-pos">+${total}</span>` : `<span class="hist-neg">${total}</span>`;
 
     const esHoyRow = fecha === todayStr;
     const penDetails = [];
-    if (!esHoyRow && count === 0) penDetails.push('0 misiones: -75 EXP');
-    if (!esHoyRow && count === 1) penDetails.push('1 misión: -25 EXP');
-    if (data.bonusRejected) penDetails.push('Bonus rechazada: -50 EXP');
-    if (penEntry.hadStreakBreak) penDetails.push('Racha 2 días en 0: -200 EXP');
+    if (!esHoyRow && count === 0) penDetails.push('0 misiones: −75');
+    if (!esHoyRow && count === 1) penDetails.push('1 misión: −25');
+    if (data.bonusRejected) penDetails.push('Bonus rechazada: −50');
+    if (penEntry.hadStreakBreak) penDetails.push('Racha 2 días en 0: −200');
     const breakdownStr = penDetails.length > 0 ? penDetails.join(' · ') : 'Sin penalizaciones';
 
-    tableHTML += `<tr class="hist-row" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'table-row' ? 'none' : 'table-row';" style="cursor:pointer;">
+    tableHTML += `<tr class="hist-row" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'table-row' ? 'none' : 'table-row';">
       <td class="hist-fecha">${fechaDisplay}${badges}</td>
       <td class="hist-misiones">${count}/3</td>
       <td style="text-align:center;">${bonusCol}</td>
@@ -640,10 +616,8 @@ function openHistorialModal() {
       <td>${penStr}</td>
       <td>${totalStr}</td>
     </tr>
-    <tr class="hist-detail-row" style="display:none;background:rgba(0,245,255,0.04);">
-      <td colspan="6" style="padding:10px 14px;font-size:0.88em;color:#99AABB;">
-        <strong style="color:#00FFFF;">Desglose:</strong> ${breakdownStr}
-      </td>
+    <tr class="hist-detail-row" style="display:none;">
+      <td colspan="6"><strong>Desglose:</strong> ${breakdownStr}</td>
     </tr>`;
   }
 
@@ -652,10 +626,10 @@ function openHistorialModal() {
   const bonusCount = display.filter(({ data }) => data.bonusMission === true).length;
 
   document.getElementById('histExpTotal').textContent = `${expTotal.toLocaleString()} EXP`;
-  document.getElementById('histMejorDia').textContent = bestDia ? `${fmtFecha(bestDia)}  (+${bestExp} EXP)` : '—';
+  document.getElementById('histMejorDia').textContent = bestDia ? `${fmtFecha(bestDia)}  (+${bestExp})` : '—';
   document.getElementById('histUltimaDespeje').textContent = fmtFecha(lastDespeje);
   document.getElementById('histBonusCount').textContent = bonusCount;
-  document.getElementById('histTableBody').innerHTML = tableHTML || '<tr><td colspan="6" style="text-align:center;color:#334455;padding:20px;">Sin registros</td></tr>';
+  document.getElementById('histTableBody').innerHTML = tableHTML || '<tr><td colspan="6" style="text-align:center;color:var(--tx-faint);padding:20px;">Sin registros</td></tr>';
 
   document.getElementById('historialModal').style.display = 'flex';
 }
@@ -674,7 +648,7 @@ function iniciarTimerMision() {
     const restante = fin.getTime() - Date.now();
 
     if (restante <= 0) {
-      el.innerHTML = `<span class="timer-completada">⚔ MISIÓN COMPLETADA ⚔</span>`;
+      el.innerHTML = `<span class="timer-completada">MISIÓN COMPLETADA</span>`;
       return;
     }
 
@@ -684,10 +658,10 @@ function iniciarTimerMision() {
     const s = Math.floor((restante % 60000) / 1000);
 
     el.innerHTML =
-      `<span class="timer-block"><span class="timer-num">${String(d).padStart(3,'0')}</span><span class="timer-unit">D</span></span>` +
-      `<span class="timer-block"><span class="timer-num">${String(h).padStart(2,'0')}</span><span class="timer-unit">H</span></span>` +
-      `<span class="timer-block"><span class="timer-num">${String(m).padStart(2,'0')}</span><span class="timer-unit">M</span></span>` +
-      `<span class="timer-block"><span class="timer-num">${String(s).padStart(2,'0')}</span><span class="timer-unit">S</span></span>`;
+      `<span class="tb"><span class="tn">${String(d).padStart(3,'0')}</span><span class="tu">D</span></span>` +
+      `<span class="tb"><span class="tn">${String(h).padStart(2,'0')}</span><span class="tu">H</span></span>` +
+      `<span class="tb"><span class="tn">${String(m).padStart(2,'0')}</span><span class="tu">M</span></span>` +
+      `<span class="tb"><span class="tn">${String(s).padStart(2,'0')}</span><span class="tu">S</span></span>`;
   }
 
   actualizar();
@@ -705,6 +679,7 @@ function checkBonusStatus() {
     if (texto) texto.textContent = `[BONUS] ${localStorage.getItem('bonusMision')}`;
   }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
   cargarDesdeSupabase();
   renderCalendar();
@@ -724,9 +699,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCalendar();
   });
 
-  // Tooltips de estadísticas
   let activeTooltip = null;
-
   document.querySelectorAll('.stat-item[data-tooltip]').forEach(item => {
     const tooltip = item.querySelector('.stat-tooltip');
     if (!tooltip) return;
@@ -740,7 +713,6 @@ document.addEventListener('DOMContentLoaded', () => {
         activeTooltip = null;
       }
       if (!isOpen) {
-        // Mostrar primero para poder medir el ancho real
         tooltip.classList.add('visible');
         activeTooltip = tooltip;
 
@@ -752,12 +724,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const ttW = tooltip.offsetWidth;
         const ttH = tooltip.offsetHeight;
 
-        // Centrado bajo la tarjeta, ajustado para no salir de pantalla
         let left = card.left + card.width / 2 - ttW / 2;
         left = Math.max(margin, Math.min(left, window.innerWidth - ttW - margin));
 
         let top = card.bottom + 8;
-        // Si no entra abajo, mostrarlo arriba
         if (top + ttH > window.innerHeight - margin) {
           top = card.top - ttH - 8;
         }
@@ -765,7 +735,6 @@ document.addEventListener('DOMContentLoaded', () => {
         tooltip.style.left = left + 'px';
         tooltip.style.top  = top  + 'px';
 
-        // Alinear la flecha con el centro real de la tarjeta
         const arrowX = (card.left + card.width / 2) - left;
         tooltip.style.setProperty('--arrow-x', arrowX + 'px');
       }
@@ -782,7 +751,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnConfirmarFecha')?.addEventListener('click', async () => {
     const input = document.getElementById('inputFechaInicio');
     if (!input) return;
-    const val = input.value; // 'YYYY-MM-DD' o vacío
+    const val = input.value;
     if (val) {
       localStorage.setItem('fechaInicio', val);
       await db.from('config').upsert({ key: 'fechaInicio', value: val }, { onConflict: 'key' });
@@ -826,7 +795,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ============================================================
-// REGISTRO DEL SISTEMA (terminal de eventos hoy + ayer)
+// REGISTRO DEL SISTEMA
 // ============================================================
 function generarEventosSistema() {
   const todayStr = getTodayStr();
@@ -844,8 +813,8 @@ function generarEventosSistema() {
     if (d.nutricion)     eventos.push({ t: label, txt: `+150 EXP — Nutrición completada`, cls: 'sl-pos' });
     if (d.entrenamiento) eventos.push({ t: label, txt: `+150 EXP — Entrenamiento completado`, cls: 'sl-pos' });
     if (d.suplementos)   eventos.push({ t: label, txt: `+75 EXP — Suplementos completado`, cls: 'sl-pos' });
-    if (count === 3)     eventos.push({ t: label, txt: `+100 EXP — DESPEJE TOTAL ✦`, cls: 'sl-gold' });
-    if (d.bonusMission)  eventos.push({ t: label, txt: `+100 EXP — Misión Bonus completada ⚡`, cls: 'sl-gold' });
+    if (count === 3)     eventos.push({ t: label, txt: `+100 EXP — DESPEJE TOTAL`, cls: 'sl-gold' });
+    if (d.bonusMission)  eventos.push({ t: label, txt: `+100 EXP — Misión Bonus completada`, cls: 'sl-gold' });
     if (d.bonusRejected) eventos.push({ t: label, txt: `-50 EXP — Bonus rechazada`, cls: 'sl-neg' });
 
     const esHoy = fechaStr === todayStr;
@@ -906,108 +875,8 @@ function renderSysLog() {
 }
 
 // ============================================================
-// EL SISTEMA — mentor + quest del día (flavor, sin EXP por ahora)
+// QUEST DEL DÍA
 // ============================================================
-const SISTEMA_EVAL = {
-  0: [
-    "Cero. Pero el más fuerte del mundo también empezó así un día.",
-    "El tablero está en cero. Mové la primera ficha, Cazador.",
-    "Nadie va a hacerlo por vos. Bien: nadie lo haría mejor.",
-    "El cero no pesa. Lo que pesa es quedarse mirándolo.",
-    "Levantate. El piso es solo el lugar desde donde se empuja.",
-    "Nadie nace fuerte. Se elige, una mañana a la vez.",
-    "El primer movimiento es el más caro y el que más vale.",
-    "Hoy el límite te mira de frente. Que parpadee él primero.",
-    "No esperes ganas. Tené disciplina, y las ganas te alcanzan.",
-    "El que arranca cansado y avanza igual ya ganó algo hoy.",
-    "Cero es una hoja en blanco. Escribí algo de lo que estar orgulloso.",
-    "Despertá. La fuerza no viene a buscarte: vas vos.",
-    "Todavía nada, y está bien. El que empieza ya le ganó al que duda.",
-    "Hoy elegís quién sos. Empezá y demostralo."
-  ],
-  1: [
-    "Una adentro. Recién empezás a despertar tu poder.",
-    "Un paso, y ya sos más fuerte que el que dudó en darlo.",
-    "Una hecha. El que mantiene el movimiento no se apaga.",
-    "Encendiste el motor. Ahora no lo dejes enfriar.",
-    "Pequeño, pero tuyo. Así se construye todo lo grande.",
-    "La primera rompe el hielo. Las que siguen vienen más fáciles.",
-    "Ya estás en movimiento. Frenar ahora sería traicionarte.",
-    "Una menos. El hambre de más es lo que te lleva lejos.",
-    "Diste el primer golpe. No sueltes el ritmo.",
-    "Arrancaste cuando era cómodo no hacerlo. Eso ya te define.",
-    "Una hecha, y el día todavía es tuyo. Andá por la segunda.",
-    "El que empieza está adelante del que solo lo piensa.",
-    "Sentiste lo difícil que era arrancar. Ahora sabés que podés.",
-    "Primer eslabón puesto. La cadena se arma sin soltar."
-  ],
-  2: [
-    "Dos de tres. Superá tu límite ahora mismo.",
-    "Te falta la que más cuesta. Justo ahí se forja el orgullo.",
-    "Casi. El que llega hasta acá no se rinde en el último golpe.",
-    "Dos adentro. El último tramo es donde se separan los rangos.",
-    "Estás a un movimiento de ganarle al día. No aflojes.",
-    "El miedo a la última es la señal de que vale la pena.",
-    "Llegaste lejos para frenar acá. Cerralo.",
-    "La tercera es la prueba. Superala y demostrate qué sos.",
-    "Dos no es nada hasta que sea tres. Terminá lo que empezaste.",
-    "Cuando duele un poco más, ahí está el crecimiento. Empujá.",
-    "El orgullo no se grita: se gana cerrando el día completo.",
-    "Una sola te separa de la cima de hoy. Subila.",
-    "El que rompe su propio techo no le teme a nadie.",
-    "Falta el golpe final. Dalo con todo, Cazador."
-  ],
-  3: [
-    "Tres de tres. Hoy te volviste alguien que ayer no podías mirar de frente.",
-    "Despeje total. Que el universo entero se entere de lo que sos.",
-    "Completaste todo. No fue suerte: fue voluntad.",
-    "Tres de tres. Esto no es el techo: es tu nuevo piso.",
-    "Le ganaste al de ayer. Mañana otra vez. Hoy, disfrutá.",
-    "Despeje total. El que entrena en silencio brilla sin pedir permiso.",
-    "Hoy fuiste imparable. Recordá esto cuando dudes.",
-    "Tres de tres. Así se construye un rango que nadie regala.",
-    "Cumpliste todo. El orgullo de hoy es combustible para mañana.",
-    "Día despejado. Sos la prueba de que la constancia gana.",
-    "Tres de tres. El Cazador que querías ser está naciendo.",
-    "Lo lograste entero. No te conformes: apuntá más alto.",
-    "Despeje total. Hoy elegiste ser fuerte, y se nota.",
-    "Día perfecto. Que se vuelva costumbre, no excepción."
-  ]
-};
-const SISTEMA_BONUS_OK = [
-  " Y todavía pediste más con la bonus: esa hambre separa rangos.",
-  " Hiciste la bonus también. El que busca más nunca se estanca.",
-  " Sumaste la bonus. Así piensa el que apunta a la cima.",
-  " No te alcanzó con cumplir: querés superarte. Bonus incluida.",
-  " Y encima la bonus. Ese extra es lo que te vuelve distinto.",
-  " Bonus hecha. El hambre de más es la marca de los grandes.",
-  " Pediste más con la bonus. El límite te queda chico.",
-  " Bonus completada. El que da el extra hoy domina mañana."
-];
-const SISTEMA_BONUS_NO = [
-  " Rechazaste la bonus, y el miedo también deja huella. (-50 EXP)",
-  " Esquivaste la bonus. La próxima, animate al extra. (-50 EXP)",
-  " Dijiste que no a la bonus. El Sistema lo registra. (-50 EXP)",
-  " Sin bonus hoy. El que evita el desafío también elige. (-50 EXP)",
-  " Rechazaste el extra. Mañana tenés revancha. (-50 EXP)",
-  " Bonus rechazada. La comodidad cuesta más de lo que parece. (-50 EXP)",
-  " No tomaste la bonus. La fuerza está del otro lado del miedo. (-50 EXP)",
-  " Bonus esquivada. El Sistema no olvida, pero perdona si volvés. (-50 EXP)"
-];
-
-const SISTEMA_MAXIMS = [
-  "No naciste fuerte. Mejor: cada gramo de poder que tengas, lo vas a haber ganado vos.",
-  "El dolor de la disciplina pesa gramos. El de la rendición pesa toneladas.",
-  "No subas de rango para que te vean. Subí hasta no necesitar que nadie te vea.",
-  "Los días que no querés entrenar son los que más te cambian.",
-  "La constancia no es glamorosa. Por eso casi nadie la sostiene.",
-  "Tu única competencia es el reflejo que te mira mañana a la mañana.",
-  "Caer es física. Levantarse es decisión.",
-  "El que aguanta un día más le gana al que abandona un día antes.",
-  "El límite que sentís hoy es el piso de mañana si no aflojás.",
-  "Nadie va a remar por vos. Y está bien: este barco es tuyo."
-];
-
 const QUEST_POOL = [
   { t: 'PROTOCOLO DE HIERRO',    d: 'Antes del mediodía, completá tu entrenamiento.' },
   { t: 'AYUNO DE DISTRACCIONES', d: 'Pasá la primera hora del día sin pantallas.' },
@@ -1043,62 +912,8 @@ function sistemaSeedIndex(arr, salt) {
   for (let i = 0; i < base.length; i++) hash = (hash * 31 + base.charCodeAt(i)) >>> 0;
   return hash % arr.length;
 }
-function getQuestDelDia()  { return QUEST_POOL[sistemaSeedIndex(QUEST_POOL, 'quest')]; }
-function getMaximaDelDia() { return SISTEMA_MAXIMS[sistemaSeedIndex(SISTEMA_MAXIMS, 'maxim')]; }
+function getQuestDelDia() { return QUEST_POOL[sistemaSeedIndex(QUEST_POOL, 'quest')]; }
 
-function sistemaEvalTexto() {
-  const data = getTodayMissionData();
-  const done = (data.nutricion ? 1 : 0) + (data.entrenamiento ? 1 : 0) + (data.suplementos ? 1 : 0);
-  const pool = SISTEMA_EVAL[done];
-  let txt = pool[sistemaSeedIndex(pool, 'eval' + done)];
-  if (data.bonusMission) txt += SISTEMA_BONUS_OK[sistemaSeedIndex(SISTEMA_BONUS_OK, 'bok')];
-  else if (data.bonusRejected) txt += SISTEMA_BONUS_NO[sistemaSeedIndex(SISTEMA_BONUS_NO, 'bno')];
-  return txt;
-}
-
-function sistemaQuestHTML() {
-  const q = getQuestDelDia();
-  const sword = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/></svg>';
-  return '<div class="sistema-div"></div>' +
-    '<div class="sistema-quest-label">' + sword + 'QUEST DEL DÍA</div>' +
-    '<div class="sistema-quest-title">' + q.t + '</div>' +
-    '<div class="sistema-quest-desc">' + q.d + '</div>';
-}
-
-let sistemaPrimerRender = true;
-function renderSistema() {
-  const cont = document.getElementById('sistemaContent');
-  if (!cont) return;
-  const evalTxt = sistemaEvalTexto();
-  const questHTML = sistemaQuestHTML();
-
-  if (sistemaPrimerRender) {
-    sistemaPrimerRender = false;
-    cont.innerHTML =
-      '<div class="sistema-eval" id="sistemaEval"></div>' +
-      '<div class="sistema-quest sistema-reveal" id="sistemaQuest">' + questHTML + '</div>';
-    const evalEl = document.getElementById('sistemaEval');
-    let i = 0;
-    evalEl.classList.add('sistema-caret');
-    const t = setInterval(() => {
-      evalEl.textContent = evalTxt.slice(0, ++i);
-      if (i >= evalTxt.length) {
-        clearInterval(t);
-        evalEl.classList.remove('sistema-caret');
-        const q1 = document.getElementById('sistemaQuest');
-        if (q1) setTimeout(() => q1.classList.add('sistema-shown'), 100);
-      }
-    }, 16);
-  } else {
-    cont.innerHTML =
-      '<div class="sistema-eval">' + evalTxt + '</div>' +
-      '<div class="sistema-quest sistema-reveal sistema-shown">' + questHTML + '</div>';
-  }
-}
-
-// ============================================================
-// QUEST DEL DÍA (flavor, fija por fecha)
-// ============================================================
 function renderQuestDia() {
   const t = document.getElementById('questDiaTitle');
   const d = document.getElementById('questDiaDesc');
