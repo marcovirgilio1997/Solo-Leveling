@@ -29,14 +29,6 @@ const MONTHS_ES = [
   'ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO',
   'JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'
 ];
-const RANK_COLORS = {
-  'E': { color: '#FFFFFF', glow: 'rgba(0,191,255,0.7)' },
-  'D': { color: '#00AA00', glow: 'rgba(0,170,0,0.7)' },
-  'C': { color: '#0066FF', glow: 'rgba(0,102,255,0.7)' },
-  'B': { color: '#FFD700', glow: 'rgba(255,215,0,0.7)' },
-  'A': { color: '#FF4400', glow: 'rgba(255,68,0,0.7)' },
-  'S': { color: '#9B59B6', glow: 'rgba(155,89,182,0.7)' },
-};
 const RANK_NAMES = {
   'E': 'Novato', 'D': 'Aprendiz', 'C': 'Competente',
   'B': 'Avanzado', 'A': 'Élite', 'S': 'Nacional',
@@ -82,7 +74,6 @@ async function cargarDesdeSupabase() {
     }
   }
   updateUI();
-  renderCalendar();
 }
 
 // ============================================================
@@ -98,6 +89,9 @@ async function guardarMision() {
   const prev = misionesCache[fecha] || {};
   misionesCache[fecha] = { ...prev, nutricion, entrenamiento, suplementos, bonusMission };
 
+  // UI inmediata, sin esperar la red
+  updateUI();
+
   const { error } = await db.from('missions').upsert({
     fecha,
     nutricion,
@@ -108,8 +102,6 @@ async function guardarMision() {
 
   console.log('Guardando:', fecha, { nutricion, entrenamiento, suplementos, bonusMission });
   if (error) console.error('Error guardando:', error);
-
-  updateUI();
 }
 
 // ============================================================
@@ -196,6 +188,13 @@ function cargarNombreCazador() {
   if (el) el.textContent = nombre;
 }
 
+function syncMissionRows() {
+  document.querySelectorAll('.m-row').forEach(row => {
+    const input = row.querySelector('input[type="checkbox"]');
+    if (input) row.classList.toggle('done', input.checked);
+  });
+}
+
 function updateRankRing(expTotal) {
   const ring = document.getElementById('rankRingProgress');
   const tip = document.getElementById('rankRingTip');
@@ -216,7 +215,6 @@ function updateRankRing(expTotal) {
     const offset = circumference - (clamped / 100) * circumference;
     ring.style.strokeDasharray = `${circumference} ${circumference}`;
     ring.style.strokeDashoffset = `${offset}`;
-    ring.style.transform = 'rotate(-90deg)';
   }
 
   const angleDeg = (clamped / 100) * 360 - 90;
@@ -331,6 +329,7 @@ function updateUI() {
   const cb = document.getElementById('bonusMissionCheckbox');
   if (cb) cb.checked = data.bonusMission;
 
+  syncMissionRows();
   cargarNombreCazador();
 
   const expTotal = calcularEXPTotal();
@@ -378,7 +377,7 @@ function updateUI() {
 }
 
 // ============================================================
-// CALENDARIO (nuevo: clases en vez de inline styles)
+// CALENDARIO
 // ============================================================
 function renderCalendar() {
   const grid = document.getElementById('cal-grid');
@@ -390,7 +389,7 @@ function renderCalendar() {
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const totalDays = new Date(calYear, calMonth + 1, 0).getDate();
   const todayStr = getTodayStr();
-  const today = new Date();
+  const now = new Date();
 
   for (let i = 0; i < firstDay; i++) {
     const empty = document.createElement('div');
@@ -403,7 +402,7 @@ function renderCalendar() {
     const key = dateToStr(date);
     const data = misionesCache[key] || null;
     const isToday = key === todayStr;
-    const isFuture = date > today && !isToday;
+    const isFuture = !isToday && date > now;
 
     const cell = document.createElement('div');
     cell.className = 'cal-cell';
@@ -415,14 +414,15 @@ function renderCalendar() {
       const count = (data.nutricion ? 1 : 0) + (data.entrenamiento ? 1 : 0) + (data.suplementos ? 1 : 0);
       const bar = document.createElement('span');
       bar.className = 'cal-bar';
-      const inner = document.createElement('i');
+      const fill = document.createElement('i');
       if (count === 0) {
         cell.classList.add('cal-z');
-        inner.style.width = '100%';
+        fill.style.width = '0%';
       } else {
-        inner.style.width = `${Math.round(count / 3 * 100)}%`;
+        if (count === 3) cell.classList.add('cal-full');
+        fill.style.width = `${Math.round(count / 3 * 100)}%`;
       }
-      bar.appendChild(inner);
+      bar.appendChild(fill);
       cell.appendChild(bar);
       if (data.bonusMission) {
         const mark = document.createElement('span');
@@ -430,14 +430,17 @@ function renderCalendar() {
         mark.textContent = '⚡';
         cell.appendChild(mark);
       }
+    } else if (!isToday) {
+      // Día pasado sin registro = día perdido
+      cell.classList.add('cal-miss');
     }
 
     if (isToday) cell.classList.add('cal-today');
 
     cell.addEventListener('click', () => {
+      if (isFuture) return;
       const detail = document.getElementById('cal-detail');
       if (!detail) return;
-      if (isFuture) { detail.innerHTML = ''; return; }
       if (!data) {
         detail.innerHTML = `<span style="color:var(--cyan);font-weight:600;letter-spacing:1px;">${d} DE ${MONTHS_ES[calMonth]} DE ${calYear}</span><br><span style="color:var(--tx-faint);">Sin misiones registradas</span>`;
         return;
@@ -680,120 +683,6 @@ function checkBonusStatus() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  cargarDesdeSupabase();
-  renderCalendar();
-  ['nutricion', 'entrenamiento', 'suplementos'].forEach(f => {
-    const el = document.getElementById(`cb-${f}`);
-    if (el) el.addEventListener('change', guardarMision);
-  });
-  document.getElementById('bonusMissionCheckbox')?.addEventListener('change', guardarMision);
-  document.getElementById('btnRankSystem')?.addEventListener('click', openRankSystemModal);
-
-  document.getElementById('cal-prev')?.addEventListener('click', () => {
-    calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
-    renderCalendar();
-  });
-  document.getElementById('cal-next')?.addEventListener('click', () => {
-    calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
-    renderCalendar();
-  });
-
-  let activeTooltip = null;
-  document.querySelectorAll('.stat-item[data-tooltip]').forEach(item => {
-    const tooltip = item.querySelector('.stat-tooltip');
-    if (!tooltip) return;
-    tooltip.textContent = item.dataset.tooltip;
-
-    item.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = activeTooltip === tooltip;
-      if (activeTooltip) {
-        activeTooltip.classList.remove('visible');
-        activeTooltip = null;
-      }
-      if (!isOpen) {
-        tooltip.classList.add('visible');
-        activeTooltip = tooltip;
-
-        const card = item.getBoundingClientRect();
-        const margin = 8;
-        const maxW = Math.min(250, window.innerWidth - margin * 2);
-        tooltip.style.maxWidth = maxW + 'px';
-
-        const ttW = tooltip.offsetWidth;
-        const ttH = tooltip.offsetHeight;
-
-        let left = card.left + card.width / 2 - ttW / 2;
-        left = Math.max(margin, Math.min(left, window.innerWidth - ttW - margin));
-
-        let top = card.bottom + 8;
-        if (top + ttH > window.innerHeight - margin) {
-          top = card.top - ttH - 8;
-        }
-
-        tooltip.style.left = left + 'px';
-        tooltip.style.top  = top  + 'px';
-
-        const arrowX = (card.left + card.width / 2) - left;
-        tooltip.style.setProperty('--arrow-x', arrowX + 'px');
-      }
-    });
-  });
-
-  document.addEventListener('click', () => {
-    if (activeTooltip) {
-      activeTooltip.classList.remove('visible');
-      activeTooltip = null;
-    }
-  });
-
-  document.getElementById('btnConfirmarFecha')?.addEventListener('click', async () => {
-    const input = document.getElementById('inputFechaInicio');
-    if (!input) return;
-    const val = input.value;
-    if (val) {
-      localStorage.setItem('fechaInicio', val);
-      await db.from('config').upsert({ key: 'fechaInicio', value: val }, { onConflict: 'key' });
-    } else {
-      localStorage.removeItem('fechaInicio');
-      await db.from('config').delete().eq('key', 'fechaInicio');
-    }
-    location.reload();
-  });
-
-  document.getElementById('btnHistorial')?.addEventListener('click', openHistorialModal);
-  document.getElementById('btnCerrarHistorial')?.addEventListener('click', () => {
-    document.getElementById('historialModal').style.display = 'none';
-  });
-  document.getElementById('historialModal')?.addEventListener('click', (e) => {
-    if (e.target === document.getElementById('historialModal'))
-      document.getElementById('historialModal').style.display = 'none';
-  });
-
-  document.getElementById('btnStats')?.addEventListener('click', () => {
-    document.getElementById('statsModal').style.display = 'flex';
-  });
-  document.getElementById('btnCerrarStats')?.addEventListener('click', () => {
-    document.getElementById('statsModal').style.display = 'none';
-  });
-  document.getElementById('statsModal')?.addEventListener('click', (e) => {
-    if (e.target === document.getElementById('statsModal'))
-      document.getElementById('statsModal').style.display = 'none';
-  });
-
-  document.getElementById('btnAceptarBonus')?.addEventListener('click', aceptarBonus);
-  document.getElementById('btnRechazarBonus')?.addEventListener('click', rechazarBonus);
-  document.getElementById('btnConfirmarCobardia')?.addEventListener('click', confirmarCobardia);
-  iniciarTimerMision();
-  checkBonusStatus();
-  renderQuestDia();
-  document.getElementById('bonusToggle')?.addEventListener('click', () => {
-    document.getElementById('bonusInline')?.classList.toggle('open');
-  });
-  setTimeout(mostrarBonusInline, 1200);
-});
-
 // ============================================================
 // REGISTRO DEL SISTEMA
 // ============================================================
@@ -922,3 +811,120 @@ function renderQuestDia() {
   t.textContent = q.t;
   d.textContent = q.d;
 }
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  cargarDesdeSupabase();
+  renderCalendar();
+  ['nutricion', 'entrenamiento', 'suplementos'].forEach(f => {
+    const el = document.getElementById(`cb-${f}`);
+    if (el) el.addEventListener('change', () => { syncMissionRows(); guardarMision(); });
+  });
+  document.getElementById('bonusMissionCheckbox')?.addEventListener('change', () => { syncMissionRows(); guardarMision(); });
+  document.getElementById('btnRankSystem')?.addEventListener('click', openRankSystemModal);
+
+  document.getElementById('cal-prev')?.addEventListener('click', () => {
+    calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
+    renderCalendar();
+  });
+  document.getElementById('cal-next')?.addEventListener('click', () => {
+    calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
+    renderCalendar();
+  });
+
+  let activeTooltip = null;
+  document.querySelectorAll('.stat-item[data-tooltip]').forEach(item => {
+    const tooltip = item.querySelector('.stat-tooltip');
+    if (!tooltip) return;
+    tooltip.textContent = item.dataset.tooltip;
+
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = activeTooltip === tooltip;
+      if (activeTooltip) {
+        activeTooltip.classList.remove('visible');
+        activeTooltip = null;
+      }
+      if (!isOpen) {
+        tooltip.classList.add('visible');
+        activeTooltip = tooltip;
+
+        const card = item.getBoundingClientRect();
+        const margin = 8;
+        const maxW = Math.min(250, window.innerWidth - margin * 2);
+        tooltip.style.maxWidth = maxW + 'px';
+
+        const ttW = tooltip.offsetWidth;
+        const ttH = tooltip.offsetHeight;
+
+        let left = card.left + card.width / 2 - ttW / 2;
+        left = Math.max(margin, Math.min(left, window.innerWidth - ttW - margin));
+
+        let top = card.bottom + 8;
+        if (top + ttH > window.innerHeight - margin) {
+          top = card.top - ttH - 8;
+        }
+
+        tooltip.style.left = left + 'px';
+        tooltip.style.top  = top  + 'px';
+
+        const arrowX = (card.left + card.width / 2) - left;
+        tooltip.style.setProperty('--arrow-x', arrowX + 'px');
+      }
+    });
+  });
+
+  document.addEventListener('click', () => {
+    if (activeTooltip) {
+      activeTooltip.classList.remove('visible');
+      activeTooltip = null;
+    }
+  });
+
+  document.getElementById('btnConfirmarFecha')?.addEventListener('click', async () => {
+    const input = document.getElementById('inputFechaInicio');
+    if (!input) return;
+    const val = input.value;
+    if (val) {
+      localStorage.setItem('fechaInicio', val);
+      await db.from('config').upsert({ key: 'fechaInicio', value: val }, { onConflict: 'key' });
+    } else {
+      localStorage.removeItem('fechaInicio');
+      await db.from('config').delete().eq('key', 'fechaInicio');
+    }
+    location.reload();
+  });
+
+  document.getElementById('btnHistorial')?.addEventListener('click', openHistorialModal);
+  document.getElementById('btnCerrarHistorial')?.addEventListener('click', () => {
+    document.getElementById('historialModal').style.display = 'none';
+  });
+  document.getElementById('historialModal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('historialModal'))
+      document.getElementById('historialModal').style.display = 'none';
+  });
+
+  document.getElementById('btnStats')?.addEventListener('click', () => {
+    document.getElementById('statsModal').style.display = 'flex';
+  });
+  document.getElementById('btnCerrarStats')?.addEventListener('click', () => {
+    document.getElementById('statsModal').style.display = 'none';
+  });
+  document.getElementById('statsModal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('statsModal'))
+      document.getElementById('statsModal').style.display = 'none';
+  });
+
+  document.getElementById('btnAceptarBonus')?.addEventListener('click', aceptarBonus);
+  document.getElementById('btnRechazarBonus')?.addEventListener('click', rechazarBonus);
+  document.getElementById('btnConfirmarCobardia')?.addEventListener('click', confirmarCobardia);
+  iniciarTimerMision();
+  checkBonusStatus();
+  renderQuestDia();
+  document.getElementById('bonusToggle')?.addEventListener('click', () => {
+    document.getElementById('bonusInline')?.classList.toggle('open');
+  });
+  setTimeout(mostrarBonusInline, 1200);
+});
