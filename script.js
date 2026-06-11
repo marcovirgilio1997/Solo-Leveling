@@ -717,9 +717,14 @@ function generarEventosSistema() {
   return eventos;
 }
 
+let syslogRunId = 0;
+let syslogTyped = false;
+
 function renderSysLog() {
   const container = document.getElementById('syslogLines');
   if (!container) return;
+
+  const runId = ++syslogRunId;
   container.innerHTML = '';
 
   const eventos = generarEventosSistema();
@@ -728,9 +733,20 @@ function renderSysLog() {
     return;
   }
 
+  // Renders posteriores: instantáneo, sin re-tipear
+  if (syslogTyped) {
+    container.innerHTML = eventos.map(ev =>
+      `<div class="syslog-line"><span class="sl-time">> [${ev.t}] </span><span class="${ev.cls}">${ev.txt}</span></div>`
+    ).join('');
+    return;
+  }
+
+  // Primer render: animación de tipeo (una sola vez por carga)
+  syslogTyped = true;
   let lineIdx = 0;
 
   function escribirSiguiente() {
+    if (runId !== syslogRunId) return;
     if (lineIdx >= eventos.length) return;
     const ev = eventos[lineIdx];
     const line = document.createElement('div');
@@ -741,6 +757,7 @@ function renderSysLog() {
     let charIdx = 0;
 
     function escribirChar() {
+      if (runId !== syslogRunId) return;
       if (charIdx <= fullText.length) {
         const partial = fullText.slice(0, charIdx);
         const m = partial.match(/^(> \[[^\]]*\] )(.*)$/);
