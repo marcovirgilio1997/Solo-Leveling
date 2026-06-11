@@ -2,429 +2,344 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Cazador - Solo Leveling</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Sistema de Cazador — Solo Leveling</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=37">
 </head>
 <body>
-    <div class="background-circuitry"></div>
-    <div class="metallic-column left"></div>
-    <div class="metallic-column right"></div>
-    <div class="blue-mist"></div>
+    <div class="shaft"></div>
+    <i class="pt pt1"></i><i class="pt pt2"></i><i class="pt pt3"></i>
 
     <div class="main-container">
-        <!-- Header -->
-        <div class="system-header">
-            <div class="system-title-box">
-                <span class="system-title">SOLO LEVELING</span>
-                <div class="mision-timer-wrap">
-                  <div class="mision-timer-label">TIEMPO RESTANTE</div>
-                  <div class="mision-timer-digits" id="misionTimer">
-                    <span class="timer-block"><span class="timer-num">000</span><span class="timer-unit">D</span></span>
-                    <span class="timer-block"><span class="timer-num">00</span><span class="timer-unit">H</span></span>
-                    <span class="timer-block"><span class="timer-num">00</span><span class="timer-unit">M</span></span>
-                    <span class="timer-block"><span class="timer-num">00</span><span class="timer-unit">S</span></span>
-                  </div>
+
+        <!-- HEADER -->
+        <header class="hd">
+            <div class="hd-rule"><i></i><b></b><i></i></div>
+            <div class="hd-title">SOLO LEVELING</div>
+            <div class="timer">
+                <div class="timer-l">TIEMPO RESTANTE</div>
+                <div class="timer-d" id="misionTimer">
+                    <span class="tb"><span class="tn">000</span><span class="tu">D</span></span>
+                    <span class="tb"><span class="tn">00</span><span class="tu">H</span></span>
+                    <span class="tb"><span class="tn">00</span><span class="tu">M</span></span>
+                    <span class="tb"><span class="tn">00</span><span class="tu">S</span></span>
                 </div>
             </div>
-        </div>
+        </header>
 
         <!-- STATUS -->
-        <div class="status-section">
-            <div class="halo-respira"></div>
+        <section class="status">
+            <div class="halo"></div>
+            <div class="hunter" id="hunterNameDisplay">MARCO</div>
+            <div class="ring-wrap">
+                <svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="lolFluidGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#001530">
+                                <animate attributeName="stop-color" values="#001530;#002850;#003d6e;#001530" dur="6s" repeatCount="indefinite"/>
+                            </stop>
+                            <stop offset="40%" stop-color="#004477">
+                                <animate attributeName="stop-color" values="#004477;#0066aa;#0088cc;#004477" dur="6s" repeatCount="indefinite"/>
+                            </stop>
+                            <stop offset="75%" stop-color="#0099dd">
+                                <animate attributeName="stop-color" values="#0099dd;#00bbee;#00ccff;#0099dd" dur="6s" repeatCount="indefinite"/>
+                            </stop>
+                            <stop offset="100%" stop-color="#00f5ff">
+                                <animate attributeName="stop-color" values="#00f5ff;#88ddff;#ffffff;#00f5ff" dur="6s" repeatCount="indefinite"/>
+                            </stop>
+                            <animateTransform attributeName="gradientTransform" type="rotate" from="0 0.5 0.5" to="360 0.5 0.5" dur="12s" repeatCount="indefinite"/>
+                        </linearGradient>
+                        <mask id="ringMaskAQ">
+                            <rect width="320" height="320" fill="black"/>
+                            <circle cx="160" cy="160" r="128" fill="none" stroke="white" stroke-width="30"/>
+                        </mask>
+                    </defs>
 
-            <div class="hunter-name-display">
-                <div class="hunter-name" id="hunterNameDisplay">MARCO</div>
-            </div>
+                    <circle cx="160" cy="160" r="146" fill="none" stroke="rgba(0,191,255,.35)" stroke-width="1"/>
+                    <circle cx="160" cy="160" r="128" fill="none" stroke="rgba(0,120,210,.12)" stroke-width="30"/>
 
-            <div class="profile-status-center">
-                <div class="rank-ring-card-epic">
-                    <svg class="rank-ring-epic" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="lolFluidGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#001530">
-                                    <animate attributeName="stop-color" values="#001530;#002850;#003d6e;#001530" dur="6s" repeatCount="indefinite"/>
-                                </stop>
-                                <stop offset="40%" stop-color="#004477">
-                                    <animate attributeName="stop-color" values="#004477;#0066aa;#0088cc;#004477" dur="6s" repeatCount="indefinite"/>
-                                </stop>
-                                <stop offset="75%" stop-color="#0099dd">
-                                    <animate attributeName="stop-color" values="#0099dd;#00bbee;#00ccff;#0099dd" dur="6s" repeatCount="indefinite"/>
-                                </stop>
-                                <stop offset="100%" stop-color="#00f5ff">
-                                    <animate attributeName="stop-color" values="#00f5ff;#88ddff;#ffffff;#00f5ff" dur="6s" repeatCount="indefinite"/>
-                                </stop>
-                                <animateTransform attributeName="gradientTransform" type="rotate" from="0 0.5 0.5" to="360 0.5 0.5" dur="12s" repeatCount="indefinite"/>
-                            </linearGradient>
+                    <circle cx="160" cy="160" r="128" fill="none"
+                        id="rankRingProgress"
+                        stroke="url(#lolFluidGradient)"
+                        stroke-width="30"
+                        stroke-linecap="round"
+                        stroke-dasharray="804.25 804.25"
+                        stroke-dashoffset="804.25"/>
 
-                            <filter id="ringGlow" x="-50%" y="-50%" width="200%" height="200%">
-                                <feGaussianBlur stdDeviation="5" result="blur"/>
-                                <feMerge>
-                                    <feMergeNode in="blur"/>
-                                    <feMergeNode in="SourceGraphic"/>
-                                </feMerge>
-                            </filter>
-
-                            <linearGradient id="trackFluidGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="rgba(0,40,80,0.4)"/>
-                                <stop offset="100%" stop-color="rgba(0,80,140,0.3)"/>
-                            </linearGradient>
-
-                            <mask id="ringMaskAQ">
-                                <rect width="320" height="320" fill="black"/>
-                                <circle cx="160" cy="160" r="128" fill="none" stroke="white" stroke-width="30"/>
-                            </mask>
-                        </defs>
-
-                        <circle cx="160" cy="160" r="128" fill="none"
-                            stroke="url(#trackFluidGradient)"
-                            stroke-width="30"/>
-
-                        <circle cx="160" cy="160" r="128" fill="none"
-                            id="rankRingProgress"
-                            stroke="url(#lolFluidGradient)"
-                            stroke-width="30"
-                            stroke-linecap="round"
-                            stroke-dasharray="804.25 804.25"
-                            stroke-dashoffset="804.25"
-                            filter="url(#ringGlow)"/>
-
-                        <g mask="url(#ringMaskAQ)" id="rankRingBubbles">
-                            <circle r="2" fill="rgba(255,255,255,0.95)">
-                                <animateMotion path="M 160 32 A 128 128 0 0 1 288 160" dur="4s" repeatCount="indefinite" begin="0s"/>
-                                <animate attributeName="opacity" values="0;0.95;0.95;0" dur="4s" repeatCount="indefinite" begin="0s"/>
-                                <animate attributeName="r" values="0.5;2.5;2;0.5" dur="4s" repeatCount="indefinite" begin="0s"/>
-                            </circle>
-                            <circle r="1.3" fill="rgba(255,255,255,0.75)">
-                                <animateMotion path="M 160 32 A 128 128 0 0 1 288 160" dur="5s" repeatCount="indefinite" begin="1.5s"/>
-                                <animate attributeName="opacity" values="0;0.75;0.75;0" dur="5s" repeatCount="indefinite" begin="1.5s"/>
-                            </circle>
-                            <circle r="1.5" fill="rgba(170,238,255,0.85)">
-                                <animateMotion path="M 160 32 A 128 128 0 0 1 288 160" dur="4.5s" repeatCount="indefinite" begin="2.8s"/>
-                                <animate attributeName="opacity" values="0;0.85;0.85;0" dur="4.5s" repeatCount="indefinite" begin="2.8s"/>
-                            </circle>
-                        </g>
-
-                        <circle cx="160" cy="160" r="146" fill="none" stroke="rgba(0,191,255,0.9)" stroke-width="1.3" style="filter:drop-shadow(0 0 4px rgba(0,191,255,0.8));"/>
-                        <circle cx="160" cy="160" r="110" fill="none" stroke="rgba(0,191,255,0.7)" stroke-width="1" style="filter:drop-shadow(0 0 3px rgba(0,191,255,0.6));"/>
-
-                        <circle cx="160" cy="32" r="9" id="rankRingTipHalo" fill="rgba(0,245,255,0.25)" style="filter:blur(2px);">
-                            <animate attributeName="r" values="7;10;7" dur="2s" repeatCount="indefinite"/>
-                            <animate attributeName="opacity" values="0.2;0.5;0.2" dur="2s" repeatCount="indefinite"/>
+                    <g mask="url(#ringMaskAQ)" id="rankRingBubbles">
+                        <circle r="2" fill="rgba(255,255,255,0.95)">
+                            <animateMotion path="M 160 32 A 128 128 0 0 1 288 160" dur="4s" repeatCount="indefinite" begin="0s"/>
+                            <animate attributeName="opacity" values="0;0.95;0.95;0" dur="4s" repeatCount="indefinite" begin="0s"/>
                         </circle>
-                        <circle cx="160" cy="32" r="6" id="rankRingTip" class="ring-tip"/>
-                    </svg>
+                        <circle r="1.3" fill="rgba(255,255,255,0.75)">
+                            <animateMotion path="M 160 32 A 128 128 0 0 1 288 160" dur="5s" repeatCount="indefinite" begin="1.5s"/>
+                            <animate attributeName="opacity" values="0;0.75;0.75;0" dur="5s" repeatCount="indefinite" begin="1.5s"/>
+                        </circle>
+                        <circle r="1.5" fill="rgba(170,238,255,0.85)">
+                            <animateMotion path="M 160 32 A 128 128 0 0 1 288 160" dur="4.5s" repeatCount="indefinite" begin="2.8s"/>
+                            <animate attributeName="opacity" values="0;0.85;0.85;0" dur="4.5s" repeatCount="indefinite" begin="2.8s"/>
+                        </circle>
+                    </g>
 
-                    <div class="rank-ring-label-epic">
-                        <span class="ring-rank-letter-epic" id="rango-letra">E</span>
-                        <span class="ring-rank-name-epic" id="rango-titulo">Novato</span>
-                        <div class="ring-exp-divider"></div>
-                        <span class="ring-exp-value-epic" id="exp-text">0 / 1500 EXP</span>
-                    </div>
+                    <circle cx="160" cy="32" r="9" id="rankRingTipHalo" fill="rgba(0,245,255,0.25)" style="filter:blur(2px);">
+                        <animate attributeName="r" values="7;10;7" dur="2s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="160" cy="32" r="6" id="rankRingTip" class="ring-tip"/>
+                </svg>
+
+                <div class="rl">
+                    <span class="rl-letter" id="rango-letra">E</span>
+                    <span class="rl-name" id="rango-titulo">Novato</span>
+                    <div class="rl-div"></div>
+                    <span class="rl-exp" id="exp-text">0 / 1500 EXP</span>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- EL SISTEMA -->
-        <div class="sistema-panel">
-            <div class="panel-header">
-                <span class="panel-title">EL SISTEMA</span>
-            </div>
-            <div class="sistema-screen">
+        <section class="sw">
+            <i class="cx"></i>
+            <div class="sw-h"><span class="sw-t">EL SISTEMA</span></div>
+            <div class="sw-b">
                 <div id="bonusInline" class="qi-inline" style="display:none;">
-                    <button id="bonusToggle" class="qi-trigger">
-                        <div class="qi-diamond-sm"><span>!</span></div>
-                        <span class="qi-trigger-text">MISIÓN DISPONIBLE</span>
-                        <span class="qi-chevron"></span>
+                    <button id="bonusToggle" class="qi-t">
+                        <span class="qi-d"><span>!</span></span>
+                        <span class="qi-tx">MISIÓN DISPONIBLE</span>
+                        <span class="qi-ch"></span>
                     </button>
-                    <div class="qi-detail">
-                        <div class="qi-mission" id="bonusModalMision"></div>
-                        <div class="qi-reward">+100 EXP</div>
-                        <div class="qi-warning">El rechazo será penalizado <b>−50 EXP</b></div>
-                        <div class="qi-buttons">
-                            <button id="btnAceptarBonus" class="bonus-btn-accept">ACEPTAR</button>
-                            <button id="btnRechazarBonus" class="bonus-btn-reject">RECHAZAR</button>
+                    <div class="qi-x">
+                        <div class="qi-m" id="bonusModalMision"></div>
+                        <div class="qi-r">+100 EXP</div>
+                        <div class="qi-w">El rechazo será penalizado<b>−50 EXP</b></div>
+                        <div class="qi-bt">
+                            <button id="btnAceptarBonus" class="btn btn-a">ACEPTAR</button>
+                            <button id="btnRechazarBonus" class="btn btn-r">RECHAZAR</button>
                         </div>
                     </div>
                 </div>
-                <div class="sistema-quest">
-                    <div class="sistema-quest-label">QUEST DEL DÍA</div>
-                    <div class="sistema-quest-title" id="questDiaTitle"></div>
-                    <div class="sistema-quest-desc" id="questDiaDesc"></div>
-                </div>
+                <div class="q-l">QUEST DEL DÍA</div>
+                <div class="q-t" id="questDiaTitle"></div>
+                <div class="q-d" id="questDiaDesc"></div>
             </div>
-        </div>
+        </section>
 
-        <!-- Registro del Sistema -->
-        <div class="syslog-panel">
-            <div class="panel-header">
-                <span class="panel-title">REGISTRO DEL SISTEMA</span>
+        <!-- REGISTRO DEL SISTEMA -->
+        <section class="sw">
+            <i class="cx"></i>
+            <div class="sw-h"><span class="sw-t">REGISTRO DEL SISTEMA</span></div>
+            <div class="sw-b">
+                <div id="syslogLines" class="log"></div>
             </div>
-            <div class="syslog-screen">
-                <div class="syslog-scanline"></div>
-                <div id="syslogLines" class="syslog-lines"></div>
-            </div>
-        </div>
+        </section>
 
-        <!-- Misiones Diarias -->
-        <div class="missions-panel">
-            <div class="panel-header">
-                <span class="panel-title">MISIONES DIARIAS</span>
-            </div>
-            <div class="missions-list">
-                <div class="mission-item">
-                    <label class="mission-checkbox">
+        <!-- MISIONES DIARIAS -->
+        <section class="sw">
+            <i class="cx"></i>
+            <div class="sw-h"><span class="sw-t">MISIONES DIARIAS</span></div>
+            <div class="sw-b sw-b-tight">
+                <div class="m-row">
+                    <label class="m-check">
                         <input type="checkbox" id="cb-nutricion">
-                        <span class="checkbox-mark"></span>
+                        <span class="m-mk"></span>
                     </label>
-                    <div class="mission-content">
-                        <span class="mission-text" id="mission1Text">Nutrición</span>
-                        <span class="mission-exp">+150 EXP</span>
-                    </div>
+                    <span class="m-n" id="mission1Text">Nutrición</span>
+                    <span class="m-e">+150 EXP</span>
                 </div>
-                <div class="mission-item">
-                    <label class="mission-checkbox">
+                <div class="m-row">
+                    <label class="m-check">
                         <input type="checkbox" id="cb-entrenamiento">
-                        <span class="checkbox-mark"></span>
+                        <span class="m-mk"></span>
                     </label>
-                    <div class="mission-content">
-                        <span class="mission-text" id="mission2Text">Entrenamiento</span>
-                        <span class="mission-exp">+150 EXP</span>
-                    </div>
+                    <span class="m-n" id="mission2Text">Entrenamiento</span>
+                    <span class="m-e">+150 EXP</span>
                 </div>
-                <div class="mission-item">
-                    <label class="mission-checkbox">
+                <div class="m-row">
+                    <label class="m-check">
                         <input type="checkbox" id="cb-suplementos">
-                        <span class="checkbox-mark"></span>
+                        <span class="m-mk"></span>
                     </label>
-                    <div class="mission-content">
-                        <span class="mission-text" id="mission3Text">Suplementos</span>
-                        <span class="mission-exp">+75 EXP</span>
-                    </div>
+                    <span class="m-n" id="mission3Text">Suplementos</span>
+                    <span class="m-e">+75 EXP</span>
                 </div>
-                <div class="mission-item" id="bonusMissionContainer" style="display:none;">
-                    <label class="mission-checkbox">
+                <div class="m-row" id="bonusMissionContainer" style="display:none;">
+                    <label class="m-check">
                         <input type="checkbox" id="bonusMissionCheckbox">
-                        <span class="checkbox-mark"></span>
+                        <span class="m-mk"></span>
                     </label>
-                    <div class="mission-content">
-                        <span class="mission-text" id="bonusMissionText">Misión Bonus</span>
-                        <span class="mission-exp">+100 EXP</span>
-                    </div>
+                    <span class="m-n" id="bonusMissionText">Misión Bonus</span>
+                    <span class="m-e">+100 EXP</span>
                 </div>
-                <div class="mission-exp-text" id="recompensa-diaria">Recompensa diaria estimada: 0 EXP</div>
+                <div class="m-sum" id="recompensa-diaria">RECOMPENSA ESTIMADA · 0 EXP</div>
             </div>
-        </div>
+        </section>
 
-        <!-- Calendario -->
-        <div class="panel">
-          <div class="panel-header"><span class="panel-title">CALENDARIO</span></div>
-          <div id="cal-nav" style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;">
-            <button id="cal-prev" class="cal-btn">◄</button>
-            <span id="cal-title"></span>
-            <button id="cal-next" class="cal-btn">►</button>
-          </div>
-          <div id="cal-headers" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:0 14px 6px;">
-            <div class="cal-hdr">DOM</div><div class="cal-hdr">LUN</div><div class="cal-hdr">MAR</div>
-            <div class="cal-hdr">MIÉ</div><div class="cal-hdr">JUE</div><div class="cal-hdr">VIE</div><div class="cal-hdr">SÁB</div>
-          </div>
-          <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:0 14px 14px;"></div>
-          <div id="cal-detail"></div>
-        </div>
-
-        <!-- Banner / Warning -->
-        <div id="clearBanner" class="clear-banner" style="display:none;">DESPEJE TOTAL</div>
-        <div class="warning-message" id="warningMessage" style="display:none;">¡Cuidado! Si no completas tus misiones, perderás EXP.</div>
+        <!-- CALENDARIO -->
+        <section class="sw">
+            <i class="cx"></i>
+            <div class="sw-h"><span class="sw-t">CALENDARIO</span></div>
+            <div class="sw-b">
+                <div id="cal-nav">
+                    <button id="cal-prev" class="c-bt">◄</button>
+                    <span id="cal-title"></span>
+                    <button id="cal-next" class="c-bt">►</button>
+                </div>
+                <div id="cal-headers">
+                    <div class="c-h">DOM</div><div class="c-h">LUN</div><div class="c-h">MAR</div>
+                    <div class="c-h">MIÉ</div><div class="c-h">JUE</div><div class="c-h">VIE</div><div class="c-h">SÁB</div>
+                </div>
+                <div id="cal-grid"></div>
+                <div id="cal-detail"></div>
+                <div class="cal-legend">
+                    <span><i class="lg-full"></i>Despeje</span>
+                    <span><i class="lg-part"></i>Parcial</span>
+                    <span><i class="lg-zero"></i>Sin misiones</span>
+                </div>
+            </div>
+        </section>
     </div>
 
     <!-- Bottom buttons -->
-    <div class="rsm-btn-container">
-        <button class="rsm-trigger-btn" id="btnRankSystem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px;filter:drop-shadow(0 0 4px currentColor);"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg>VER SISTEMA DE RANGOS</button>
-        <button class="rsm-trigger-btn hist-trigger-btn" id="btnHistorial"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px;filter:drop-shadow(0 0 4px currentColor);"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>HISTORIAL DE EXP</button>
-        <button class="rsm-trigger-btn stats-trigger-btn" id="btnStats"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px;filter:drop-shadow(0 0 4px currentColor);"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>ESTADÍSTICAS</button>
+    <div class="acts">
+        <button class="act" id="btnRankSystem">SISTEMA DE RANGOS</button>
+        <button class="act" id="btnHistorial">HISTORIAL DE EXP</button>
+        <button class="act" id="btnStats">ESTADÍSTICAS</button>
     </div>
 
     <!-- Modal Historial -->
     <div id="historialModal" class="hist-overlay" style="display:none;">
-      <div class="hist-content">
-        <button class="hist-close" id="btnCerrarHistorial">✕</button>
-        <div class="hist-header">📊 HISTORIAL DE EXP</div>
-        <div class="hist-subheader">ÚLTIMOS 30 DÍAS REGISTRADOS</div>
-        <div class="hist-summary">
-          <div class="hist-summary-item">
-            <div class="hist-summary-label">EXP TOTAL ACUMULADA</div>
-            <div class="hist-summary-value cyan" id="histExpTotal">—</div>
-          </div>
-          <div class="hist-summary-item">
-            <div class="hist-summary-label">MEJOR DÍA</div>
-            <div class="hist-summary-value gold" id="histMejorDia">—</div>
-          </div>
-          <div class="hist-summary-item">
-            <div class="hist-summary-label">ÚLTIMO DESPEJE TOTAL</div>
-            <div class="hist-summary-value gold" id="histUltimaDespeje">—</div>
-          </div>
-          <div class="hist-summary-item">
-            <div class="hist-summary-label">BONUS COMPLETADAS</div>
-            <div class="hist-summary-value gold" id="histBonusCount">—</div>
-          </div>
+        <div class="hist-content">
+            <button class="hist-close" id="btnCerrarHistorial">✕</button>
+            <div class="hist-header">HISTORIAL DE EXP</div>
+            <div class="hist-subheader">ÚLTIMOS 30 DÍAS REGISTRADOS</div>
+            <div class="hist-summary">
+                <div class="hist-summary-item">
+                    <div class="hist-summary-label">EXP TOTAL ACUMULADA</div>
+                    <div class="hist-summary-value cyan" id="histExpTotal">—</div>
+                </div>
+                <div class="hist-summary-item">
+                    <div class="hist-summary-label">MEJOR DÍA</div>
+                    <div class="hist-summary-value" id="histMejorDia">—</div>
+                </div>
+                <div class="hist-summary-item">
+                    <div class="hist-summary-label">ÚLTIMO DESPEJE TOTAL</div>
+                    <div class="hist-summary-value" id="histUltimaDespeje">—</div>
+                </div>
+                <div class="hist-summary-item">
+                    <div class="hist-summary-label">BONUS COMPLETADAS</div>
+                    <div class="hist-summary-value" id="histBonusCount">—</div>
+                </div>
+            </div>
+            <div class="hist-table-wrap">
+                <table class="hist-table">
+                    <thead>
+                        <tr>
+                            <th>FECHA</th><th>MISIONES</th><th>BONUS</th><th>EXP GANADA</th><th>PENALIZACIÓN</th><th>TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="histTableBody"></tbody>
+                </table>
+            </div>
+            <div class="hist-legend">
+                <span class="hist-badge-gold">◆</span> Despeje Total &nbsp;&nbsp;
+                <span class="hist-badge-bolt">⚡</span> Bonus completada
+            </div>
         </div>
-        <div class="hist-table-wrap">
-          <table class="hist-table">
-            <thead>
-              <tr>
-                <th>FECHA</th><th>MISIONES</th><th>BONUS</th><th>EXP GANADA</th><th>PENALIZACIÓN</th><th>TOTAL DEL DÍA</th>
-              </tr>
-            </thead>
-            <tbody id="histTableBody"></tbody>
-          </table>
-        </div>
-        <div class="hist-legend">
-          <span class="hist-badge-gold">✦</span> Despeje Total &nbsp;&nbsp;
-          <span class="hist-badge-bolt">⚡</span> Misión Bonus completada
-        </div>
-      </div>
     </div>
 
     <div id="bonusFlash" class="bonus-flash"></div>
 
     <!-- Coward modal -->
     <div id="cowardModal" class="coward-overlay" style="display:none;">
-      <div class="coward-content">
-        <div class="coward-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;filter:drop-shadow(0 0 6px currentColor);"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>ADVERTENCIA DEL SISTEMA<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-left:6px;filter:drop-shadow(0 0 6px currentColor);"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-        <div class="coward-body">El Sistema registrará tu cobardía.<span class="coward-penalty">-50 EXP</span></div>
-        <button id="btnConfirmarCobardia" class="coward-confirm-btn">CONFIRMAR</button>
-      </div>
+        <div class="coward-content">
+            <div class="coward-header">ADVERTENCIA DEL SISTEMA</div>
+            <div class="coward-body">
+                El Sistema registrará tu cobardía.
+                <span class="coward-penalty">−50 EXP</span>
+            </div>
+            <button id="btnConfirmarCobardia" class="coward-confirm-btn">CONFIRMAR</button>
+        </div>
     </div>
 
     <!-- Rank System Modal -->
     <div id="rankSystemModal" class="rsm-overlay" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
-      <div class="rsm-content">
-        <button class="rsm-close" onclick="document.getElementById('rankSystemModal').style.display='none'">×</button>
-        <div class="rsm-header">
-          <div class="rsm-title">SISTEMA DE RANGOS</div>
-          <div class="rsm-subtitle">— ASOCIACIÓN DE CAZADORES —</div>
+        <div class="rsm-content">
+            <button class="rsm-close" onclick="document.getElementById('rankSystemModal').style.display='none'">✕</button>
+            <div class="rsm-header">
+                <div class="rsm-title">SISTEMA DE RANGOS</div>
+                <div class="rsm-subtitle">ASOCIACIÓN DE CAZADORES</div>
+            </div>
+            <div class="rsm-section">
+                <div class="rsm-section-title">TABLA DE RANGOS</div>
+                <div id="rankTable" class="rsm-rank-table"></div>
+            </div>
+            <div class="rsm-section">
+                <div class="rsm-section-title">SISTEMA DE EXP</div>
+                <div class="rsm-exp-rules">
+                    <div class="rsm-rule rsm-pos"><span class="rsm-desc">Misión diaria completada</span><span class="rsm-val pos">+150</span></div>
+                    <div class="rsm-rule rsm-pos"><span class="rsm-desc">Despeje Total (3/3 misiones)</span><span class="rsm-val pos">+100</span></div>
+                    <div class="rsm-rule rsm-pos"><span class="rsm-desc">Misión Bonus completada</span><span class="rsm-val pos">+100</span></div>
+                    <div class="rsm-rule rsm-neg"><span class="rsm-desc">0 misiones en el día</span><span class="rsm-val neg">−75</span></div>
+                    <div class="rsm-rule rsm-neg"><span class="rsm-desc">Solo 1 misión completada</span><span class="rsm-val neg">−25</span></div>
+                    <div class="rsm-rule rsm-crit"><span class="rsm-desc">2 días consecutivos sin nada</span><span class="rsm-val crit">−200</span></div>
+                </div>
+            </div>
+            <div class="rsm-section">
+                <div class="rsm-section-title">TU PROGRESO</div>
+                <div id="myRankProgress" class="rsm-my-progress"></div>
+            </div>
+            <div class="rsm-section">
+                <div class="rsm-section-title">FECHA DE INICIO</div>
+                <div class="rsm-start-desc">Define desde qué día se calcula tu eficiencia</div>
+                <div class="rsm-date-row">
+                    <input type="date" id="inputFechaInicio" class="rsm-date-input">
+                    <button id="btnConfirmarFecha" class="rsm-date-btn">CONFIRMAR</button>
+                </div>
+            </div>
         </div>
-        <div class="rsm-section">
-          <div class="rsm-section-title">TABLA DE RANGOS</div>
-          <div id="rankTable" class="rsm-rank-table"></div>
-        </div>
-        <div class="rsm-section">
-          <div class="rsm-section-title">SISTEMA DE EXP</div>
-          <div class="rsm-exp-rules">
-            <div class="rsm-rule rsm-pos"><span class="rsm-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;filter:drop-shadow(0 0 4px currentColor);"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></span><span class="rsm-desc">Misión diaria completada</span><span class="rsm-val pos">+150 EXP</span></div>
-            <div class="rsm-rule rsm-pos"><span class="rsm-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;filter:drop-shadow(0 0 4px currentColor);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><span class="rsm-desc">Despeje Total (3/3 misiones)</span><span class="rsm-val pos">+100 EXP</span></div>
-            <div class="rsm-rule rsm-pos"><span class="rsm-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;filter:drop-shadow(0 0 4px currentColor);"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><span class="rsm-desc">Misión Bonus completada</span><span class="rsm-val pos">+100 EXP</span></div>
-            <div class="rsm-rule rsm-neg"><span class="rsm-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;filter:drop-shadow(0 0 4px currentColor);"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></span><span class="rsm-desc">0 misiones en el día</span><span class="rsm-val neg">−75 EXP</span></div>
-            <div class="rsm-rule rsm-neg"><span class="rsm-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;filter:drop-shadow(0 0 4px currentColor);"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><span class="rsm-desc">Solo 1 misión completada</span><span class="rsm-val neg">−25 EXP</span></div>
-            <div class="rsm-rule rsm-crit"><span class="rsm-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;filter:drop-shadow(0 0 4px currentColor);"><path d="M12 2a9 9 0 00-9 9c0 3.18 1.66 5.99 4.17 7.6V21h9.67v-2.4C19.34 17 21 14.18 21 11a9 9 0 00-9-9z"/><line x1="9" y1="17" x2="9" y2="21"/><line x1="15" y1="17" x2="15" y2="21"/><circle cx="9" cy="11" r="1" fill="currentColor"/><circle cx="15" cy="11" r="1" fill="currentColor"/></svg></span><span class="rsm-desc">2 días consecutivos sin nada</span><span class="rsm-val crit">−200 EXP</span></div>
-          </div>
-        </div>
-        <div class="rsm-section">
-          <div class="rsm-section-title">TU PROGRESO</div>
-          <div id="myRankProgress" class="rsm-my-progress"></div>
-        </div>
-        <div class="rsm-section">
-          <div class="rsm-section-title">FECHA DE INICIO</div>
-          <div class="rsm-start-desc">Define desde qué día se calcula tu eficiencia</div>
-          <div class="rsm-date-row">
-            <input type="date" id="inputFechaInicio" class="rsm-date-input">
-            <button id="btnConfirmarFecha" class="rsm-date-btn">CONFIRMAR</button>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Stats Modal -->
     <div id="statsModal" class="stats-overlay" style="display:none;">
-      <div class="stats-modal-content">
-        <button class="stats-close" id="btnCerrarStats">✕</button>
-        <div class="stats-modal-header">ESTADÍSTICAS DEL CAZADOR</div>
-        <div class="stats-grid">
-          <div class="stat-item" data-tooltip="Días consecutivos con al menos una misión completada">
-            <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L13 8L18 9L13 10L12 16L11 10L6 9L11 8L12 2Z" fill="#00FFFF"/><path d="M12 16V20" stroke="#00FFFF" stroke-width="2"/><path d="M10 18L12 20L14 18" stroke="#00FFFF" stroke-width="2"/><path d="M12 2L14 6L12 8L10 6L12 2Z" fill="#FF4500" opacity="0.7"/></svg></div>
-            <div class="stat-name">RACHA</div>
-            <div class="stat-value" id="stat-racha">0</div>
-            <div class="stat-desc">días consecutivos</div>
-            <div id="streakVisual" style="display:none;"></div>
-            <div class="stat-value" id="streakCount" style="display:none;">0</div>
-            <div class="stat-value" id="maxStreakCount" style="display:none;">0</div>
-            <div class="stat-tooltip"></div>
-          </div>
-          <div class="stat-item" data-tooltip="Total histórico de misiones completadas">
-            <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L20 6V12C20 16 16 20 12 22C8 20 4 16 4 12V6L12 2Z" stroke="#00FFFF" stroke-width="2" fill="none"/><path d="M9 12L11 14L15 10" stroke="#00FFFF" stroke-width="2" fill="none"/></svg></div>
-            <div class="stat-name">MISIONES</div>
-            <div class="stat-value" id="stat-misiones">0</div>
-            <div class="stat-desc">completadas</div>
-            <div class="stat-tooltip"></div>
-          </div>
-          <div class="stat-item" data-tooltip="Experiencia acumulada desde el primer día">
-            <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L16 8L20 14L16 20L12 22L8 20L4 14L8 8L12 2Z" stroke="#00FFFF" stroke-width="2" fill="none"/><path d="M12 2L16 8L12 14L8 8L12 2Z" fill="#00FFFF" opacity="0.4"/><circle cx="12" cy="12" r="2" fill="#00FFFF"/></svg></div>
-            <div class="stat-name">EXP TOTAL</div>
-            <div class="stat-value" id="stat-exp">0</div>
-            <div class="stat-desc">puntos acumulados</div>
-            <div class="stat-value" id="totalExpCount" style="display:none;">0</div>
-            <div class="stat-tooltip"></div>
-          </div>
-          <div class="stat-item" data-tooltip="Porcentaje de días con las 3 misiones completadas">
-            <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="#00FFFF" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="6" stroke="#00FFFF" stroke-width="1" fill="none"/><circle cx="12" cy="12" r="2" fill="#00FFFF"/><path d="M12 2V4M12 20V22M2 12H4M20 12H22" stroke="#00FFFF" stroke-width="1"/></svg></div>
-            <div class="stat-name">EFICIENCIA</div>
-            <div class="stat-value" id="stat-eficiencia">0%</div>
-            <div class="stat-desc">días con 3/3 misiones</div>
-            <div class="stat-tooltip"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Profile Modal (legacy — kept for JS compat) -->
-    <div id="hunterProfileModal" class="profile-modal" style="display:none;">
-        <div class="modal-background"></div>
-        <div class="modal-content profile-content">
-            <div class="modal-header">
-                <div class="modal-title-box"><span class="modal-title">IDENTIDAD DEL CAZADOR</span></div>
-            </div>
-            <div class="profile-details">
-                <div class="profile-name-section">
-                    <div class="profile-name" id="profileName">MARCO</div>
-                    <div class="profile-rank" id="profileRank">RANGO E</div>
+        <div class="stats-modal-content">
+            <button class="stats-close" id="btnCerrarStats">✕</button>
+            <div class="stats-modal-header">ESTADÍSTICAS DEL CAZADOR</div>
+            <div class="stats-grid">
+                <div class="stat-item" data-tooltip="Días consecutivos con al menos una misión completada">
+                    <div class="stat-name">RACHA</div>
+                    <div class="stat-value" id="stat-racha">0</div>
+                    <div class="stat-desc">días consecutivos</div>
+                    <div id="streakVisual" style="display:none;"></div>
+                    <div class="stat-value" id="streakCount" style="display:none;">0</div>
+                    <div class="stat-value" id="maxStreakCount" style="display:none;">0</div>
+                    <div class="stat-tooltip"></div>
                 </div>
-                <div class="profile-exp-bar">
-                    <div class="exp-bar-fill" id="profileExpFill"></div>
-                    <div class="exp-bar-text"><span id="profileExpText">0 / 1000 EXP</span></div>
+                <div class="stat-item" data-tooltip="Total histórico de misiones completadas">
+                    <div class="stat-name">MISIONES</div>
+                    <div class="stat-value" id="stat-misiones">0</div>
+                    <div class="stat-desc">completadas</div>
+                    <div class="stat-tooltip"></div>
                 </div>
-                <div class="profile-stats-grid">
-                    <div class="profile-stat"><div class="stat-label">Racha Actual</div><div class="stat-value" id="profileCurrentStreak">0</div></div>
-                    <div class="profile-stat"><div class="stat-label">Racha Máxima</div><div class="stat-value" id="profileMaxStreak">0</div></div>
-                    <div class="profile-stat"><div class="stat-label">Días Totales</div><div class="stat-value" id="profileTotalDays">0</div></div>
-                    <div class="profile-stat"><div class="stat-label">Misiones Completadas</div><div class="stat-value" id="profileCompletedMissions">0</div></div>
-                    <div class="profile-stat"><div class="stat-label">EXP Total</div><div class="stat-value" id="profileTotalExp">0</div></div>
-                    <div class="profile-stat"><div class="stat-label">% Eficiencia</div><div class="stat-value" id="profileEfficiency">0%</div></div>
+                <div class="stat-item" data-tooltip="Experiencia acumulada desde el primer día">
+                    <div class="stat-name">EXP TOTAL</div>
+                    <div class="stat-value" id="stat-exp">0</div>
+                    <div class="stat-desc">puntos acumulados</div>
+                    <div class="stat-value" id="totalExpCount" style="display:none;">0</div>
+                    <div class="stat-tooltip"></div>
+                </div>
+                <div class="stat-item" data-tooltip="Porcentaje de días con las 3 misiones completadas">
+                    <div class="stat-name">EFICIENCIA</div>
+                    <div class="stat-value" id="stat-eficiencia">0%</div>
+                    <div class="stat-desc">días con 3/3 misiones</div>
+                    <div class="stat-tooltip"></div>
                 </div>
             </div>
-            <div class="modal-close" id="closeProfile">×</div>
         </div>
-    </div>
-
-    <!-- Penalty Modal (legacy) -->
-    <div id="penaltyModal" class="penalty-modal" style="display:none;">
-        <div class="modal-background"></div>
-        <div class="modal-content penalty-content">
-            <div class="modal-header"><div class="modal-title-box"><span class="modal-title">ADVERTENCIA</span></div></div>
-            <div class="modal-body">
-                <div class="penalty-text">El Sistema registrará tu cobardía. -50 EXP</div>
-                <button onclick="confirmPenalty()" class="confirm-btn">CONFIRMAR</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="error-message" id="dungeonFailedMessage" style="display:none;">
-        Mazmorra Fallida: No completaste ninguna misión hoy.
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="script.js"></script>
+    <script src="script.js?v=37"></script>
 </body>
 </html>
