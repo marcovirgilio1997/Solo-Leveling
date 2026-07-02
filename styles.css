@@ -31,28 +31,30 @@ body{
 body::before{
   content:'';position:fixed;inset:0;pointer-events:none;z-index:6;
   background:radial-gradient(ellipse 130% 95% at 50% 50%, transparent 58%, rgba(0,0,0,.5) 100%);
+  transform:translateZ(0);-webkit-backface-visibility:hidden;
 }
 
 /* ───── AMBIENTE ───── */
 .shaft{
-  position:fixed;left:50%;top:0;transform:translateX(-50%);
-  width:min(420px,82vw);height:58vh;pointer-events:none;z-index:0;
+  position:fixed;left:50%;top:0;transform:translate3d(-50%,0,0);
+  width:min(420px,82vw);height:58vh;height:58svh;pointer-events:none;z-index:0;
   background:radial-gradient(ellipse 50% 78% at 50% 0%, rgba(0,180,255,.07), transparent 70%);
   filter:blur(12px);
+  will-change:opacity;-webkit-backface-visibility:hidden;
   animation:shaft 9s ease-in-out infinite alternate;
 }
 @keyframes shaft{from{opacity:.5}to{opacity:1}}
 .pt{position:fixed;width:3px;height:3px;border-radius:50%;
   background:rgba(0,235,255,.65);box-shadow:0 0 8px rgba(0,235,255,.75);
-  pointer-events:none;z-index:1;opacity:0}
+  pointer-events:none;z-index:1;opacity:0;-webkit-backface-visibility:hidden}
 .pt1{left:16%;animation:fl 17s linear infinite}
 .pt2{left:74%;animation:fl 23s linear infinite 7s}
 .pt3{left:46%;animation:fl 28s linear infinite 13s}
 @keyframes fl{
-  0%{transform:translateY(104vh) scale(.6);opacity:0}
+  0%{transform:translateY(104svh) scale(.6);opacity:0}
   12%{opacity:.65}
   85%{opacity:.35}
-  100%{transform:translateY(-8vh) scale(1);opacity:0}
+  100%{transform:translateY(-8svh) scale(1);opacity:0}
 }
 
 /* ───── LAYOUT ───── */
