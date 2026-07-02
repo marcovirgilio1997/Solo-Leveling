@@ -10,7 +10,12 @@
       "Bash(powershell -Command \"Get-Content 'c:/Users/Marco/OneDrive/Desktop/SoloLeveling/styles.css' | Select-Object -Skip 373 -First 15\")",
       "Bash(python3 -c ' *)",
       "Bash(node -e ' *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git ls-remote *)",
+      "Bash(gh api *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://marcovirgilio1997.github.io/Solo-Leveling/)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }
