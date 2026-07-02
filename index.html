@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=42">
+    <link rel="stylesheet" href="styles.css?v=44">
 </head>
 <body>
     <div class="shaft"></div>
@@ -206,7 +206,7 @@
     <div class="acts">
         <button class="act" id="btnRankSystem">SISTEMA DE RANGOS</button>
         <button class="act" id="btnHistorial">HISTORIAL DE EXP</button>
-        <button class="act" id="btnStats">ESTADÍSTICAS</button>
+        <button class="act" id="btnStats">ANÁLISIS DEL CAZADOR</button>
     </div>
 
     <!-- Modal Historial -->
@@ -302,45 +302,41 @@
         </div>
     </div>
 
-    <!-- Stats Modal -->
+    <!-- Análisis Modal -->
     <div id="statsModal" class="stats-overlay" style="display:none;">
         <div class="stats-modal-content">
             <button class="stats-close" id="btnCerrarStats">✕</button>
-            <div class="stats-modal-header">ESTADÍSTICAS DEL CAZADOR</div>
-            <div class="stats-grid">
-                <div class="stat-item" data-tooltip="Días consecutivos con al menos una misión completada">
-                    <div class="stat-name">RACHA</div>
-                    <div class="stat-value" id="stat-racha">0</div>
-                    <div class="stat-desc">días consecutivos</div>
-                    <div id="streakVisual" style="display:none;"></div>
-                    <div class="stat-value" id="streakCount" style="display:none;">0</div>
-                    <div class="stat-value" id="maxStreakCount" style="display:none;">0</div>
-                    <div class="stat-tooltip"></div>
+            <div class="stats-modal-header">ANÁLISIS DEL CAZADOR</div>
+
+            <div class="sec">
+                <div class="sec-t">RACHA</div>
+                <div class="rk">
+                    <div class="rk-box"><div class="rk-n" id="anRachaActual">0</div><div class="rk-l">Actual</div></div>
+                    <div class="rk-box rec"><div class="rk-n" id="anRachaRecord">0</div><div class="rk-l">Récord</div></div>
                 </div>
-                <div class="stat-item" data-tooltip="Total histórico de misiones completadas">
-                    <div class="stat-name">MISIONES</div>
-                    <div class="stat-value" id="stat-misiones">0</div>
-                    <div class="stat-desc">completadas</div>
-                    <div class="stat-tooltip"></div>
-                </div>
-                <div class="stat-item" data-tooltip="Experiencia acumulada desde el primer día">
-                    <div class="stat-name">EXP TOTAL</div>
-                    <div class="stat-value" id="stat-exp">0</div>
-                    <div class="stat-desc">puntos acumulados</div>
-                    <div class="stat-value" id="totalExpCount" style="display:none;">0</div>
-                    <div class="stat-tooltip"></div>
-                </div>
-                <div class="stat-item" data-tooltip="Porcentaje de días con las 3 misiones completadas">
-                    <div class="stat-name">EFICIENCIA</div>
-                    <div class="stat-value" id="stat-eficiencia">0%</div>
-                    <div class="stat-desc">días con 3/3 misiones</div>
-                    <div class="stat-tooltip"></div>
-                </div>
+                <div class="rk-days" id="anRachaDias"></div>
+                <div class="rk-cap">Últimos 14 días</div>
+            </div>
+
+            <div class="sec">
+                <div class="sec-t">DEBILIDAD DETECTADA</div>
+                <div id="anDebilidad"></div>
+            </div>
+
+            <div class="sec">
+                <div class="sec-t">PATRÓN SEMANAL · % DE DESPEJE TOTAL</div>
+                <div class="wd" id="anSemanal"></div>
+                <div class="wd-cap" id="anSemanalCap"></div>
+            </div>
+
+            <div class="sec" style="margin-bottom:4px">
+                <div class="sec-t">PROYECCIÓN DEL SISTEMA</div>
+                <div id="anProyeccion"></div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="script.js?v=42"></script>
+    <script src="script.js?v=44"></script>
 </body>
 </html>

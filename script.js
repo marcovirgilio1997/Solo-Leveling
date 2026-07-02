@@ -846,6 +846,177 @@ function renderQuestDia() {
 }
 
 // ============================================================
+// ANÁLISIS DEL CAZADOR
+// ============================================================
+const DIAS_SEM = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
+const DIAS_SEM_FULL = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+
+function countDia(d) {
+  return (d.nutricion ? 1 : 0) + (d.entrenamiento ? 1 : 0) + (d.suplementos ? 1 : 0);
+}
+
+function openAnalisisModal() {
+  const fInicio = getFechaInicio();
+  const todayStr = getTodayStr();
+  const hoy = new Date(todayStr + 'T00:00:00');
+  const inicio = new Date(fInicio + 'T00:00:00');
+  const ayer = new Date(hoy.getTime() - 86400000);
+
+  // ---- RACHA: actual, récord y ticks de 14 días
+  const rachaActual = calcularRacha();
+  let record = 0, run = 0;
+  for (let t = inicio.getTime(); t <= hoy.getTime(); t += 86400000) {
+    const key = dateToStr(new Date(t));
+    const d = misionesCache[key];
+    if (d && countDia(d) > 0) {
+      run++;
+      if (run > record) record = run;
+    } else if (key !== todayStr) {
+      run = 0;
+    }
+  }
+  const elRA = document.getElementById('anRachaActual');
+  const elRR = document.getElementById('anRachaRecord');
+  if (elRA) elRA.textContent = rachaActual;
+  if (elRR) elRR.textContent = record;
+
+  const ticksEl = document.getElementById('anRachaDias');
+  if (ticksEl) {
+    let ticks = '';
+    for (let i = 13; i >= 0; i--) {
+      const dDate = new Date(hoy.getTime() - i * 86400000);
+      const key = dateToStr(dDate);
+      if (key < fInicio) { ticks += '<i></i>'; continue; }
+      const d = misionesCache[key];
+      const ok = d && countDia(d) > 0;
+      if (key === todayStr && !ok) ticks += '<i></i>';
+      else ticks += ok ? '<i class="on"></i>' : '<i class="off"></i>';
+    }
+    ticksEl.innerHTML = ticks;
+  }
+
+  // ---- Días completos transcurridos (hasta ayer)
+  let diasCompletos = Math.floor((ayer.getTime() - inicio.getTime()) / 86400000) + 1;
+  if (diasCompletos < 0) diasCompletos = 0;
+
+  // ---- DEBILIDAD DETECTADA
+  const NOMBRES = { nutricion: 'Nutrición', entrenamiento: 'Entrenamiento', suplementos: 'Suplementos' };
+  const cumplidas = { nutricion: 0, entrenamiento: 0, suplementos: 0 };
+  for (let t = inicio.getTime(); t <= ayer.getTime(); t += 86400000) {
+    const d = misionesCache[dateToStr(new Date(t))];
+    if (!d) continue;
+    if (d.nutricion) cumplidas.nutricion++;
+    if (d.entrenamiento) cumplidas.entrenamiento++;
+    if (d.suplementos) cumplidas.suplementos++;
+  }
+  const debEl = document.getElementById('anDebilidad');
+  if (debEl) {
+    const rows = Object.keys(cumplidas).map(k => ({
+      key: k,
+      nombre: NOMBRES[k],
+      pct: diasCompletos > 0 ? Math.round((cumplidas[k] / diasCompletos) * 100) : 0,
+      fallos: Math.max(0, diasCompletos - cumplidas[k])
+    })).sort((a, b) => b.pct - a.pct);
+    const peor = rows[rows.length - 1];
+    const costo = peor.fallos * MISSION_EXP[peor.key];
+    debEl.innerHTML = rows.map(r => `
+      <div class="wk-row${r === peor && diasCompletos > 0 ? ' weak' : ''}">
+        <span class="wk-name">${r.nombre}</span>
+        <span class="wk-bar"><i style="width:${r.pct}%"></i></span>
+        <span class="wk-pct">${r.pct}%</span>
+      </div>`).join('') +
+      (diasCompletos > 0 && peor.fallos > 0 ? `
+      <div class="wk-verdict">
+        <b>PUNTO DÉBIL · ${peor.nombre.toUpperCase()}</b><br>
+        Te costó ${costo.toLocaleString()} EXP en misiones falladas desde el inicio.
+      </div>` : '');
+  }
+
+  // ---- PATRÓN SEMANAL
+  const semTotal = [0,0,0,0,0,0,0], semFull = [0,0,0,0,0,0,0];
+  for (let t = inicio.getTime(); t <= ayer.getTime(); t += 86400000) {
+    const dDate = new Date(t);
+    const wd = dDate.getDay();
+    semTotal[wd]++;
+    const d = misionesCache[dateToStr(dDate)];
+    if (d && countDia(d) === 3) semFull[wd]++;
+  }
+  const pcts = semTotal.map((n, i) => n > 0 ? Math.round((semFull[i] / n) * 100) : null);
+  const semEl = document.getElementById('anSemanal');
+  const semCap = document.getElementById('anSemanalCap');
+  if (semEl) {
+    let worst = -1, best = -1;
+    pcts.forEach((p, i) => {
+      if (p === null) return;
+      if (worst === -1 || p < pcts[worst]) worst = i;
+      if (best === -1 || p > pcts[best]) best = i;
+    });
+    semEl.innerHTML = pcts.map((p, i) => {
+      const h = p === null ? 3 : Math.max(p, 3);
+      const cls = (i === worst && worst !== best) ? ' worst' : (i === best ? ' best' : '');
+      return `<div class="wd-col${cls}"><div class="wd-bar" style="height:${h}%"></div><span class="wd-lbl">${DIAS_SEM[i]}</span></div>`;
+    }).join('');
+    if (semCap) {
+      semCap.innerHTML = (worst !== -1 && worst !== best)
+        ? `Tu día más flojo es el <b>${DIAS_SEM_FULL[worst]}</b> · ${pcts[worst]}% de despeje`
+        : '';
+    }
+  }
+
+  // ---- PROYECCIÓN DEL SISTEMA
+  const expTotal = calcularEXPTotal();
+  const rango = calcularRango(expTotal);
+  const idx = RANK_THRESHOLDS.findIndex(r => r.rank === rango);
+  const nxt = idx < RANK_THRESHOLDS.length - 1 ? RANK_THRESHOLDS[idx + 1] : null;
+
+  const ventana = Math.max(1, Math.min(14, diasCompletos));
+  let expVentana = 0;
+  for (let i = 1; i <= ventana; i++) {
+    const key = dateToStr(new Date(hoy.getTime() - i * 86400000));
+    if (key < fInicio) break;
+    const d = misionesCache[key];
+    if (!d) { expVentana += ZERO_MISSION_PENALTY; continue; }
+    const c = countDia(d);
+    let e = (d.nutricion ? MISSION_EXP.nutricion : 0) + (d.entrenamiento ? MISSION_EXP.entrenamiento : 0) + (d.suplementos ? MISSION_EXP.suplementos : 0) + (c === 3 ? FULL_CLEAR_BONUS : 0) + (d.bonusMission ? BONUS_MISSION_EXP : 0);
+    if (c === 0) e += ZERO_MISSION_PENALTY;
+    if (c === 1) e += ONE_MISSION_PENALTY;
+    if (d.bonusRejected) e += BONUS_REJECTED_PENALTY;
+    expVentana += e;
+  }
+  const ritmo = Math.max(0, Math.round(expVentana / ventana));
+
+  const diasTranscurridos = Math.floor((hoy.getTime() - inicio.getTime()) / 86400000);
+  const diasRestantes = Math.max(0, 105 - diasTranscurridos);
+
+  const pjEl = document.getElementById('anProyeccion');
+  if (pjEl) {
+    let rowsHTML = `<div class="pj-row"><span class="pj-l">Ritmo actual</span><span class="pj-v cy">${ritmo.toLocaleString()} EXP / DÍA</span></div>`;
+    let verdictHTML = '';
+    if (!nxt) {
+      verdictHTML = `<div class="pj-verdict">RANGO MÁXIMO ALCANZADO</div>`;
+    } else {
+      const falta = Math.max(0, nxt.threshold - expTotal);
+      rowsHTML += `<div class="pj-row"><span class="pj-l">Próximo rango</span><span class="pj-v">${nxt.rank} — ${RANK_NAMES[nxt.rank].toUpperCase()}</span></div>`;
+      if (ritmo > 0) {
+        const llegada = Math.ceil(falta / ritmo);
+        rowsHTML += `<div class="pj-row"><span class="pj-l">Llegada estimada</span><span class="pj-v cy">${llegada} DÍAS</span></div>`;
+        rowsHTML += `<div class="pj-row"><span class="pj-l">Fin de la misión</span><span class="pj-v">${diasRestantes} DÍAS</span></div>`;
+        if (llegada <= diasRestantes) {
+          verdictHTML = `<div class="pj-verdict">RANGO ${nxt.rank} ALCANZABLE<br>ANTES DEL FIN DE LA MISIÓN</div>`;
+        } else {
+          const necesario = diasRestantes > 0 ? Math.ceil(falta / diasRestantes) : falta;
+          verdictHTML = `<div class="pj-verdict bad">RITMO INSUFICIENTE<br>NECESITÁS ${necesario.toLocaleString()} EXP / DÍA</div>`;
+        }
+      } else {
+        rowsHTML += `<div class="pj-row"><span class="pj-l">Fin de la misión</span><span class="pj-v">${diasRestantes} DÍAS</span></div>`;
+        verdictHTML = `<div class="pj-verdict bad">SIN RITMO REGISTRADO<br>SUMÁ EXP HOY</div>`;
+      }
+    }
+    pjEl.innerHTML = `<div class="pj-rows">${rowsHTML}</div>` + verdictHTML;
+  }
+}
+
+// ============================================================
 // INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -940,6 +1111,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('btnStats')?.addEventListener('click', () => {
+    openAnalisisModal();
     document.getElementById('statsModal').style.display = 'flex';
   });
   document.getElementById('btnCerrarStats')?.addEventListener('click', () => {
