@@ -387,25 +387,6 @@ function renderCalendar() {
   title.textContent = `${MONTHS_ES[calMonth]} ${calYear}`;
   grid.innerHTML = '';
 
-  const resumen = document.getElementById('cal-resumen');
-  if (resumen) {
-    const fInicio = getFechaInicio();
-    let dias = 0, despejes = 0;
-    for (const [fecha, d] of Object.entries(misionesCache)) {
-      if (fecha < fInicio) continue;
-      dias++;
-      const c = (d.nutricion?1:0) + (d.entrenamiento?1:0) + (d.suplementos?1:0);
-      if (c === 3) despejes++;
-    }
-    if (dias > 0) {
-      const [fy, fm, fd] = fInicio.split('-');
-      const ef = Math.round((despejes / dias) * 100);
-      resumen.innerHTML = `DESDE EL <b>${fd}/${fm}</b> · <b>${dias}</b> DÍAS · <b>${despejes}</b> DESPEJES · <b>${ef}%</b> EFICIENCIA`;
-    } else {
-      resumen.innerHTML = '';
-    }
-  }
-
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const totalDays = new Date(calYear, calMonth + 1, 0).getDate();
   const todayStr = getTodayStr();

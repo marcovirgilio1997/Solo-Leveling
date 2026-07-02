@@ -298,14 +298,6 @@ body::before{
 .lg-full{background:rgba(0,90,160,.4);border-color:rgba(0,235,255,.5)}
 .lg-part{background:rgba(0,25,50,.4);border-color:rgba(0,200,255,.25)}
 .lg-zero{background:rgba(70,8,16,.45);border-color:rgba(255,93,112,.4)}
-.cal-resumen{
-  text-align:center;
-  font-family:'Orbitron';font-weight:400;font-size:.52em;
-  letter-spacing:2px;color:var(--tx-dim);
-  padding:2px 0 14px;
-}
-.cal-resumen b{color:rgba(0,235,255,.85);font-weight:500;text-shadow:0 0 8px rgba(0,235,255,.35)}
-.cal-resumen:empty{display:none}
 
 /* ───── ACCIONES ───── */
 .acts{
