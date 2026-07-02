@@ -38,8 +38,7 @@ body::before{
 .shaft{
   position:fixed;left:50%;top:0;transform:translate3d(-50%,0,0);
   width:min(420px,82vw);height:58vh;height:58svh;pointer-events:none;z-index:0;
-  background:radial-gradient(ellipse 50% 78% at 50% 0%, rgba(0,180,255,.07), transparent 70%);
-  filter:blur(12px);
+  background:radial-gradient(ellipse 50% 78% at 50% 0%, rgba(0,180,255,.06), transparent 70%);
   opacity:.75;
   will-change:opacity;-webkit-backface-visibility:hidden;
 }
@@ -107,13 +106,8 @@ body::before{
 #rankRingProgress{
   transform:rotate(-90deg);
   transform-origin:160px 160px;
-  filter:drop-shadow(0 0 8px rgba(0,235,255,.75)) drop-shadow(0 0 20px rgba(0,191,255,.45));
-  animation:pglow 2.6s ease-in-out infinite alternate;
+  filter:drop-shadow(0 0 10px rgba(0,235,255,.8)) drop-shadow(0 0 24px rgba(0,191,255,.5));
   transition:stroke-dashoffset .8s cubic-bezier(.25,.46,.45,.94);
-}
-@keyframes pglow{
-  from{filter:drop-shadow(0 0 6px rgba(0,235,255,.6)) drop-shadow(0 0 16px rgba(0,191,255,.4))}
-  to{filter:drop-shadow(0 0 14px rgba(0,235,255,.95)) drop-shadow(0 0 34px rgba(0,191,255,.7))}
 }
 #rankRingBubbles{transform:rotate(-90deg);transform-origin:160px 160px}
 .ring-tip{fill:#fff;filter:drop-shadow(0 0 10px #00f5ff) drop-shadow(0 0 22px #00ccff);
@@ -123,10 +117,8 @@ body::before{
 .rl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:3}
 .rl-letter{
   font-family:'Orbitron';font-weight:700;font-size:4em;line-height:1;color:#fff;
-  text-shadow:0 0 22px var(--cyan),0 0 60px rgba(0,235,255,.4);
-  animation:lp 3.2s ease-in-out infinite
+  text-shadow:0 0 22px var(--cyan),0 0 60px rgba(0,235,255,.45)
 }
-@keyframes lp{0%,100%{text-shadow:0 0 20px var(--cyan),0 0 55px rgba(0,235,255,.4)}50%{text-shadow:0 0 30px var(--cyan),0 0 85px rgba(0,235,255,.7)}}
 .rl-name{font-family:'Rajdhani';font-weight:500;font-size:.66em;letter-spacing:6px;text-indent:6px;color:var(--tx-dim);margin-top:10px;text-transform:uppercase}
 .rl-div{width:34px;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.5;margin:9px 0 7px}
 .rl-exp{font-family:'Orbitron';font-weight:400;font-size:.55em;letter-spacing:1.5px;color:rgba(225,245,255,.5)}
