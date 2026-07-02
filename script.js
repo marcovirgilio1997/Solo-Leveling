@@ -9,6 +9,7 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // CONSTANTES
 // ============================================================
 const NOMBRE_KEY = 'cazador-nombre';
+const FECHA_INICIO_FALLBACK = '2026-04-18';
 const RANK_THRESHOLDS = [
   { rank: 'E', threshold: 0 },
   { rank: 'D', threshold: 1500 },
@@ -51,6 +52,11 @@ function dateToStr(date) {
   return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
 }
 
+// Fecha de inicio blindada: localStorage → fallback fijo
+function getFechaInicio() {
+  return localStorage.getItem('fechaInicio') || FECHA_INICIO_FALLBACK;
+}
+
 // ============================================================
 // CARGA DESDE SUPABASE
 // ============================================================
@@ -89,7 +95,6 @@ async function guardarMision() {
   const prev = misionesCache[fecha] || {};
   misionesCache[fecha] = { ...prev, nutricion, entrenamiento, suplementos, bonusMission };
 
-  // UI inmediata, sin esperar la red
   updateUI();
 
   const { error } = await db.from('missions').upsert({
@@ -100,7 +105,6 @@ async function guardarMision() {
     bonus_mission: bonusMission
   }, { onConflict: 'fecha' });
 
-  console.log('Guardando:', fecha, { nutricion, entrenamiento, suplementos, bonusMission });
   if (error) console.error('Error guardando:', error);
 }
 
@@ -112,9 +116,9 @@ function getTodayMissionData() {
 }
 
 function calcularEXPTotal() {
-  const fechaInicio = localStorage.getItem('fechaInicio') || null;
+  const fechaInicio = getFechaInicio();
   const entries = Object.entries(misionesCache)
-    .filter(([fecha]) => !fechaInicio || fecha >= fechaInicio)
+    .filter(([fecha]) => fecha >= fechaInicio)
     .map(([fecha, data]) => ({ date: new Date(fecha + 'T00:00:00'), data }))
     .sort((a, b) => a.date - b.date);
 
@@ -125,7 +129,7 @@ function calcularEXPTotal() {
   const todayStr = getTodayStr();
 
   for (const { date, data } of entries) {
-    const fechaStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+    const fechaStr = dateToStr(date);
     const esHoy = fechaStr === todayStr;
     const count = (data.nutricion ? 1 : 0) + (data.entrenamiento ? 1 : 0) + (data.suplementos ? 1 : 0);
     const dailyExp = (data.nutricion ? MISSION_EXP.nutricion : 0) + (data.entrenamiento ? MISSION_EXP.entrenamiento : 0) + (data.suplementos ? MISSION_EXP.suplementos : 0) + (count === 3 ? FULL_CLEAR_BONUS : 0) + (data.bonusMission ? BONUS_MISSION_EXP : 0);
@@ -153,7 +157,7 @@ function calcularEXPTotal() {
 }
 
 function calcularRacha() {
-  const fechaInicio = localStorage.getItem('fechaInicio') || null;
+  const fechaInicio = getFechaInicio();
   let racha = 0;
   const hoy = new Date();
 
@@ -161,7 +165,7 @@ function calcularRacha() {
     const d = new Date(hoy);
     d.setDate(hoy.getDate() - i);
     const key = dateToStr(d);
-    if (fechaInicio && key < fechaInicio) break;
+    if (key < fechaInicio) break;
     const data = misionesCache[key];
     if (data) {
       const count = (data.nutricion ? 1 : 0) + (data.entrenamiento ? 1 : 0) + (data.suplementos ? 1 : 0);
@@ -207,8 +211,6 @@ function updateRankRing(expTotal) {
   const clamped = Math.min(Math.max(progress, 0), 100);
 
   const radius = 128;
-  const cxCenter = 160;
-  const cyCenter = 160;
   const circumference = 2 * Math.PI * radius;
 
   if (ring) {
@@ -219,8 +221,8 @@ function updateRankRing(expTotal) {
 
   const angleDeg = (clamped / 100) * 360 - 90;
   const angleRad = angleDeg * Math.PI / 180;
-  const cx = cxCenter + radius * Math.cos(angleRad);
-  const cy = cyCenter + radius * Math.sin(angleRad);
+  const cx = 160 + radius * Math.cos(angleRad);
+  const cy = 160 + radius * Math.sin(angleRad);
 
   if (tip) {
     tip.setAttribute('cx', cx);
@@ -314,15 +316,14 @@ function openRankSystemModal() {
   }
 
   const inputFecha = document.getElementById('inputFechaInicio');
-  if (inputFecha) inputFecha.value = localStorage.getItem('fechaInicio') || '';
+  if (inputFecha) inputFecha.value = getFechaInicio();
 
   document.getElementById('rankSystemModal').style.display = 'flex';
 }
 
 function updateUI() {
   const data = getTodayMissionData();
-  const fields = ['nutricion', 'entrenamiento', 'suplementos'];
-  fields.forEach(f => {
+  ['nutricion', 'entrenamiento', 'suplementos'].forEach(f => {
     const el = document.getElementById(`cb-${f}`);
     if (el) el.checked = data[f];
   });
@@ -349,10 +350,10 @@ function updateUI() {
   if (anilloTitulo) anilloTitulo.textContent = RANK_NAMES[rango] || '';
 
   const racha = calcularRacha();
-  const fechaInicio = localStorage.getItem('fechaInicio') || null;
+  const fechaInicio = getFechaInicio();
   let misionesTotales = 0, diasTotales = 0, diasCompletos = 0;
   for (const [fecha, d] of Object.entries(misionesCache)) {
-    if (fechaInicio && fecha < fechaInicio) continue;
+    if (fecha < fechaInicio) continue;
     const count = (d.nutricion ? 1 : 0) + (d.entrenamiento ? 1 : 0) + (d.suplementos ? 1 : 0);
     diasTotales++;
     misionesTotales += count;
@@ -388,15 +389,15 @@ function renderCalendar() {
 
   const resumen = document.getElementById('cal-resumen');
   if (resumen) {
-    const fInicio = localStorage.getItem('fechaInicio') || null;
+    const fInicio = getFechaInicio();
     let dias = 0, despejes = 0;
     for (const [fecha, d] of Object.entries(misionesCache)) {
-      if (fInicio && fecha < fInicio) continue;
+      if (fecha < fInicio) continue;
       dias++;
       const c = (d.nutricion?1:0) + (d.entrenamiento?1:0) + (d.suplementos?1:0);
       if (c === 3) despejes++;
     }
-    if (fInicio && dias > 0) {
+    if (dias > 0) {
       const [fy, fm, fd] = fInicio.split('-');
       const ef = Math.round((despejes / dias) * 100);
       resumen.innerHTML = `DESDE EL <b>${fd}/${fm}</b> · <b>${dias}</b> DÍAS · <b>${despejes}</b> DESPEJES · <b>${ef}%</b> EFICIENCIA`;
@@ -450,7 +451,6 @@ function renderCalendar() {
         cell.appendChild(mark);
       }
     } else if (!isToday) {
-      // Día pasado sin registro = día perdido
       cell.classList.add('cal-miss');
     }
 
@@ -570,9 +570,9 @@ function confirmarCobardia() {
 // HISTORIAL DE EXP
 // ============================================================
 function openHistorialModal() {
-  const fechaInicio = localStorage.getItem('fechaInicio') || null;
+  const fechaInicio = getFechaInicio();
   const allEntries = Object.entries(misionesCache)
-    .filter(([fecha]) => !fechaInicio || fecha >= fechaInicio)
+    .filter(([fecha]) => fecha >= fechaInicio)
     .map(([fecha, data]) => ({ date: new Date(fecha + 'T00:00:00'), fecha, data }))
     .sort((a, b) => a.date - b.date);
 
@@ -664,8 +664,7 @@ function iniciarTimerMision() {
   if (!el) return;
 
   function actualizar() {
-    const fi = localStorage.getItem('fechaInicio');
-    const inicio = fi ? new Date(fi + 'T00:00:00') : new Date(getTodayStr() + 'T00:00:00');
+    const inicio = new Date(getFechaInicio() + 'T00:00:00');
     const fin = new Date(inicio.getTime() + 105 * 86400000);
     const restante = fin.getTime() - Date.now();
 
@@ -752,7 +751,6 @@ function renderSysLog() {
     return;
   }
 
-  // Renders posteriores: instantáneo, sin re-tipear
   if (syslogTyped) {
     container.innerHTML = eventos.map(ev =>
       `<div class="syslog-line"><span class="sl-time">> [${ev.t}] </span><span class="${ev.cls}">${ev.txt}</span></div>`
@@ -760,7 +758,6 @@ function renderSysLog() {
     return;
   }
 
-  // Primer render: animación de tipeo (una sola vez por carga)
   syslogTyped = true;
   let lineIdx = 0;
 
