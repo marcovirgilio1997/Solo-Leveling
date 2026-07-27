@@ -10,6 +10,7 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // ============================================================
 const NOMBRE_KEY = 'cazador-nombre';
 const FECHA_INICIO_FALLBACK = '2026-04-18';
+const FECHA_FIN_FALLBACK = '2026-08-16';
 const RANK_THRESHOLDS = [
   { rank: 'E', threshold: 0 },
   { rank: 'D', threshold: 1500 },
@@ -55,6 +56,11 @@ function dateToStr(date) {
 // Fecha de inicio blindada: localStorage → fallback fijo
 function getFechaInicio() {
   return localStorage.getItem('fechaInicio') || FECHA_INICIO_FALLBACK;
+}
+
+// Fecha de fin de misión: independiente de la fecha de inicio (no afecta historial/EXP)
+function getFechaFinMision() {
+  return localStorage.getItem('fechaFinMision') || FECHA_FIN_FALLBACK;
 }
 
 // ============================================================
@@ -317,6 +323,9 @@ function openRankSystemModal() {
 
   const inputFecha = document.getElementById('inputFechaInicio');
   if (inputFecha) inputFecha.value = getFechaInicio();
+
+  const inputFin = document.getElementById('inputFechaFin');
+  if (inputFin) inputFin.value = getFechaFinMision();
 
   document.getElementById('rankSystemModal').style.display = 'flex';
 }
@@ -645,8 +654,7 @@ function iniciarTimerMision() {
   if (!el) return;
 
   function actualizar() {
-    const inicio = new Date(getFechaInicio() + 'T00:00:00');
-    const fin = new Date(inicio.getTime() + 105 * 86400000);
+    const fin = new Date(getFechaFinMision() + 'T00:00:00');
     const restante = fin.getTime() - Date.now();
 
     if (restante <= 0) {
@@ -966,8 +974,8 @@ function openAnalisisModal() {
   }
   const ritmo = Math.max(0, Math.round(expVentana / ventana));
 
-  const diasTranscurridos = Math.floor((hoy.getTime() - inicio.getTime()) / 86400000);
-  const diasRestantes = Math.max(0, 105 - diasTranscurridos);
+  const finMision = new Date(getFechaFinMision() + 'T00:00:00');
+  const diasRestantes = Math.max(0, Math.floor((finMision.getTime() - Date.now()) / 86400000));
 
   const pjEl = document.getElementById('anProyeccion');
   if (pjEl) {
@@ -1078,6 +1086,20 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       localStorage.removeItem('fechaInicio');
       await db.from('config').delete().eq('key', 'fechaInicio');
+    }
+    location.reload();
+  });
+
+  document.getElementById('btnConfirmarFechaFin')?.addEventListener('click', async () => {
+    const input = document.getElementById('inputFechaFin');
+    if (!input) return;
+    const val = input.value;
+    if (val) {
+      localStorage.setItem('fechaFinMision', val);
+      await db.from('config').upsert({ key: 'fechaFinMision', value: val }, { onConflict: 'key' });
+    } else {
+      localStorage.removeItem('fechaFinMision');
+      await db.from('config').delete().eq('key', 'fechaFinMision');
     }
     location.reload();
   });
