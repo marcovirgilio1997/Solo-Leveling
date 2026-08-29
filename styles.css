@@ -172,6 +172,15 @@ body::before{
 .sw-h::after{content:'';position:absolute;left:16%;right:16%;bottom:0;height:1px;
   background:linear-gradient(90deg,transparent,rgba(0,210,255,.3),transparent)}
 .sw-t{font-family:'Orbitron';font-weight:500;font-size:.6em;letter-spacing:6px;text-indent:6px;color:rgba(225,245,255,.8)}
+.sw-i{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  width:19px;height:19px;display:grid;place-items:center;border-radius:50%;
+  border:1px solid rgba(0,200,255,.3);background:none;
+  font-family:'Orbitron';font-weight:500;font-size:9px;line-height:1;
+  color:rgba(0,225,255,.65);cursor:pointer;
+  transition:border-color .2s,color .2s,box-shadow .2s
+}
+.sw-i:active{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 10px rgba(0,235,255,.3)}
 .sw-b{padding:18px 18px 20px}
 .sw-b-tight{padding:14px 14px 16px}
 
@@ -321,6 +330,10 @@ body::before{
   margin-top:8px;padding-top:12px;border-top:1px solid var(--line2);text-align:right;
   font-family:'Orbitron';font-weight:400;font-size:.56em;letter-spacing:2px;color:var(--tx-faint);text-transform:uppercase
 }
+.m-pre{
+  text-align:center;font-size:.96em;color:var(--tx-dim);line-height:1.6;
+  padding:22px 12px;letter-spacing:.3px
+}
 
 /* ───── CALENDARIO ───── */
 #cal-nav{display:flex;align-items:center;justify-content:space-between;padding:0 2px 12px}
@@ -444,6 +457,13 @@ body::before{
   padding:14px;cursor:pointer;text-shadow:0 0 6px var(--cyan2);transition:all .2s
 }
 .cfg-save:active{background:rgba(0,200,255,.1);color:#fff;box-shadow:0 0 14px rgba(0,235,255,.3)}
+
+/* ───── MODAL INFO ───── */
+.info-block{margin-bottom:17px}
+.info-block:last-child{margin-bottom:0}
+.info-h{font-family:'Orbitron';font-weight:500;font-size:.56em;letter-spacing:2.5px;
+  color:var(--cyan2);margin-bottom:7px;text-transform:uppercase}
+.info-block p{font-size:.94em;color:var(--tx-dim);line-height:1.6;letter-spacing:.2px}
 
 /* ───── COWARD ───── */
 .coward-content{

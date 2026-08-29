@@ -10,7 +10,7 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // ============================================================
 const CICLO_ACTUAL = 2;
 const NOMBRE_KEY = 'cazador-nombre';
-const FECHA_INICIO_FALLBACK = '2026-08-26';
+const FECHA_INICIO_FALLBACK = '2026-08-31';
 const FECHA_FIN_FALLBACK = '2026-11-10';
 
 const MISIONES = [
@@ -48,20 +48,17 @@ const RANK_NAMES = {
 };
 
 const FULL_CLEAR_BONUS = 150;
-const BONUS_MISSION_EXP = 100;
 const ZERO_MISSION_PENALTY = -75;
 const ONE_MISSION_PENALTY = -25;
 const TWO_DAY_STREAK_PENALTY = -200;
-const BONUS_REJECTED_PENALTY = -50;
 const MIN_EXP_TOTAL = 0;
 
 const KCAL_POR_KG = 7700;
 const DEFICIT_DIARIO = 600;
-const UMBRAL_GRASA = 0.82;
 const UMBRAL_MUSCULO = 0.75;
 const INCERTIDUMBRE_KG = 1.5;
 
-const ANTRO_DEFAULT = { peso:84.8, musculo:39.0, grasa:16.9, objetivo:12.0 };
+const ANTRO_DEFAULT = { peso:84.8, musculo:39.0, grasa:16.9, objetivo:12.9 };
 
 const MONTHS_ES = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
 
@@ -99,7 +96,6 @@ function expDia(d) {
   const defs = defsDelDia(d);
   let e = defs.reduce((n, m) => n + (d[m.key] ? m.exp : 0), 0);
   if (countDia(d) === defs.length) e += FULL_CLEAR_BONUS;
-  if (d.bonusMission) e += BONUS_MISSION_EXP;
   return e;
 }
 
@@ -112,7 +108,7 @@ function penalDia(d) {
 }
 
 function diaVacio() {
-  const base = { ciclo: CICLO_ACTUAL, bonusMission: false, bonusRejected: false, nota: '' };
+  const base = { ciclo: CICLO_ACTUAL, nota: '' };
   for (const m of MISIONES) base[m.key] = false;
   return base;
 }
@@ -132,8 +128,6 @@ async function cargarDesdeSupabase() {
     const ciclo = row.ciclo || 1;
     const dia = {
       ciclo,
-      bonusMission: !!row.bonus_mission,
-      bonusRejected: !!row.bonus_rejected,
       nota: row.nota || ''
     };
     for (const m of (ciclo === 1 ? MISIONES_C1 : MISIONES)) dia[m.key] = !!row[m.col];
@@ -146,6 +140,7 @@ async function cargarDesdeSupabase() {
 
 async function guardarMision() {
   const fecha = getTodayStr();
+  if (fecha < getFechaInicio()) return;
   const prev = misionesCache[fecha] || diaVacio();
   const dia = { ...prev, ciclo: CICLO_ACTUAL };
   const payload = { fecha, ciclo: CICLO_ACTUAL };
@@ -155,8 +150,6 @@ async function guardarMision() {
     dia[m.key] = v;
     payload[m.col] = v;
   }
-  dia.bonusMission = document.getElementById('bonusMissionCheckbox')?.checked || false;
-  payload.bonus_mission = dia.bonusMission;
 
   misionesCache[fecha] = dia;
   updateUI();
@@ -189,7 +182,6 @@ function calcularEXPTotal() {
       zeroStreak = 0;
     }
     if (!esHoy && zeroStreak === 2) penalty += TWO_DAY_STREAK_PENALTY;
-    if (data.bonusRejected) penalty += BONUS_REJECTED_PENALTY;
 
     total += expDia(data) + penalty;
     previousDate = date;
@@ -214,7 +206,11 @@ function statsProyeccion() {
   const ayer = new Date(hoy.getTime() - 86400000);
 
   const diasCiclo = Math.max(1, Math.round((fin - inicio) / 86400000));
-  const diasLimpiosNecesarios = Math.ceil(diasCiclo * UMBRAL_GRASA);
+
+  const antro = getAntro();
+  const deficitKg = Math.max(0, antro.grasa - antro.objetivo);
+  const diasLimpiosNecesarios = Math.min(diasCiclo, Math.ceil(deficitKg * KCAL_POR_KG / DEFICIT_DIARIO));
+  const umbralGrasa = diasCiclo > 0 ? diasLimpiosNecesarios / diasCiclo : 0;
   const fichasTotal = diasCiclo - diasLimpiosNecesarios;
 
   let evaluados = 0, limpios = 0, musOK = 0, musPos = 0;
@@ -232,16 +228,16 @@ function statsProyeccion() {
   const adhMusculo = musPos > 0 ? musOK / musPos : 0;
   const fichasUsadas = Math.max(0, evaluados - limpios);
 
-  const antro = getAntro();
   const perdida = adhGrasa * diasCiclo * DEFICIT_DIARIO / KCAL_POR_KG;
-  const grasaProy = Math.max(4, antro.grasa - perdida);
+  const grasaProy = Math.max(0, antro.grasa - perdida);
 
   const diasRestantes = Math.max(0, Math.round((fin - hoy) / 86400000));
+  const preCiclo = getTodayStr() < getFechaInicio();
 
   return {
-    diasCiclo, diasRestantes, evaluados, limpios,
+    diasCiclo, diasRestantes, evaluados, limpios, preCiclo,
     fichasTotal, fichasUsadas,
-    adhGrasa, adhMusculo,
+    adhGrasa, adhMusculo, umbralGrasa,
     grasaProy, antro,
     diaActual: Math.max(1, Math.min(diasCiclo, Math.round((hoy - inicio) / 86400000) + 1))
   };
@@ -267,7 +263,9 @@ function renderProyeccion() {
   const s = statsProyeccion();
 
   const cicloDia = document.getElementById('cicloDia');
-  if (cicloDia) cicloDia.textContent = `DÍA ${s.diaActual} DE ${s.diasCiclo}`;
+  if (cicloDia) cicloDia.textContent = s.preCiclo
+    ? `POR COMENZAR · ${s.diasCiclo} DÍAS`
+    : `DÍA ${s.diaActual} DE ${s.diasCiclo}`;
 
   function barra(pctId, barId, markId, capId, valor, umbral, etiqueta) {
     const pct = Math.round(valor * 100);
@@ -288,7 +286,7 @@ function renderProyeccion() {
   }
 
   barra('adhGrasaPct', 'adhGrasaBar', 'adhGrasaMark', 'adhGrasaCap',
-    s.adhGrasa, UMBRAL_GRASA, `${s.limpios} de ${s.evaluados} días limpios`);
+    s.adhGrasa, s.umbralGrasa, `${s.limpios} de ${s.evaluados} días limpios`);
   barra('adhMusculoPct', 'adhMusculoBar', 'adhMusculoMark', 'adhMusculoCap',
     s.adhMusculo, UMBRAL_MUSCULO, 'entrenamiento y suplementos');
 
@@ -315,11 +313,13 @@ function renderProyeccion() {
   const ver = document.getElementById('proyVeredicto');
   if (ver) {
     ver.classList.remove('bad', 'warn');
-    if (s.evaluados === 0) {
+    if (s.preCiclo) {
+      ver.textContent = 'EL CICLO AÚN NO COMENZÓ';
+    } else if (s.evaluados === 0) {
       ver.textContent = 'SIN DATOS SUFICIENTES';
-    } else if (s.adhGrasa >= UMBRAL_GRASA && s.adhMusculo >= UMBRAL_MUSCULO) {
+    } else if (s.adhGrasa >= s.umbralGrasa && s.adhMusculo >= UMBRAL_MUSCULO) {
       ver.innerHTML = 'EN RITMO<br>LA META ESTÁ AL ALCANCE';
-    } else if (s.adhGrasa >= UMBRAL_GRASA) {
+    } else if (s.adhGrasa >= s.umbralGrasa) {
       ver.classList.add('warn');
       ver.innerHTML = 'LA GRASA VA EN RITMO<br>EL ENTRENAMIENTO ESTÁ POR DEBAJO';
     } else if (s.adhMusculo >= UMBRAL_MUSCULO) {
@@ -338,6 +338,14 @@ function renderProyeccion() {
 function renderMisiones() {
   const cont = document.getElementById('misionesLista');
   if (!cont) return;
+
+  const inicio = getFechaInicio();
+  if (getTodayStr() < inicio) {
+    const [, mes, dia] = inicio.split('-');
+    cont.innerHTML = `<div class="m-pre">El ciclo arranca el ${dia}/${mes}. Las misiones se habilitan ese día.</div>`;
+    return;
+  }
+
   const data = getTodayMissionData();
   let html = '', grupoPrev = null;
 
@@ -411,10 +419,6 @@ function cargarNombreCazador() {
 function updateUI() {
   const data = getTodayMissionData();
   renderMisiones();
-
-  const cb = document.getElementById('bonusMissionCheckbox');
-  if (cb) cb.checked = data.bonusMission;
-
   syncMissionRows();
   cargarNombreCazador();
 
@@ -494,12 +498,6 @@ function renderCalendar() {
       }
       bar.appendChild(fill);
       cell.appendChild(bar);
-      if (data.bonusMission) {
-        const mark = document.createElement('span');
-        mark.className = 'cal-bonus-mark';
-        mark.textContent = '◆';
-        cell.appendChild(mark);
-      }
     } else if (!isToday) {
       cell.classList.add('cal-miss');
     }
@@ -518,100 +516,11 @@ function renderCalendar() {
       const defs = defsDelDia(data);
       const icon = v => v ? '<span class="cd-ok">✓</span>' : '<span class="cd-no">✗</span>';
       const filas = defs.map(m => `${icon(data[m.key])} ${m.label.toUpperCase()}`).join('<br>');
-      const bonus = data.bonusMission ? '<br><span class="cd-bonus">◆ MISIÓN BONUS COMPLETADA</span>' : '';
       const c1 = data.ciclo === 1 ? '<br><span class="cd-empty">Registro del Ciclo 1</span>' : '';
-      detail.innerHTML = `${cab}<br>${filas}${bonus}${c1}`;
+      detail.innerHTML = `${cab}<br>${filas}${c1}`;
     });
 
     grid.appendChild(cell);
-  }
-}
-
-// ============================================================
-// MISIÓN BONUS
-// ============================================================
-const BONUS_POOL = [
-  'Caminá 20 minutos sin parar',
-  'Mantené plancha 60 segundos',
-  'Hacé 40 sentadillas',
-  'Hacé 30 flexiones',
-  'Hacé 3 series de 10 flexiones diamante'
-];
-
-function getBonusMisionDelDia() {
-  const hoy = getTodayStr();
-  let hash = 0;
-  for (let i = 0; i < hoy.length; i++) hash += hoy.charCodeAt(i);
-  return BONUS_POOL[hash % BONUS_POOL.length];
-}
-
-function mostrarBonusInline() {
-  const hoy = getTodayStr();
-  if (localStorage.getItem('bonusDate') === hoy) return;
-  const mision = getBonusMisionDelDia();
-  localStorage.setItem('bonusMision', mision);
-  const el = document.getElementById('bonusModalMision');
-  if (el) el.textContent = mision;
-  const box = document.getElementById('bonusInline');
-  if (!box) return;
-  box.style.display = 'block';
-  requestAnimationFrame(() => requestAnimationFrame(() => box.classList.add('visible')));
-}
-
-function cerrarBonusInline() {
-  const box = document.getElementById('bonusInline');
-  if (!box) return;
-  box.classList.remove('open');
-  setTimeout(() => {
-    box.classList.remove('visible');
-    setTimeout(() => { box.style.display = 'none'; }, 500);
-  }, 350);
-}
-
-function aceptarBonus() {
-  localStorage.setItem('bonusDate', getTodayStr());
-  localStorage.setItem('bonusStatus', 'aceptada');
-  const flash = document.getElementById('bonusFlash');
-  if (flash) { flash.classList.add('on'); setTimeout(() => flash.classList.remove('on'), 180); }
-  cerrarBonusInline();
-  const container = document.getElementById('bonusMissionContainer');
-  const texto = document.getElementById('bonusMissionText');
-  if (container) container.style.display = 'flex';
-  if (texto) texto.textContent = `[BONUS] ${localStorage.getItem('bonusMision')}`;
-}
-
-async function rechazarBonus() {
-  cerrarBonusInline();
-  const hoy = getTodayStr();
-  localStorage.setItem('bonusDate', hoy);
-  localStorage.setItem('bonusStatus', 'rechazada');
-
-  const prev = misionesCache[hoy] || diaVacio();
-  misionesCache[hoy] = { ...prev, bonusRejected: true, ciclo: CICLO_ACTUAL };
-
-  const payload = { fecha: hoy, ciclo: CICLO_ACTUAL, bonus_rejected: true, bonus_mission: !!prev.bonusMission };
-  for (const m of MISIONES) payload[m.col] = !!prev[m.key];
-  await db.from('missions').upsert(payload, { onConflict: 'fecha' });
-
-  setTimeout(() => {
-    const coward = document.getElementById('cowardModal');
-    if (coward) coward.style.display = 'flex';
-  }, 780);
-}
-
-function confirmarCobardia() {
-  const coward = document.getElementById('cowardModal');
-  if (coward) coward.style.display = 'none';
-  updateUI();
-}
-
-function checkBonusStatus() {
-  if (localStorage.getItem('bonusDate') === getTodayStr() &&
-      localStorage.getItem('bonusStatus') === 'aceptada') {
-    const container = document.getElementById('bonusMissionContainer');
-    const texto = document.getElementById('bonusMissionText');
-    if (container) container.style.display = 'flex';
-    if (texto) texto.textContent = `[BONUS] ${localStorage.getItem('bonusMision')}`;
   }
 }
 
@@ -661,8 +570,6 @@ function generarEventosSistema() {
       if (d[m.key]) eventos.push({ t: label, txt: `+${m.exp} EXP — ${m.label}`, cls: 'sl-pos' });
     }
     if (count === defs.length) eventos.push({ t: label, txt: `+${FULL_CLEAR_BONUS} EXP — DESPEJE TOTAL`, cls: 'sl-gold' });
-    if (d.bonusMission) eventos.push({ t: label, txt: `+${BONUS_MISSION_EXP} EXP — Misión Bonus`, cls: 'sl-gold' });
-    if (d.bonusRejected) eventos.push({ t: label, txt: `${BONUS_REJECTED_PENALTY} EXP — Bonus rechazada`, cls: 'sl-neg' });
 
     if (fechaStr !== todayStr) {
       const p = penalDia(d);
@@ -838,11 +745,6 @@ document.addEventListener('DOMContentLoaded', () => {
   renderEstado();
   renderProyeccion();
 
-  document.getElementById('bonusMissionCheckbox')?.addEventListener('change', () => {
-    syncMissionRows();
-    guardarMision();
-  });
-
   document.getElementById('cal-prev')?.addEventListener('click', () => {
     calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
     renderCalendar();
@@ -862,15 +764,17 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('configModal').style.display = 'none';
   });
 
-  document.getElementById('btnAceptarBonus')?.addEventListener('click', aceptarBonus);
-  document.getElementById('btnRechazarBonus')?.addEventListener('click', rechazarBonus);
-  document.getElementById('btnConfirmarCobardia')?.addEventListener('click', confirmarCobardia);
-  document.getElementById('bonusToggle')?.addEventListener('click', () => {
-    document.getElementById('bonusInline')?.classList.toggle('open');
+  const proyInfo = document.getElementById('proyInfoModal');
+  document.getElementById('btnProyInfo')?.addEventListener('click', () => {
+    if (proyInfo) proyInfo.style.display = 'flex';
+  });
+  document.getElementById('btnCerrarProyInfo')?.addEventListener('click', () => {
+    if (proyInfo) proyInfo.style.display = 'none';
+  });
+  proyInfo?.addEventListener('click', e => {
+    if (e.target === proyInfo) proyInfo.style.display = 'none';
   });
 
   iniciarTimerMision();
-  checkBonusStatus();
   renderQuestDia();
-  setTimeout(mostrarBonusInline, 1200);
 });

@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=46">
+    <link rel="stylesheet" href="styles.css?v=47">
 </head>
 <body>
     <div id="ariseOverlay" class="arise-overlay">
@@ -140,7 +140,10 @@
 
         <section class="sw">
             <i class="cx"></i>
-            <div class="sw-h"><span class="sw-t">PROYECCIÓN DEL CICLO</span></div>
+            <div class="sw-h">
+                <span class="sw-t">PROYECCIÓN DEL CICLO</span>
+                <button class="sw-i" id="btnProyInfo" aria-label="Cómo se calcula">i</button>
+            </div>
             <div class="sw-b">
                 <div class="pb">
                     <div class="pb-head">
@@ -188,22 +191,6 @@
             <i class="cx"></i>
             <div class="sw-h"><span class="sw-t">EL SISTEMA</span></div>
             <div class="sw-b">
-                <div id="bonusInline" class="qi-inline" style="display:none;">
-                    <button id="bonusToggle" class="qi-t">
-                        <span class="qi-d"><span>◆</span></span>
-                        <span class="qi-tx">MISIÓN DISPONIBLE</span>
-                        <span class="qi-ch"></span>
-                    </button>
-                    <div class="qi-x">
-                        <div class="qi-m" id="bonusModalMision"></div>
-                        <div class="qi-r">+100 EXP</div>
-                        <div class="qi-w">El rechazo será penalizado<b>−50 EXP</b></div>
-                        <div class="qi-bt">
-                            <button id="btnAceptarBonus" class="btn btn-a">ACEPTAR</button>
-                            <button id="btnRechazarBonus" class="btn btn-r">RECHAZAR</button>
-                        </div>
-                    </div>
-                </div>
                 <div class="q-l">QUEST DEL DÍA</div>
                 <div class="q-t" id="questDiaTitle"></div>
                 <div class="q-d" id="questDiaDesc"></div>
@@ -215,14 +202,6 @@
             <div class="sw-h"><span class="sw-t">MISIONES DIARIAS</span></div>
             <div class="sw-b sw-b-tight">
                 <div id="misionesLista"></div>
-                <div class="m-row" id="bonusMissionContainer" style="display:none;">
-                    <label class="m-check">
-                        <input type="checkbox" id="bonusMissionCheckbox">
-                        <span class="m-mk"></span>
-                    </label>
-                    <span class="m-n" id="bonusMissionText">Misión Bonus</span>
-                    <span class="m-e">+100 EXP</span>
-                </div>
                 <div class="m-sum" id="recompensa-diaria">RECOMPENSA ESTIMADA · 0 EXP</div>
             </div>
         </section>
@@ -305,20 +284,39 @@
         </div>
     </div>
 
-    <div id="bonusFlash" class="bonus-flash"></div>
+    <div id="proyInfoModal" class="cfg-overlay" style="display:none;">
+        <div class="cfg-content">
+            <button class="cfg-close" id="btnCerrarProyInfo">✕</button>
+            <div class="cfg-header">CÓMO SE CALCULA</div>
 
-    <div id="cowardModal" class="coward-overlay" style="display:none;">
-        <div class="coward-content">
-            <div class="coward-header">ADVERTENCIA DEL SISTEMA</div>
-            <div class="coward-body">
-                El Sistema registrará tu cobardía.
-                <span class="coward-penalty">−50 EXP</span>
+            <div class="info-block">
+                <div class="info-h">Qué muestra</div>
+                <p>Estima cuánta grasa vas a tener el 10 de noviembre según cómo venís cumpliendo el plan. No es una medición: la única real es el InBody del cierre.</p>
             </div>
-            <button id="btnConfirmarCobardia" class="coward-confirm-btn">CONFIRMAR</button>
+            <div class="info-block">
+                <div class="info-h">Día limpio</div>
+                <p>Un día cuenta como limpio si cumplís al menos 5 de las 6 misiones de nutrición: desayuno, almuerzo, merienda, cena, ayuno y día limpio.</p>
+            </div>
+            <div class="info-block">
+                <div class="info-h">Barra de grasa</div>
+                <p>Días limpios sobre días transcurridos. El umbral marcado es el mínimo que necesitás sostener para bajar los 4 kg antes del cierre.</p>
+            </div>
+            <div class="info-block">
+                <div class="info-h">Barra de músculo</div>
+                <p>Promedio de entrenamiento y suplementos. Por debajo del 75 % hay riesgo de perder músculo mientras bajás grasa.</p>
+            </div>
+            <div class="info-block">
+                <div class="info-h">Presupuesto de fallas</div>
+                <p>Los días que podés fallar y todavía llegar al objetivo. Cada día no limpio gasta uno.</p>
+            </div>
+            <div class="info-block">
+                <div class="info-h">Grasa proyectada</div>
+                <p>Parte de tu grasa inicial y resta lo que baja con un déficit estimado de 600 kcal por día limpio. Va como rango de ±1,5 kg porque se calcula sobre tildes, no sobre balanza.</p>
+            </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="script.js?v=46"></script>
+    <script src="script.js?v=47"></script>
 </body>
 </html>
