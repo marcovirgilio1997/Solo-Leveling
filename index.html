@@ -3,22 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Sistema de Cazador — Solo Leveling</title>
+    <title>Sistema de Cazador — Ciclo 2</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=44">
+    <link rel="stylesheet" href="styles.css?v=46">
 </head>
 <body>
+    <div id="ariseOverlay" class="arise-overlay">
+        <div class="arise-line"></div>
+        <div class="arise-word">
+            <span>A</span><span>R</span><span>I</span><span>S</span><span>E</span>
+        </div>
+        <div class="arise-line"></div>
+    </div>
+
     <div class="shaft"></div>
     <i class="pt pt1"></i><i class="pt pt2"></i><i class="pt pt3"></i>
 
     <div class="main-container">
 
-        <!-- HEADER -->
         <header class="hd">
             <div class="hd-rule"><i></i><b></b><i></i></div>
             <div class="hd-title">SOLO LEVELING</div>
+            <div class="hd-ciclo">CICLO 2 · <span id="cicloDia">—</span></div>
             <div class="timer">
                 <div class="timer-l">TIEMPO RESTANTE</div>
                 <div class="timer-d" id="misionTimer">
@@ -30,7 +38,6 @@
             </div>
         </header>
 
-        <!-- STATUS -->
         <section class="status">
             <div class="halo"></div>
             <div class="hunter" id="hunterNameDisplay">MARCO</div>
@@ -94,19 +101,96 @@
                     <span class="rl-letter" id="rango-letra">E</span>
                     <span class="rl-name" id="rango-titulo">Novato</span>
                     <div class="rl-div"></div>
-                    <span class="rl-exp" id="exp-text">0 / 1500 EXP</span>
+                    <span class="rl-exp" id="exp-text">0 / 2000 EXP</span>
                 </div>
             </div>
         </section>
 
-        <!-- EL SISTEMA -->
+        <section class="sw">
+            <i class="cx"></i>
+            <div class="sw-h"><span class="sw-t">ESTADO DEL CAZADOR</span></div>
+            <div class="sw-b">
+                <div class="est-grid">
+                    <div class="est-cell">
+                        <div class="est-l">PESO</div>
+                        <div class="est-v" id="estPeso">—</div>
+                    </div>
+                    <div class="est-cell">
+                        <div class="est-l">MÚSCULO</div>
+                        <div class="est-v" id="estMusculo">—</div>
+                    </div>
+                    <div class="est-cell">
+                        <div class="est-l">GRASA</div>
+                        <div class="est-v" id="estGrasa">—</div>
+                    </div>
+                    <div class="est-cell">
+                        <div class="est-l">% GRASA</div>
+                        <div class="est-v" id="estPgc">—</div>
+                    </div>
+                </div>
+                <div class="est-goal">
+                    <div class="est-goal-row">
+                        <span class="est-goal-l">OBJETIVO DE GRASA</span>
+                        <span class="est-goal-v" id="estObjetivo">—</span>
+                    </div>
+                    <div class="est-goal-note" id="estNota">—</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="sw">
+            <i class="cx"></i>
+            <div class="sw-h"><span class="sw-t">PROYECCIÓN DEL CICLO</span></div>
+            <div class="sw-b">
+                <div class="pb">
+                    <div class="pb-head">
+                        <span class="pb-l">GRASA · NUTRICIÓN</span>
+                        <span class="pb-p" id="adhGrasaPct">—</span>
+                    </div>
+                    <div class="pb-track">
+                        <div class="pb-fill" id="adhGrasaBar"></div>
+                        <i class="pb-mark" id="adhGrasaMark"></i>
+                    </div>
+                    <div class="pb-cap" id="adhGrasaCap">—</div>
+                </div>
+
+                <div class="pb">
+                    <div class="pb-head">
+                        <span class="pb-l">MÚSCULO · ENTRENAMIENTO</span>
+                        <span class="pb-p" id="adhMusculoPct">—</span>
+                    </div>
+                    <div class="pb-track">
+                        <div class="pb-fill" id="adhMusculoBar"></div>
+                        <i class="pb-mark" id="adhMusculoMark"></i>
+                    </div>
+                    <div class="pb-cap" id="adhMusculoCap">—</div>
+                </div>
+
+                <div class="fich">
+                    <div class="fich-h">
+                        <span class="fich-l">PRESUPUESTO DE FALLAS</span>
+                        <span class="fich-n" id="fichasTexto">—</span>
+                    </div>
+                    <div class="fich-grid" id="fichasGrid"></div>
+                </div>
+
+                <div class="proy">
+                    <div class="proy-l">GRASA PROYECTADA AL CIERRE</div>
+                    <div class="proy-v"><span id="proyValor">—</span><em id="proyRango"></em></div>
+                    <div class="proy-cap">Estimación por adherencia. No es una medición.</div>
+                </div>
+
+                <div class="pj-verdict" id="proyVeredicto">SIN DATOS SUFICIENTES</div>
+            </div>
+        </section>
+
         <section class="sw">
             <i class="cx"></i>
             <div class="sw-h"><span class="sw-t">EL SISTEMA</span></div>
             <div class="sw-b">
                 <div id="bonusInline" class="qi-inline" style="display:none;">
                     <button id="bonusToggle" class="qi-t">
-                        <span class="qi-d"><span>!</span></span>
+                        <span class="qi-d"><span>◆</span></span>
                         <span class="qi-tx">MISIÓN DISPONIBLE</span>
                         <span class="qi-ch"></span>
                     </button>
@@ -126,44 +210,11 @@
             </div>
         </section>
 
-        <!-- REGISTRO DEL SISTEMA -->
-        <section class="sw">
-            <i class="cx"></i>
-            <div class="sw-h"><span class="sw-t">REGISTRO DEL SISTEMA</span></div>
-            <div class="sw-b">
-                <div id="syslogLines" class="log"></div>
-            </div>
-        </section>
-
-        <!-- MISIONES DIARIAS -->
         <section class="sw">
             <i class="cx"></i>
             <div class="sw-h"><span class="sw-t">MISIONES DIARIAS</span></div>
             <div class="sw-b sw-b-tight">
-                <div class="m-row">
-                    <label class="m-check">
-                        <input type="checkbox" id="cb-nutricion">
-                        <span class="m-mk"></span>
-                    </label>
-                    <span class="m-n" id="mission1Text">Nutrición</span>
-                    <span class="m-e">+150 EXP</span>
-                </div>
-                <div class="m-row">
-                    <label class="m-check">
-                        <input type="checkbox" id="cb-entrenamiento">
-                        <span class="m-mk"></span>
-                    </label>
-                    <span class="m-n" id="mission2Text">Entrenamiento</span>
-                    <span class="m-e">+150 EXP</span>
-                </div>
-                <div class="m-row">
-                    <label class="m-check">
-                        <input type="checkbox" id="cb-suplementos">
-                        <span class="m-mk"></span>
-                    </label>
-                    <span class="m-n" id="mission3Text">Suplementos</span>
-                    <span class="m-e">+75 EXP</span>
-                </div>
+                <div id="misionesLista"></div>
                 <div class="m-row" id="bonusMissionContainer" style="display:none;">
                     <label class="m-check">
                         <input type="checkbox" id="bonusMissionCheckbox">
@@ -176,7 +227,14 @@
             </div>
         </section>
 
-        <!-- CALENDARIO -->
+        <section class="sw">
+            <i class="cx"></i>
+            <div class="sw-h"><span class="sw-t">REGISTRO DEL SISTEMA</span></div>
+            <div class="sw-b">
+                <div id="syslogLines" class="log"></div>
+            </div>
+        </section>
+
         <section class="sw">
             <i class="cx"></i>
             <div class="sw-h"><span class="sw-t">CALENDARIO</span></div>
@@ -201,57 +259,54 @@
         </section>
     </div>
 
-    <!-- Bottom buttons -->
     <div class="acts">
-        <button class="act" id="btnRankSystem">SISTEMA DE RANGOS</button>
-        <button class="act" id="btnHistorial">HISTORIAL DE EXP</button>
-        <button class="act" id="btnStats">ANÁLISIS DEL CAZADOR</button>
+        <button class="act" id="btnConfig">CONFIGURACIÓN DEL CICLO</button>
     </div>
 
-    <!-- Modal Historial -->
-    <div id="historialModal" class="hist-overlay" style="display:none;">
-        <div class="hist-content">
-            <button class="hist-close" id="btnCerrarHistorial">✕</button>
-            <div class="hist-header">HISTORIAL DE EXP</div>
-            <div class="hist-subheader">ÚLTIMOS 30 DÍAS REGISTRADOS</div>
-            <div class="hist-summary">
-                <div class="hist-summary-item">
-                    <div class="hist-summary-label">EXP TOTAL ACUMULADA</div>
-                    <div class="hist-summary-value cyan" id="histExpTotal">—</div>
+    <div id="configModal" class="cfg-overlay" style="display:none;">
+        <div class="cfg-content">
+            <button class="cfg-close" id="btnCerrarConfig">✕</button>
+            <div class="cfg-header">CONFIGURACIÓN DEL CICLO</div>
+
+            <div class="cfg-section">
+                <div class="cfg-section-title">FECHAS</div>
+                <div class="cfg-field">
+                    <label for="inputFechaInicio">Inicio del ciclo</label>
+                    <input type="date" id="inputFechaInicio" class="cfg-input">
                 </div>
-                <div class="hist-summary-item">
-                    <div class="hist-summary-label">MEJOR DÍA</div>
-                    <div class="hist-summary-value" id="histMejorDia">—</div>
-                </div>
-                <div class="hist-summary-item">
-                    <div class="hist-summary-label">ÚLTIMO DESPEJE TOTAL</div>
-                    <div class="hist-summary-value" id="histUltimaDespeje">—</div>
-                </div>
-                <div class="hist-summary-item">
-                    <div class="hist-summary-label">BONUS COMPLETADAS</div>
-                    <div class="hist-summary-value" id="histBonusCount">—</div>
+                <div class="cfg-field">
+                    <label for="inputFechaFin">Cierre del ciclo</label>
+                    <input type="date" id="inputFechaFin" class="cfg-input">
                 </div>
             </div>
-            <div class="hist-table-wrap">
-                <table class="hist-table">
-                    <thead>
-                        <tr>
-                            <th>FECHA</th><th>MISIONES</th><th>BONUS</th><th>EXP GANADA</th><th>PENALIZACIÓN</th><th>TOTAL</th>
-                        </tr>
-                    </thead>
-                    <tbody id="histTableBody"></tbody>
-                </table>
+
+            <div class="cfg-section">
+                <div class="cfg-section-title">ANTROPOMETRÍA DE PARTIDA</div>
+                <div class="cfg-desc">Valores de la última medición InBody</div>
+                <div class="cfg-field">
+                    <label for="inputPeso">Peso (kg)</label>
+                    <input type="number" step="0.1" id="inputPeso" class="cfg-input">
+                </div>
+                <div class="cfg-field">
+                    <label for="inputMusculo">Masa muscular (kg)</label>
+                    <input type="number" step="0.1" id="inputMusculo" class="cfg-input">
+                </div>
+                <div class="cfg-field">
+                    <label for="inputGrasa">Masa grasa (kg)</label>
+                    <input type="number" step="0.1" id="inputGrasa" class="cfg-input">
+                </div>
+                <div class="cfg-field">
+                    <label for="inputObjetivo">Objetivo de grasa (kg)</label>
+                    <input type="number" step="0.1" id="inputObjetivo" class="cfg-input">
+                </div>
             </div>
-            <div class="hist-legend">
-                <span class="hist-badge-gold">◆</span> Despeje Total &nbsp;&nbsp;
-                <span class="hist-badge-bolt">⚡</span> Bonus completada
-            </div>
+
+            <button id="btnGuardarConfig" class="cfg-save">GUARDAR</button>
         </div>
     </div>
 
     <div id="bonusFlash" class="bonus-flash"></div>
 
-    <!-- Coward modal -->
     <div id="cowardModal" class="coward-overlay" style="display:none;">
         <div class="coward-content">
             <div class="coward-header">ADVERTENCIA DEL SISTEMA</div>
@@ -263,87 +318,7 @@
         </div>
     </div>
 
-    <!-- Rank System Modal -->
-    <div id="rankSystemModal" class="rsm-overlay" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
-        <div class="rsm-content">
-            <button class="rsm-close" onclick="document.getElementById('rankSystemModal').style.display='none'">✕</button>
-            <div class="rsm-header">
-                <div class="rsm-title">SISTEMA DE RANGOS</div>
-                <div class="rsm-subtitle">ASOCIACIÓN DE CAZADORES</div>
-            </div>
-            <div class="rsm-section">
-                <div class="rsm-section-title">TABLA DE RANGOS</div>
-                <div id="rankTable" class="rsm-rank-table"></div>
-            </div>
-            <div class="rsm-section">
-                <div class="rsm-section-title">SISTEMA DE EXP</div>
-                <div class="rsm-exp-rules">
-                    <div class="rsm-rule rsm-pos"><span class="rsm-desc">Misión diaria completada</span><span class="rsm-val pos">+150</span></div>
-                    <div class="rsm-rule rsm-pos"><span class="rsm-desc">Despeje Total (3/3 misiones)</span><span class="rsm-val pos">+100</span></div>
-                    <div class="rsm-rule rsm-pos"><span class="rsm-desc">Misión Bonus completada</span><span class="rsm-val pos">+100</span></div>
-                    <div class="rsm-rule rsm-neg"><span class="rsm-desc">0 misiones en el día</span><span class="rsm-val neg">−75</span></div>
-                    <div class="rsm-rule rsm-neg"><span class="rsm-desc">Solo 1 misión completada</span><span class="rsm-val neg">−25</span></div>
-                    <div class="rsm-rule rsm-crit"><span class="rsm-desc">2 días consecutivos sin nada</span><span class="rsm-val crit">−200</span></div>
-                </div>
-            </div>
-            <div class="rsm-section">
-                <div class="rsm-section-title">TU PROGRESO</div>
-                <div id="myRankProgress" class="rsm-my-progress"></div>
-            </div>
-            <div class="rsm-section">
-                <div class="rsm-section-title">FECHA DE INICIO</div>
-                <div class="rsm-start-desc">Define desde qué día se calcula tu eficiencia</div>
-                <div class="rsm-date-row">
-                    <input type="date" id="inputFechaInicio" class="rsm-date-input">
-                    <button id="btnConfirmarFecha" class="rsm-date-btn">CONFIRMAR</button>
-                </div>
-            </div>
-            <div class="rsm-section">
-                <div class="rsm-section-title">FIN DE LA MISIÓN</div>
-                <div class="rsm-start-desc">Define la fecha límite del contador "TIEMPO RESTANTE"</div>
-                <div class="rsm-date-row">
-                    <input type="date" id="inputFechaFin" class="rsm-date-input">
-                    <button id="btnConfirmarFechaFin" class="rsm-date-btn">CONFIRMAR</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Análisis Modal -->
-    <div id="statsModal" class="stats-overlay" style="display:none;">
-        <div class="stats-modal-content">
-            <button class="stats-close" id="btnCerrarStats">✕</button>
-            <div class="stats-modal-header">ANÁLISIS DEL CAZADOR</div>
-
-            <div class="sec">
-                <div class="sec-t">RACHA</div>
-                <div class="rk">
-                    <div class="rk-box"><div class="rk-n" id="anRachaActual">0</div><div class="rk-l">Actual</div></div>
-                    <div class="rk-box rec"><div class="rk-n" id="anRachaRecord">0</div><div class="rk-l">Récord</div></div>
-                </div>
-                <div class="rk-days" id="anRachaDias"></div>
-                <div class="rk-cap">Últimos 14 días</div>
-            </div>
-
-            <div class="sec">
-                <div class="sec-t">DEBILIDAD DETECTADA</div>
-                <div id="anDebilidad"></div>
-            </div>
-
-            <div class="sec">
-                <div class="sec-t">PATRÓN SEMANAL · % DE DESPEJE TOTAL</div>
-                <div class="wd" id="anSemanal"></div>
-                <div class="wd-cap" id="anSemanalCap"></div>
-            </div>
-
-            <div class="sec" style="margin-bottom:4px">
-                <div class="sec-t">PROYECCIÓN DEL SISTEMA</div>
-                <div id="anProyeccion"></div>
-            </div>
-        </div>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="script.js?v=44"></script>
+    <script src="script.js?v=46"></script>
 </body>
 </html>
