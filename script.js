@@ -286,7 +286,7 @@ function renderProyeccion() {
   }
 
   barra('adhGrasaPct', 'adhGrasaBar', 'adhGrasaMark', 'adhGrasaCap',
-    s.adhGrasa, s.umbralGrasa, `${s.limpios} de ${s.evaluados} días limpios`);
+    s.adhGrasa, s.umbralGrasa, `${s.limpios} de ${s.evaluados} días en regla`);
   barra('adhMusculoPct', 'adhMusculoBar', 'adhMusculoMark', 'adhMusculoCap',
     s.adhMusculo, UMBRAL_MUSCULO, 'entrenamiento y suplementos');
 
