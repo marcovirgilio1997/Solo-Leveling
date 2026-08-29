@@ -9,49 +9,29 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // CICLO Y MISIONES
 // ============================================================
 const CICLO_ACTUAL = 2;
-const NOMBRE_KEY = 'cazador-nombre';
 const FECHA_INICIO_FALLBACK = '2026-08-31';
 const FECHA_FIN_FALLBACK = '2026-11-10';
 
 const MISIONES = [
-  { key:'desayuno',      col:'desayuno',      label:'Desayuno',           exp:50,  grupo:'NUTRICIÓN' },
-  { key:'almuerzo',      col:'almuerzo',      label:'Almuerzo',           exp:50,  grupo:'NUTRICIÓN' },
-  { key:'merienda',      col:'merienda',      label:'Merienda',           exp:50,  grupo:'NUTRICIÓN' },
-  { key:'cena',          col:'cena',          label:'Cena',               exp:50,  grupo:'NUTRICIÓN' },
-  { key:'ayuno',         col:'ayuno',         label:'Ayuno 12 h',         exp:75,  grupo:'PROTOCOLO' },
-  { key:'diaLimpio',     col:'dia_limpio',    label:'Día limpio',         exp:75,  grupo:'PROTOCOLO' },
-  { key:'entrenamiento', col:'entrenamiento', label:'Entrenamiento',      exp:150, grupo:'CUERPO' },
-  { key:'suplementos',   col:'suplementos',   label:'Omega 3 + creatina', exp:50,  grupo:'CUERPO' }
+  { key:'desayuno',      col:'desayuno',      label:'Desayuno',           grupo:'NUTRICIÓN' },
+  { key:'almuerzo',      col:'almuerzo',      label:'Almuerzo',           grupo:'NUTRICIÓN' },
+  { key:'merienda',      col:'merienda',      label:'Merienda',           grupo:'NUTRICIÓN' },
+  { key:'cena',          col:'cena',          label:'Cena',               grupo:'NUTRICIÓN' },
+  { key:'ayuno',         col:'ayuno',         label:'Ayuno 12 h',         grupo:'PROTOCOLO' },
+  { key:'diaLimpio',     col:'dia_limpio',    label:'Día limpio',         grupo:'PROTOCOLO' },
+  { key:'entrenamiento', col:'entrenamiento', label:'Entrenamiento',      grupo:'CUERPO' },
+  { key:'suplementos',   col:'suplementos',   label:'Omega 3 + creatina', grupo:'CUERPO' }
 ];
 
 const MISIONES_C1 = [
-  { key:'nutricion',     col:'nutricion',     label:'Nutrición',     exp:150 },
-  { key:'entrenamiento', col:'entrenamiento', label:'Entrenamiento', exp:150 },
-  { key:'suplementos',   col:'suplementos',   label:'Suplementos',   exp:75  }
+  { key:'nutricion',     col:'nutricion',     label:'Nutrición' },
+  { key:'entrenamiento', col:'entrenamiento', label:'Entrenamiento' },
+  { key:'suplementos',   col:'suplementos',   label:'Suplementos' }
 ];
 
 const KEYS_GRASA   = ['desayuno','almuerzo','merienda','cena','ayuno','diaLimpio'];
 const KEYS_MUSCULO = ['entrenamiento','suplementos'];
 const MIN_LIMPIO   = 5;
-
-const RANK_THRESHOLDS = [
-  { rank:'E', threshold:0 },
-  { rank:'D', threshold:2000 },
-  { rank:'C', threshold:8000 },
-  { rank:'B', threshold:18000 },
-  { rank:'A', threshold:32000 },
-  { rank:'S', threshold:46000 }
-];
-const RANK_NAMES = {
-  E:'Novato', D:'Aprendiz', C:'Competente',
-  B:'Avanzado', A:'Élite', S:'Nacional'
-};
-
-const FULL_CLEAR_BONUS = 150;
-const ZERO_MISSION_PENALTY = -75;
-const ONE_MISSION_PENALTY = -25;
-const TWO_DAY_STREAK_PENALTY = -200;
-const MIN_EXP_TOTAL = 0;
 
 const KCAL_POR_KG = 7700;
 const DEFICIT_DIARIO = 600;
@@ -89,22 +69,6 @@ function defsDelDia(d) { return (d && d.ciclo === 1) ? MISIONES_C1 : MISIONES; }
 function countDia(d) {
   if (!d) return 0;
   return defsDelDia(d).reduce((n, m) => n + (d[m.key] ? 1 : 0), 0);
-}
-
-function expDia(d) {
-  if (!d) return 0;
-  const defs = defsDelDia(d);
-  let e = defs.reduce((n, m) => n + (d[m.key] ? m.exp : 0), 0);
-  if (countDia(d) === defs.length) e += FULL_CLEAR_BONUS;
-  return e;
-}
-
-function penalDia(d) {
-  const defs = defsDelDia(d);
-  const pct = countDia(d) / defs.length;
-  if (pct < 0.25) return ZERO_MISSION_PENALTY;
-  if (pct < 0.50) return ONE_MISSION_PENALTY;
-  return 0;
 }
 
 function diaVacio() {
@@ -156,44 +120,6 @@ async function guardarMision() {
 
   const { error } = await db.from('missions').upsert(payload, { onConflict: 'fecha' });
   if (error) console.error('Error guardando:', error);
-}
-
-// ============================================================
-// EXP Y RANGO
-// ============================================================
-function calcularEXPTotal() {
-  const fechaInicio = getFechaInicio();
-  const todayStr = getTodayStr();
-  const entries = Object.entries(misionesCache)
-    .filter(([f]) => f >= fechaInicio)
-    .map(([f, data]) => ({ date: new Date(f + 'T00:00:00'), fecha: f, data }))
-    .sort((a, b) => a.date - b.date);
-
-  let total = 0, zeroStreak = 0, previousDate = null;
-
-  for (const { date, fecha, data } of entries) {
-    const esHoy = fecha === todayStr;
-    const count = countDia(data);
-    let penalty = esHoy ? 0 : penalDia(data);
-
-    if (count === 0) {
-      zeroStreak = (previousDate && date - previousDate === 86400000) ? zeroStreak + 1 : 1;
-    } else {
-      zeroStreak = 0;
-    }
-    if (!esHoy && zeroStreak === 2) penalty += TWO_DAY_STREAK_PENALTY;
-
-    total += expDia(data) + penalty;
-    previousDate = date;
-  }
-  return Math.max(total, MIN_EXP_TOTAL);
-}
-
-function calcularRango(exp) {
-  for (let i = RANK_THRESHOLDS.length - 1; i >= 0; i--) {
-    if (exp >= RANK_THRESHOLDS[i].threshold) return RANK_THRESHOLDS[i].rank;
-  }
-  return 'E';
 }
 
 // ============================================================
@@ -354,7 +280,6 @@ function renderMisiones() {
     html += `<div class="m-row${data[m.key] ? ' done' : ''}">
       <label class="m-check"><input type="checkbox" id="cb-${m.key}"${data[m.key] ? ' checked' : ''}><span class="m-mk"></span></label>
       <span class="m-n">${m.label}</span>
-      <span class="m-e">+${m.exp} EXP</span>
     </div>`;
   }
   cont.innerHTML = html;
@@ -375,78 +300,14 @@ function syncMissionRows() {
 }
 
 // ============================================================
-// ANILLO
-// ============================================================
-function updateRankRing(expTotal) {
-  const ring = document.getElementById('rankRingProgress');
-  const tip = document.getElementById('rankRingTip');
-  const tipHalo = document.getElementById('rankRingTipHalo');
-  const rango = calcularRango(expTotal);
-  const idx = RANK_THRESHOLDS.findIndex(r => r.rank === rango);
-  const cur = RANK_THRESHOLDS[idx]?.threshold || 0;
-  const nxt = idx < RANK_THRESHOLDS.length - 1 ? RANK_THRESHOLDS[idx + 1].threshold : cur;
-  const progress = rango === 'S' ? 100 : nxt > cur ? ((expTotal - cur) / (nxt - cur)) * 100 : 0;
-  const clamped = Math.min(Math.max(progress, 0), 100);
-
-  const radius = 128;
-  const circumference = 2 * Math.PI * radius;
-
-  if (ring) {
-    ring.style.strokeDasharray = `${circumference} ${circumference}`;
-    ring.style.strokeDashoffset = `${circumference - (clamped / 100) * circumference}`;
-  }
-
-  const angleRad = ((clamped / 100) * 360 - 90) * Math.PI / 180;
-  const cx = 160 + radius * Math.cos(angleRad);
-  const cy = 160 + radius * Math.sin(angleRad);
-
-  [tip, tipHalo].forEach(el => {
-    if (!el) return;
-    el.setAttribute('cx', cx);
-    el.setAttribute('cy', cy);
-    el.style.opacity = clamped > 1 ? 1 : 0;
-  });
-}
-
-// ============================================================
 // UI PRINCIPAL
 // ============================================================
-function cargarNombreCazador() {
-  const el = document.getElementById('hunterNameDisplay');
-  if (el) el.textContent = localStorage.getItem(NOMBRE_KEY) || 'MARCO';
-}
-
 function updateUI() {
-  const data = getTodayMissionData();
   renderMisiones();
   syncMissionRows();
-  cargarNombreCazador();
-
-  const expTotal = calcularEXPTotal();
-  const rango = calcularRango(expTotal);
-  const idx = RANK_THRESHOLDS.findIndex(r => r.rank === rango);
-  const cur = RANK_THRESHOLDS[idx]?.threshold || 0;
-  const nxt = idx < RANK_THRESHOLDS.length - 1 ? RANK_THRESHOLDS[idx + 1].threshold : cur;
-  const rangeSize = (nxt - cur) || 1;
-
-  const textoExp = document.getElementById('exp-text');
-  if (textoExp) textoExp.textContent = rango === 'S'
-    ? `${expTotal - cur} EXP`
-    : `${expTotal - cur} / ${rangeSize} EXP`;
-
-  const letra = document.getElementById('rango-letra');
-  if (letra) letra.textContent = rango;
-  const titulo = document.getElementById('rango-titulo');
-  if (titulo) titulo.textContent = RANK_NAMES[rango] || '';
-
-  const recompensa = document.getElementById('recompensa-diaria');
-  if (recompensa) recompensa.textContent = `RECOMPENSA ESTIMADA · ${expDia(data)} EXP`;
-
-  updateRankRing(expTotal);
   renderEstado();
   renderProyeccion();
   renderCalendar();
-  renderSysLog();
 }
 
 // ============================================================
@@ -552,93 +413,6 @@ function iniciarTimerMision() {
 }
 
 // ============================================================
-// REGISTRO DEL SISTEMA
-// ============================================================
-function generarEventosSistema() {
-  const todayStr = getTodayStr();
-  const ayer = new Date(Date.now() - 86400000);
-  const ayerStr = dateToStr(ayer);
-  const eventos = [];
-
-  function eventosDelDia(fechaStr, label) {
-    const d = misionesCache[fechaStr];
-    if (!d) return;
-    const defs = defsDelDia(d);
-    const count = countDia(d);
-
-    for (const m of defs) {
-      if (d[m.key]) eventos.push({ t: label, txt: `+${m.exp} EXP — ${m.label}`, cls: 'sl-pos' });
-    }
-    if (count === defs.length) eventos.push({ t: label, txt: `+${FULL_CLEAR_BONUS} EXP — DESPEJE TOTAL`, cls: 'sl-gold' });
-
-    if (fechaStr !== todayStr) {
-      const p = penalDia(d);
-      if (p === ZERO_MISSION_PENALTY) eventos.push({ t: label, txt: `${p} EXP — Día casi sin misiones`, cls: 'sl-neg' });
-      else if (p === ONE_MISSION_PENALTY) eventos.push({ t: label, txt: `${p} EXP — Menos de la mitad del día`, cls: 'sl-neg' });
-    }
-  }
-
-  eventosDelDia(ayerStr, 'AYER');
-  eventosDelDia(todayStr, 'HOY');
-  return eventos;
-}
-
-let syslogRunId = 0;
-let syslogTyped = false;
-
-function renderSysLog() {
-  const container = document.getElementById('syslogLines');
-  if (!container) return;
-  const runId = ++syslogRunId;
-  container.innerHTML = '';
-
-  const eventos = generarEventosSistema();
-  if (eventos.length === 0) {
-    container.innerHTML = '<div class="syslog-empty">> Sin actividad registrada</div>';
-    return;
-  }
-
-  if (syslogTyped) {
-    container.innerHTML = eventos.map(ev =>
-      `<div class="syslog-line"><span class="sl-time">> [${ev.t}] </span><span class="${ev.cls}">${ev.txt}</span></div>`
-    ).join('');
-    return;
-  }
-
-  syslogTyped = true;
-  let lineIdx = 0;
-
-  function escribirSiguiente() {
-    if (runId !== syslogRunId || lineIdx >= eventos.length) return;
-    const ev = eventos[lineIdx];
-    const line = document.createElement('div');
-    line.className = 'syslog-line typing';
-    container.appendChild(line);
-
-    const fullText = `> [${ev.t}] ${ev.txt}`;
-    let charIdx = 0;
-
-    function escribirChar() {
-      if (runId !== syslogRunId) return;
-      if (charIdx <= fullText.length) {
-        const partial = fullText.slice(0, charIdx);
-        const m = partial.match(/^(> \[[^\]]*\] )(.*)$/);
-        if (m) line.innerHTML = `<span class="sl-time">${m[1]}</span><span class="${ev.cls}">${m[2]}</span>`;
-        else line.textContent = partial;
-        charIdx++;
-        setTimeout(escribirChar, 18);
-      } else {
-        line.classList.remove('typing');
-        lineIdx++;
-        setTimeout(escribirSiguiente, 120);
-      }
-    }
-    escribirChar();
-  }
-  escribirSiguiente();
-}
-
-// ============================================================
 // QUEST DEL DÍA
 // ============================================================
 const QUEST_POOL = [
@@ -721,12 +495,6 @@ async function guardarConfig() {
 function iniciarArise() {
   const overlay = document.getElementById('ariseOverlay');
   if (!overlay) return;
-  const hoy = getTodayStr();
-  if (localStorage.getItem('ariseUltimo') === hoy) {
-    overlay.classList.add('arise-off');
-    return;
-  }
-  localStorage.setItem('ariseUltimo', hoy);
   const cerrar = () => {
     overlay.classList.add('arise-done');
     setTimeout(() => overlay.classList.add('arise-off'), 450);

@@ -111,42 +111,6 @@ body::before{
 .tu{font-family:'Orbitron';font-size:.5em;color:var(--tx-faint);letter-spacing:1px}
 .timer-completada{font-family:'Orbitron';font-weight:500;font-size:.85em;color:var(--cyan);letter-spacing:3px;text-shadow:0 0 14px var(--cyan)}
 
-/* ───── STATUS ───── */
-.status{position:relative;padding:30px 0 6px;text-align:center;animation:in .6s ease .12s both}
-.halo{
-  position:absolute;left:50%;top:56%;transform:translate(-50%,-50%);
-  width:430px;height:430px;max-width:122vw;border-radius:50%;pointer-events:none;z-index:0;
-  background:radial-gradient(circle, rgba(0,180,255,.10) 0%, rgba(0,130,220,.04) 38%, transparent 66%);
-  animation:halo 6s ease-in-out infinite
-}
-@keyframes halo{0%,100%{opacity:.5}50%{opacity:.95}}
-.hunter{
-  position:relative;z-index:2;
-  font-family:'Orbitron';font-weight:500;
-  font-size:clamp(1em,4.4vw,1.25em);
-  letter-spacing:9px;text-indent:9px;
-  color:#fff;text-shadow:0 0 16px rgba(255,255,255,.22);
-  margin-bottom:24px
-}
-.ring-wrap{position:relative;z-index:2;width:262px;height:262px;margin:0 auto}
-.ring-wrap svg{width:100%;height:100%;display:block;overflow:visible}
-#rankRingProgress{
-  transform:rotate(-90deg);transform-origin:160px 160px;
-  filter:drop-shadow(0 0 10px rgba(0,235,255,.8)) drop-shadow(0 0 24px rgba(0,191,255,.5));
-  transition:stroke-dashoffset .8s cubic-bezier(.25,.46,.45,.94);
-}
-#rankRingBubbles{transform:rotate(-90deg);transform-origin:160px 160px}
-.ring-tip{fill:#fff;filter:drop-shadow(0 0 10px #00f5ff) drop-shadow(0 0 22px #00ccff);
-  transition:cx .8s cubic-bezier(.4,0,.2,1), cy .8s cubic-bezier(.4,0,.2,1)}
-#rankRingTipHalo{transition:cx .8s cubic-bezier(.4,0,.2,1), cy .8s cubic-bezier(.4,0,.2,1)}
-
-.rl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:3}
-.rl-letter{font-family:'Orbitron';font-weight:700;font-size:4em;line-height:1;color:#fff;
-  text-shadow:0 0 22px var(--cyan),0 0 60px rgba(0,235,255,.45)}
-.rl-name{font-family:'Rajdhani';font-weight:500;font-size:.66em;letter-spacing:6px;text-indent:6px;color:var(--tx-dim);margin-top:10px;text-transform:uppercase}
-.rl-div{width:34px;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.5;margin:9px 0 7px}
-.rl-exp{font-family:'Orbitron';font-weight:400;font-size:.55em;letter-spacing:1.5px;color:rgba(225,245,255,.5)}
-
 /* ───── SYSTEM WINDOW ───── */
 .sw{
   position:relative;margin-top:26px;
@@ -154,12 +118,11 @@ body::before{
   background:linear-gradient(180deg, rgba(9,22,42,.82), rgba(3,9,20,.88));
   animation:in .6s ease both
 }
-.sw:nth-of-type(1){animation-delay:.18s}
-.sw:nth-of-type(2){animation-delay:.22s}
-.sw:nth-of-type(3){animation-delay:.26s}
-.sw:nth-of-type(4){animation-delay:.30s}
-.sw:nth-of-type(5){animation-delay:.34s}
-.sw:nth-of-type(6){animation-delay:.38s}
+.sw:nth-of-type(1){animation-delay:.14s}
+.sw:nth-of-type(2){animation-delay:.18s}
+.sw:nth-of-type(3){animation-delay:.22s}
+.sw:nth-of-type(4){animation-delay:.26s}
+.sw:nth-of-type(5){animation-delay:.30s}
 .sw::before,.sw::after,.cx::before,.cx::after{
   content:'';position:absolute;width:9px;height:9px;border:0 solid var(--cyan);
   filter:drop-shadow(0 0 4px rgba(0,235,255,.7));opacity:.85;z-index:2
@@ -184,7 +147,7 @@ body::before{
 .sw-b{padding:18px 18px 20px}
 .sw-b-tight{padding:14px 14px 16px}
 
-/* ───── ESTADO DEL CAZADOR ───── */
+/* ───── PUNTO DE PARTIDA ───── */
 .est-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .est-cell{background:rgba(0,25,50,.3);border:1px solid var(--line2);padding:13px 14px}
 .est-l{font-family:'Orbitron';font-weight:400;font-size:.46em;letter-spacing:2px;color:var(--tx-faint);margin-bottom:6px}
@@ -238,62 +201,10 @@ body::before{
   background:rgba(55,8,14,.25);color:var(--neg);text-shadow:0 0 10px rgba(255,93,112,.5)
 }
 
-/* ───── EL SISTEMA ───── */
-.qi-inline{
-  border:1px solid rgba(0,200,255,.22);background:rgba(0,40,80,.14);margin-bottom:18px;
-  opacity:0;transform:translateY(-6px);
-  transition:opacity .5s ease,transform .5s ease,border-color .4s ease,box-shadow .5s ease
-}
-.qi-inline.visible{opacity:1;transform:translateY(0)}
-.qi-inline.visible:not(.open){animation:qip 1.6s ease-in-out infinite alternate}
-@keyframes qip{
-  from{border-color:rgba(0,200,255,.22);box-shadow:0 0 0 rgba(0,235,255,0)}
-  to{border-color:rgba(0,235,255,.7);box-shadow:0 0 16px rgba(0,235,255,.26)}
-}
-.qi-inline.open{border-color:rgba(0,235,255,.55);box-shadow:0 0 18px rgba(0,220,255,.16);animation:none}
-.qi-t{width:100%;display:flex;align-items:center;gap:12px;background:none;border:none;cursor:pointer;padding:13px 15px;text-align:left}
-.qi-d{width:16px;height:16px;flex:0 0 16px;position:relative;transform:rotate(45deg);
-  border:1.5px solid var(--cyan);background:rgba(0,70,130,.4);
-  animation:qid 1.7s ease-in-out infinite alternate}
-@keyframes qid{from{box-shadow:0 0 5px rgba(0,235,255,.35)}to{box-shadow:0 0 13px rgba(0,235,255,.85)}}
-.qi-d span{position:absolute;inset:0;display:grid;place-items:center;transform:rotate(-45deg);
-  font-family:'Orbitron';font-weight:700;font-size:8px;color:#fff;text-shadow:0 0 7px var(--cyan)}
-.qi-tx{font-family:'Orbitron';font-weight:500;font-size:.58em;letter-spacing:4px;color:#fff;text-shadow:0 0 9px rgba(0,235,255,.45)}
-.qi-ch{margin-left:auto;width:7px;height:7px;flex:0 0 7px;
-  border-right:1.5px solid var(--cyan2);border-bottom:1.5px solid var(--cyan2);
-  transform:rotate(45deg) translate(-1px,-1px);transition:transform .4s;
-  filter:drop-shadow(0 0 3px rgba(0,191,255,.6))}
-.qi-inline.open .qi-ch{transform:rotate(225deg)}
-.qi-x{max-height:0;opacity:0;overflow:hidden;
-  transition:max-height .6s cubic-bezier(.25,.8,.3,1),opacity .42s ease .1s}
-.qi-inline.open .qi-x{max-height:380px;opacity:1}
-.qi-m{text-align:center;font-family:'Rajdhani';font-weight:500;font-size:1.1em;color:var(--cyan);
-  text-shadow:0 0 12px rgba(0,235,255,.35);margin:6px 16px 5px;letter-spacing:.5px}
-.qi-r{text-align:center;font-family:'Orbitron';font-weight:400;font-size:.62em;letter-spacing:2.5px;color:#fff;
-  text-shadow:0 0 9px rgba(0,235,255,.5);margin-bottom:14px}
-.qi-w{text-align:center;font-size:.86em;font-weight:400;color:rgba(255,125,140,.85);margin:0 16px 15px;letter-spacing:.4px}
-.qi-w b{font-family:'Orbitron';font-weight:500;font-size:.92em;color:var(--neg);text-shadow:0 0 8px rgba(255,80,100,.55);margin-left:5px}
-.qi-bt{display:flex;gap:10px;padding:0 15px 16px}
-.btn{flex:1;padding:13px;background:none;cursor:pointer;font-family:'Orbitron';font-weight:500;font-size:.6em;letter-spacing:3px;transition:all .25s}
-.btn-a{border:1px solid rgba(0,200,255,.55);color:#fff;text-shadow:0 0 8px rgba(0,235,255,.55)}
-.btn-a:active{background:rgba(0,200,255,.12);box-shadow:0 0 18px rgba(0,220,255,.4)}
-.btn-r{border:1px solid rgba(140,160,180,.22);color:rgba(150,175,195,.6)}
-.btn-r:active{border-color:rgba(255,90,110,.6);color:var(--neg)}
-
+/* ───── QUEST DEL DÍA ───── */
 .q-l{font-family:'Orbitron';font-weight:400;font-size:.54em;letter-spacing:4px;color:var(--tx-faint);margin-bottom:9px}
 .q-t{font-family:'Orbitron';font-weight:500;font-size:.92em;letter-spacing:2px;color:#fff;margin-bottom:6px;text-shadow:0 0 12px rgba(0,235,255,.25)}
 .q-d{font-size:.98em;font-weight:400;color:var(--tx-dim);line-height:1.5}
-
-/* ───── REGISTRO ───── */
-.log{font-size:.95em;min-height:118px;font-family:'Rajdhani','Courier New',monospace}
-.syslog-line{padding:3px 0;letter-spacing:.4px;white-space:nowrap;overflow:hidden;font-weight:400;border-right:2px solid transparent}
-.syslog-line.typing{border-right-color:var(--cyan);animation:caret .6s steps(1) infinite}
-@keyframes caret{50%{border-right-color:transparent}}
-.syslog-line .sl-time{color:var(--tx-faint);margin-right:6px}
-.syslog-line .sl-pos{color:var(--pos);text-shadow:0 0 6px rgba(110,255,192,.22);font-weight:500}
-.syslog-line .sl-neg{color:var(--neg);text-shadow:0 0 6px rgba(255,93,112,.22);font-weight:500}
-.syslog-line .sl-gold{color:#fff;text-shadow:0 0 10px rgba(0,235,255,.55);font-weight:500}
-.syslog-empty{color:var(--tx-faint);font-style:italic;text-align:center;padding:24px 0}
 
 /* ───── MISIONES ───── */
 .m-grp{font-family:'Orbitron';font-weight:400;font-size:.48em;letter-spacing:3px;color:var(--tx-faint);margin:16px 0 9px;padding-left:2px}
@@ -324,12 +235,6 @@ body::before{
 @keyframes mkpop{from{transform:scale(.3)}to{transform:scale(1)}}
 .m-n{flex:1;font-weight:500;font-size:1.02em;letter-spacing:.6px;color:rgba(232,246,255,.85);transition:color .25s,text-shadow .25s}
 .m-row.done .m-n{color:var(--cyan);text-shadow:0 0 10px rgba(0,235,255,.32)}
-.m-e{font-family:'Orbitron';font-weight:400;font-size:.54em;letter-spacing:1.5px;color:var(--tx-faint);transition:color .25s,text-shadow .25s}
-.m-row.done .m-e{color:rgba(0,235,255,.85);text-shadow:0 0 8px rgba(0,235,255,.4)}
-.m-sum{
-  margin-top:8px;padding-top:12px;border-top:1px solid var(--line2);text-align:right;
-  font-family:'Orbitron';font-weight:400;font-size:.56em;letter-spacing:2px;color:var(--tx-faint);text-transform:uppercase
-}
 .m-pre{
   text-align:center;font-size:.96em;color:var(--tx-dim);line-height:1.6;
   padding:22px 12px;letter-spacing:.3px
@@ -364,7 +269,6 @@ body::before{
   color:#fff;text-shadow:0 0 8px rgba(0,235,255,.6)
 }
 .cal-cell.cal-future{color:rgba(160,190,210,.18);background:rgba(0,20,40,.1);border-color:rgba(0,200,255,.03);cursor:default}
-.cal-bonus-mark{position:absolute;top:2px;right:3px;font-size:.5em;color:var(--cyan);text-shadow:0 0 6px var(--cyan);line-height:1;pointer-events:none}
 
 #cal-detail{
   margin-top:14px;padding:12px 14px;
@@ -376,7 +280,6 @@ body::before{
 .cd-empty{color:var(--tx-faint)}
 .cd-ok{color:var(--pos)}
 .cd-no{color:var(--neg)}
-.cd-bonus{color:var(--cyan)}
 
 .cal-legend{
   display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:12px;
@@ -404,14 +307,13 @@ body::before{
 .act:active{background:rgba(0,200,255,.07);border-color:rgba(0,235,255,.6);box-shadow:0 0 16px rgba(0,225,255,.25)}
 
 /* ───── OVERLAYS ───── */
-.cfg-overlay,.coward-overlay{
+.cfg-overlay{
   position:fixed;inset:0;z-index:5000;background:rgba(0,5,12,.94);
   display:flex;justify-content:center;align-items:flex-start;
   overflow-y:auto;padding:30px 16px 60px
 }
-.coward-overlay{align-items:center}
 
-/* ───── CONFIGURACIÓN ───── */
+/* ───── CONFIGURACIÓN / MODALES ───── */
 .cfg-content{
   position:relative;width:100%;max-width:520px;
   background:linear-gradient(180deg, rgba(8,18,32,.97), rgba(3,10,20,.97));
@@ -419,13 +321,12 @@ body::before{
   box-shadow:0 0 40px rgba(0,191,255,.18);
   animation:zoomIn .35s cubic-bezier(.34,1.46,.64,1)
 }
-.cfg-content::before,.cfg-content::after,
-.coward-content::before,.coward-content::after{
+.cfg-content::before,.cfg-content::after{
   content:'';position:absolute;width:10px;height:10px;border:0 solid var(--cyan);
   filter:drop-shadow(0 0 4px rgba(0,235,255,.7))
 }
-.cfg-content::before,.coward-content::before{top:-1px;left:-1px;border-top-width:1.5px;border-left-width:1.5px}
-.cfg-content::after,.coward-content::after{top:-1px;right:-1px;border-top-width:1.5px;border-right-width:1.5px}
+.cfg-content::before{top:-1px;left:-1px;border-top-width:1.5px;border-left-width:1.5px}
+.cfg-content::after{top:-1px;right:-1px;border-top-width:1.5px;border-right-width:1.5px}
 @keyframes zoomIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
 .cfg-close{
   position:absolute;top:12px;right:14px;background:none;border:none;
@@ -465,30 +366,6 @@ body::before{
   color:var(--cyan2);margin-bottom:7px;text-transform:uppercase}
 .info-block p{font-size:.94em;color:var(--tx-dim);line-height:1.6;letter-spacing:.2px}
 
-/* ───── COWARD ───── */
-.coward-content{
-  position:relative;
-  background:linear-gradient(180deg, rgba(20,5,8,.96), rgba(10,2,4,.96));
-  border:1px solid rgba(255,93,112,.55);
-  max-width:380px;width:90%;padding:34px 26px;text-align:center;
-  box-shadow:0 0 40px rgba(255,93,112,.25);
-  animation:zoomIn .3s cubic-bezier(.34,1.56,.64,1)
-}
-.coward-content::before,.coward-content::after{border-color:var(--neg)}
-.coward-header{font-family:'Orbitron';font-weight:500;font-size:.78em;color:var(--neg);letter-spacing:3px;margin-bottom:18px;
-  text-shadow:0 0 12px var(--neg);animation:cp 1.2s ease-in-out infinite alternate}
-@keyframes cp{from{text-shadow:0 0 8px var(--neg)}to{text-shadow:0 0 22px var(--neg),0 0 44px rgba(255,93,112,.4)}}
-.coward-body{font-family:'Rajdhani';font-size:1.02em;color:#ecd5d9;letter-spacing:.3px;line-height:1.7;margin-bottom:24px}
-.coward-penalty{display:block;font-family:'Orbitron';font-weight:500;font-size:1.3em;color:var(--neg);text-shadow:0 0 14px var(--neg);margin-top:10px}
-.coward-confirm-btn{background:none;border:1px solid rgba(255,93,112,.6);color:var(--neg);
-  font-family:'Orbitron';font-weight:500;font-size:.65em;letter-spacing:3px;padding:13px 28px;cursor:pointer;
-  text-shadow:0 0 8px rgba(255,93,112,.5);transition:all .2s}
-.coward-confirm-btn:active{background:rgba(255,93,112,.1);box-shadow:0 0 16px rgba(255,93,112,.3)}
-
-/* ───── BONUS FLASH ───── */
-.bonus-flash{position:fixed;inset:0;z-index:9998;background:#fff;pointer-events:none;opacity:0;transition:opacity .07s}
-.bonus-flash.on{opacity:.7}
-
 /* ───── ANIMACIÓN BASE ───── */
 @keyframes in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
@@ -497,8 +374,6 @@ body::before{
   body{font-size:14.5px}
   .main-container{padding:0 14px}
   .acts{padding:0 14px;margin-top:22px}
-  .ring-wrap{width:240px;height:240px}
-  .rl-letter{font-size:3.6em}
   .cfg-field{flex-wrap:wrap;gap:6px}
   .cfg-input{width:100%;flex:1 1 100%}
 }
