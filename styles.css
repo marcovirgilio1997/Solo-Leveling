@@ -38,27 +38,33 @@ body::before{
 /* ───── ARISE ───── */
 .arise-overlay{
   position:fixed;inset:0;z-index:9999;background:#010810;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px
 }
-.arise-overlay.arise-done{opacity:0;pointer-events:none;transition:opacity .45s ease}
+.arise-overlay.arise-done{opacity:0;pointer-events:none;transition:opacity .5s ease}
 .arise-overlay.arise-off{display:none}
 .arise-line{
-  width:0;height:2px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);
-  animation:ariseLine .6s cubic-bezier(.16,.84,.44,1) .1s forwards
+  width:0;height:2px;background:var(--cyan);box-shadow:0 0 10px var(--cyan),0 0 28px rgba(0,191,255,.6);
+  animation:ariseLine .55s cubic-bezier(.16,.84,.44,1) .15s forwards
 }
-@keyframes ariseLine{to{width:86%}}
+@keyframes ariseLine{to{width:88%}}
+.arise-row{
+  display:flex;align-items:center;gap:.06em;
+  font-family:'Orbitron';font-weight:500;
+  font-size:clamp(42px,14vw,78px);
+  min-height:1.2em
+}
 .arise-word{
-  display:flex;gap:.1em;font-family:'Orbitron';font-weight:500;
-  font-size:clamp(40px,14vw,76px);letter-spacing:.12em;color:#eaf9ff;
-  text-shadow:0 0 16px var(--cyan),0 0 44px rgba(0,191,255,.5)
+  letter-spacing:.12em;color:#f2fcff;white-space:pre;
+  text-shadow:0 0 14px var(--cyan),0 0 40px rgba(0,191,255,.55)
 }
-.arise-word span{opacity:0;animation:ariseChar .35s ease-out forwards}
-.arise-word span:nth-child(1){animation-delay:.55s}
-.arise-word span:nth-child(2){animation-delay:.68s}
-.arise-word span:nth-child(3){animation-delay:.81s}
-.arise-word span:nth-child(4){animation-delay:.94s}
-.arise-word span:nth-child(5){animation-delay:1.07s}
-@keyframes ariseChar{to{opacity:1}}
+.arise-caret{
+  display:inline-block;width:.4em;height:.98em;flex:none;
+  background:#f2fcff;
+  box-shadow:0 0 16px var(--cyan),0 0 46px rgba(0,191,255,.7)
+}
+.arise-caret.hidden{opacity:0}
+.arise-caret.blink{animation:ariseBlink .5s steps(1) infinite}
+@keyframes ariseBlink{50%{opacity:0}}
 
 /* ───── AMBIENTE ───── */
 .shaft{
