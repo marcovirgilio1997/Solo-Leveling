@@ -498,13 +498,6 @@ function iniciarArise() {
   const caret = document.getElementById('ariseCaret');
   if (!overlay || !text || !caret) return;
 
-  const hoy = getTodayStr();
-  if (localStorage.getItem('ariseUltimo') === hoy) {
-    overlay.classList.add('arise-off');
-    return;
-  }
-  localStorage.setItem('ariseUltimo', hoy);
-
   const PALABRA = 'ARISE';
   const T_ESCRIBIR = 170;
   const T_ARRANQUE = 800;
