@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=49">
+    <link rel="stylesheet" href="styles.css?v=51">
 </head>
 <body>
     <div id="ariseOverlay" class="arise-overlay">
@@ -121,9 +121,8 @@
 
         <section class="sw">
             <i class="cx"></i>
-            <div class="sw-h"><span class="sw-t">EL SISTEMA</span></div>
+            <div class="sw-h"><span class="sw-t">QUEST DEL DÍA</span></div>
             <div class="sw-b">
-                <div class="q-l">QUEST DEL DÍA</div>
                 <div class="q-t" id="questDiaTitle"></div>
                 <div class="q-d" id="questDiaDesc"></div>
             </div>
@@ -162,7 +161,18 @@
     </div>
 
     <div class="acts">
+        <button class="act" id="btnPlan">PROTOCOLO NUTRICIONAL</button>
         <button class="act" id="btnConfig">CONFIGURACIÓN DEL CICLO</button>
+    </div>
+
+    <div id="planModal" class="plan-overlay" style="display:none;">
+        <div class="plan-content">
+            <button class="cfg-close" id="btnCerrarPlan">✕</button>
+            <div class="plan-header">PROTOCOLO NUTRICIONAL</div>
+            <div class="plan-sub">ANTONELLA FRANCO · 26.08.2026</div>
+            <div class="plan-warn">Las cuatro comidas son obligatorias. No hay comida opcional en este plan.</div>
+            <div id="planBody"></div>
+        </div>
     </div>
 
     <div id="configModal" class="cfg-overlay" style="display:none;">
@@ -240,6 +250,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="script.js?v=49"></script>
+    <script src="script.js?v=51"></script>
 </body>
 </html>

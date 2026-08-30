@@ -504,14 +504,134 @@ function iniciarArise() {
 }
 
 // ============================================================
+// PROTOCOLO NUTRICIONAL
+// ============================================================
+const EQ_GRASA = [
+  '¼ de palta',
+  '1 cda sopera de aceite de oliva o coco',
+  '8 aceitunas',
+  '6 nueces, almendras o pistachos',
+  '1 cda sopera de semillas (chía, lino, sésamo, girasol)',
+  '2 cdas soperas de harina de frutos secos o semillas',
+  '¼ taza de leche vegetal',
+  '1 tostada de esas harinas'
+];
+
+const PLAN = [
+  {
+    t:'AYUNO 12 H',
+    s:'Reposo digestivo entre la cena y el desayuno',
+    b:[
+      { tipo:'regla', txt:'12 horas. El plan aclara que no hay que extenderlo más.' },
+      { tipo:'texto', txt:'Cenás cerca de las 21 y no volvés a comer hasta las 9. Ese es el rango, no un mínimo a superar.' }
+    ]
+  },
+  {
+    t:'DESAYUNO Y MERIENDA',
+    s:'Infusión + 3 proteínas + 2 grasas + 1 fruta o 1 carbo',
+    b:[
+      { tipo:'lista', h:'PROTEÍNA · elegís 3', items:['1 huevo','2 claras','30 g de queso de cabra'] },
+      { tipo:'lista', h:'GRASA · elegís 2', items:EQ_GRASA },
+      { tipo:'lista', h:'CARBO · elegís 1', items:['1 tostada de sarraceno o quinoa','2 tostadas de arroz','2 cdas soperas de las harinas'] },
+      { tipo:'ej', h:'EJEMPLOS', items:[
+        'Tostada de sarraceno con 2 huevos revueltos, queso de cabra y almendras',
+        'Pancake de 2 huevos y 2 claras con harina de almendras, nueces y banana',
+        'Tortilla de 3 huevos con aceitunas y semillas, más 2 tostadas de arroz',
+        'Revuelto de 2 huevos y 30 g de queso de cabra con palta y aceite de oliva'
+      ]},
+      { tipo:'regla', txt:'Solo en la merienda: batido de proteína + 1 fruta como variante.' }
+    ]
+  },
+  {
+    t:'ALMUERZO',
+    s:'200 g cocidos de proteína animal + medio plato de vegetales crudos + 1 carbo + 1 grasa',
+    b:[
+      { tipo:'lista', h:'PROTEÍNA · 200 g cocidos', items:['Vaca','Cerdo','Pollo','Pescado'] },
+      { tipo:'lista', h:'VEGETALES CRUDOS · sin límite', items:['Pepino, tomate, zanahoria','Rúcula, apio, rabanito','Albahaca y demás verdes'] },
+      { tipo:'lista', h:'CARBO · elegís 1', items:['60 g cocidos de grano o cereal sin TACC','200 g de tubérculos','4 cdas soperas de harinas sin TACC'] },
+      { tipo:'lista', h:'GRASA · elegís 1', items:EQ_GRASA },
+      { tipo:'ej', h:'EJEMPLOS', items:[
+        'Pechuga de pollo con quinoa y ensalada de rúcula, tomate y pepino',
+        'Bife con papas y ensalada, terminado con aceite de oliva',
+        'Merluza con arroz, zanahoria rallada, apio y aceitunas',
+        'Cerdo con batata, ensalada verde y nueces'
+      ]}
+    ]
+  },
+  {
+    t:'CENA',
+    s:'Igual al almuerzo, pero sin carbohidrato',
+    b:[
+      { tipo:'texto', txt:'200 g cocidos de proteína animal, medio plato de vegetales crudos y 1 grasa. Sin grano, sin tubérculo, sin harina.' },
+      { tipo:'ej', h:'EJEMPLOS', items:[
+        'Tortilla soufflé de verduras con pollo al horno',
+        'Bowl de vegetales crudos con pollo y palta',
+        'Pescado al horno con ensalada grande y aceite de oliva',
+        'Carne con zucchini y berenjena, más semillas por encima'
+      ]},
+      { tipo:'regla', txt:'Postre opcional: 1 barrita de chocolate amargo al 80 % o media taza de frutos rojos congelados.' }
+    ]
+  },
+  {
+    t:'DESACONSEJADOS',
+    s:'Lo que rompe el día limpio',
+    veto:true,
+    b:[
+      { tipo:'lista', h:'FUERA', items:[
+        'Granos y cereales con gluten',
+        'Lácteos de vaca. De otro animal sí',
+        'Galletitas, panificados industriales, embutidos, snacks',
+        'Azúcar refinada, jarabe de maíz, edulcorantes artificiales',
+        'Alcohol y exceso de cafeína',
+        'Soja, maní y derivados',
+        'Maíz y derivados'
+      ]}
+    ]
+  },
+  {
+    t:'SUPLEMENTOS',
+    s:'Omega 3 + creatina',
+    b:[
+      { tipo:'texto', txt:'Sostenidos todos los días. La creatina es de lo poco que protege masa magra mientras bajás grasa.' }
+    ]
+  }
+];
+
+function renderPlan() {
+  const cont = document.getElementById('planBody');
+  if (!cont) return;
+  cont.innerHTML = PLAN.map((sec, i) => {
+    const cuerpo = sec.b.map(bl => {
+      if (bl.tipo === 'texto') return `<p class="pl-p">${bl.txt}</p>`;
+      if (bl.tipo === 'regla') return `<div class="pl-regla">${bl.txt}</div>`;
+      const cls = bl.tipo === 'ej' ? 'pl-ej' : 'pl-eq';
+      return `<div class="pl-blk">
+        <div class="pl-blk-h">${bl.h}</div>
+        <ul class="${cls}">${bl.items.map(x => `<li>${x}</li>`).join('')}</ul>
+      </div>`;
+    }).join('');
+    return `<div class="pl-sec${sec.veto ? ' veto' : ''}" data-i="${i}">
+      <button class="pl-tog">
+        <span class="pl-t">${sec.t}</span>
+        <span class="pl-ch"></span>
+      </button>
+      <div class="pl-s">${sec.s}</div>
+      <div class="pl-x">${cuerpo}</div>
+    </div>`;
+  }).join('');
+
+  cont.querySelectorAll('.pl-tog').forEach(btn => {
+    btn.addEventListener('click', () => btn.closest('.pl-sec').classList.toggle('open'));
+  });
+}
+
+// ============================================================
 // INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
   iniciarArise();
+  updateUI();
   cargarDesdeSupabase();
-  renderCalendar();
-  renderEstado();
-  renderProyeccion();
 
   document.getElementById('cal-prev')?.addEventListener('click', () => {
     calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
@@ -541,6 +661,18 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   proyInfo?.addEventListener('click', e => {
     if (e.target === proyInfo) proyInfo.style.display = 'none';
+  });
+
+  renderPlan();
+  document.getElementById('btnPlan')?.addEventListener('click', () => {
+    document.getElementById('planModal').style.display = 'flex';
+  });
+  document.getElementById('btnCerrarPlan')?.addEventListener('click', () => {
+    document.getElementById('planModal').style.display = 'none';
+  });
+  document.getElementById('planModal')?.addEventListener('click', e => {
+    if (e.target === document.getElementById('planModal'))
+      document.getElementById('planModal').style.display = 'none';
   });
 
   iniciarTimerMision();
