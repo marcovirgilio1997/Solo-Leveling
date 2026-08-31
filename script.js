@@ -495,43 +495,34 @@ async function guardarConfig() {
 function iniciarArise() {
   const overlay = document.getElementById('ariseOverlay');
   const text = document.getElementById('ariseText');
-  const caret = document.getElementById('ariseCaret');
-  if (!overlay || !text || !caret) return;
+  if (!overlay || !text) return;
 
   const PALABRA = 'ARISE';
-  const T_ESCRIBIR = 170;
-  const T_ARRANQUE = 800;
-  const T_SOSTEN = 900;
   const timers = [];
   let cerrado = false;
+
+  // cada letra entra con un pequeño desfase: sube, se enfoca y aparece
+  text.innerHTML = '';
+  [...PALABRA].forEach((ch, idx) => {
+    const s = document.createElement('span');
+    s.className = 'arise-ch';
+    s.textContent = ch;
+    s.style.animationDelay = (0.34 + idx * 0.08) + 's';
+    text.appendChild(s);
+  });
 
   const cerrar = () => {
     if (cerrado) return;
     cerrado = true;
     timers.forEach(clearTimeout);
     overlay.classList.add('arise-done');
-    setTimeout(() => overlay.classList.add('arise-off'), 500);
+    setTimeout(() => overlay.classList.add('arise-off'), 650);
   };
 
-  let i = 0;
-  const escribir = () => {
-    if (cerrado) return;
-    if (i < PALABRA.length) {
-      text.textContent += PALABRA[i];
-      i++;
-      timers.push(setTimeout(escribir, T_ESCRIBIR));
-    } else {
-      caret.classList.add('blink');
-      timers.push(setTimeout(cerrar, T_SOSTEN));
-    }
-  };
-
-  caret.classList.add('hidden');
-  timers.push(setTimeout(() => {
-    if (cerrado) return;
-    caret.classList.remove('hidden');
-    escribir();
-  }, T_ARRANQUE));
+  // fogonazo + latido cuando las letras terminan de asentarse
+  timers.push(setTimeout(() => overlay.classList.add('arise-charged'), 1050));
+  // cierre automático
+  timers.push(setTimeout(cerrar, 2600));
 
   overlay.addEventListener('click', cerrar);
 }
