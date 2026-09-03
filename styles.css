@@ -13,6 +13,10 @@
   --neg:#ff5d70;
   --warn:#ffa15d;
   --bg:#010810;
+  --gold:#ffce7a;
+  --gold-bright:#ffefc4;
+  --gold-deep:#c8952f;
+  --gold-line:rgba(255,205,120,.5);
 }
 
 /* ───── RESET ───── */
@@ -160,7 +164,8 @@ body::before{
   position:relative;margin-top:26px;
   border:1px solid var(--line);
   background:linear-gradient(180deg, rgba(9,22,42,.82), rgba(3,9,20,.88));
-  animation:in .6s ease both
+  animation:in .6s ease both;
+  transition:border-color .55s ease, box-shadow .55s ease, background .55s ease
 }
 .sw:nth-of-type(1){animation-delay:.14s}
 .sw:nth-of-type(2){animation-delay:.18s}
@@ -283,6 +288,89 @@ body::before{
   padding:22px 12px;letter-spacing:.3px
 }
 
+/* ───── DÍA PLENO · TODO DORADO ───── */
+.m-clear{
+  text-align:center;padding:15px 12px 16px;margin-bottom:10px;
+  border:1px solid var(--gold-line);
+  background:linear-gradient(180deg, rgba(62,46,11,.42), rgba(30,22,5,.32));
+  box-shadow:0 0 20px rgba(255,205,120,.15), inset 0 0 22px rgba(255,190,95,.05);
+  animation:in .45s ease both
+}
+.m-clear-t{
+  display:block;font-family:'Orbitron';font-weight:700;
+  font-size:.72em;letter-spacing:5px;text-indent:5px;
+  color:var(--gold-bright);text-shadow:0 0 12px rgba(255,205,120,.6)
+}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .m-clear-t{
+    background:linear-gradient(90deg,#c8952f 0%,#ffefc4 25%,#fff8ec 50%,#ffefc4 75%,#c8952f 100%);
+    background-size:200% auto;
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent;
+    text-shadow:none;
+    filter:drop-shadow(0 0 10px rgba(255,205,120,.55));
+    animation:goldSheen 3.2s linear infinite
+  }
+}
+.m-clear-s{
+  display:block;margin-top:8px;font-size:.86em;letter-spacing:.6px;
+  color:rgba(255,214,150,.72)
+}
+@keyframes goldSheen{to{background-position:-200% center}}
+
+.dia-pleno #panelMisiones{
+  border-color:var(--gold-line);
+  background:linear-gradient(180deg, rgba(42,31,9,.5), rgba(20,14,3,.62));
+  box-shadow:0 0 28px rgba(255,205,120,.16), inset 0 0 34px rgba(255,190,95,.05)
+}
+.dia-pleno #panelMisiones .sw-t{color:var(--gold-bright);text-shadow:0 0 12px rgba(255,214,140,.6)}
+.dia-pleno #panelMisiones .sw-h::after{background:linear-gradient(90deg,transparent,rgba(255,205,120,.5),transparent)}
+.dia-pleno #panelMisiones::before,
+.dia-pleno #panelMisiones::after,
+.dia-pleno #panelMisiones .cx::before,
+.dia-pleno #panelMisiones .cx::after{
+  border-color:var(--gold);filter:drop-shadow(0 0 4px rgba(255,205,120,.8))
+}
+.dia-pleno #panelMisiones .m-grp{color:rgba(255,205,120,.5)}
+.dia-pleno .m-row.done{
+  border-color:rgba(255,205,120,.5);
+  background:linear-gradient(180deg, rgba(72,52,13,.28), rgba(36,25,6,.3));
+  box-shadow:0 0 14px rgba(255,205,120,.14), inset 0 0 18px rgba(255,182,84,.06)
+}
+.dia-pleno .m-row.done::before{background:var(--gold);box-shadow:0 0 8px var(--gold)}
+.dia-pleno .m-row.done .m-mk{border-color:var(--gold);box-shadow:0 0 12px rgba(255,205,120,.6)}
+.dia-pleno .m-row.done .m-mk::after{background:var(--gold);box-shadow:0 0 8px var(--gold)}
+.dia-pleno .m-row.done .m-n{color:var(--gold-bright);text-shadow:0 0 10px rgba(255,205,120,.4)}
+
+.dia-pleno .pt{background:rgba(255,216,145,.7);box-shadow:0 0 8px rgba(255,216,145,.8)}
+.dia-pleno .shaft{background:radial-gradient(ellipse 50% 78% at 50% 0%, rgba(255,200,120,.07), transparent 70%)}
+
+/* fogonazo dorado al cerrar el último tilde */
+.pleno-flash{
+  position:fixed;inset:0;z-index:4000;pointer-events:none;opacity:0;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse 72% 52% at 50% 44%, rgba(255,214,135,.5), rgba(255,190,90,.12) 45%, transparent 72%)
+}
+.pleno-flash.go{animation:plenoFx 1.6s cubic-bezier(.2,.7,.3,1)}
+@keyframes plenoFx{
+  0%{opacity:0;transform:scale(.72)}
+  18%{opacity:1}
+  100%{opacity:0;transform:scale(1.32)}
+}
+.pleno-flash-t{
+  font-family:'Orbitron';font-weight:700;letter-spacing:.16em;
+  font-size:clamp(22px,7vw,46px);white-space:nowrap;
+  color:#fff8ec;text-shadow:0 0 22px rgba(255,205,120,.9),0 0 62px rgba(255,180,80,.5);
+  opacity:0;transform:scale(.8)
+}
+.pleno-flash.go .pleno-flash-t{animation:plenoText 1.7s cubic-bezier(.2,.7,.3,1)}
+@keyframes plenoText{
+  0%{opacity:0;transform:scale(.8);filter:blur(6px)}
+  22%{opacity:1;transform:scale(1);filter:blur(0)}
+  72%{opacity:1}
+  100%{opacity:0;transform:scale(1.08)}
+}
+
 /* ───── CALENDARIO ───── */
 #cal-nav{display:flex;align-items:center;justify-content:space-between;padding:0 2px 12px}
 .c-bt{background:none;border:none;color:rgba(0,210,255,.5);font-size:.8em;cursor:pointer;padding:4px 12px;font-family:'Orbitron';transition:color .2s}
@@ -301,8 +389,6 @@ body::before{
 .cal-empty{background:none;border:none}
 .cal-bar{position:absolute;left:50%;bottom:7px;transform:translateX(-50%);height:3px;width:62%;max-width:26px;background:rgba(0,210,255,.12);overflow:hidden}
 .cal-bar i{position:absolute;left:0;top:0;bottom:0;background:var(--cyan);box-shadow:0 0 6px rgba(0,235,255,.85)}
-.cal-cell.cal-full{background:rgba(0,90,160,.24);border-color:rgba(0,235,255,.38);color:#fff;text-shadow:0 0 8px rgba(0,235,255,.4)}
-.cal-cell.cal-full .cal-bar i{background:#fff;box-shadow:0 0 8px var(--cyan)}
 .cal-cell.cal-z{background:rgba(70,8,16,.32);border-color:rgba(255,93,112,.28)}
 .cal-cell.cal-z .cal-bar{background:rgba(255,93,112,.65);box-shadow:0 0 5px rgba(255,93,112,.4)}
 .cal-cell.cal-miss{background:rgba(55,8,14,.2);border-color:rgba(255,93,112,.13);color:rgba(210,235,250,.32)}
@@ -312,6 +398,34 @@ body::before{
   color:#fff;text-shadow:0 0 8px rgba(0,235,255,.6)
 }
 .cal-cell.cal-future{color:rgba(160,190,210,.18);background:rgba(0,20,40,.1);border-color:rgba(0,200,255,.03);cursor:default}
+
+/* ── DÍA PLENO · marco dorado épico ── */
+.cal-cell.cal-full{
+  background:linear-gradient(180deg, rgba(94,68,17,.36), rgba(48,33,7,.44));
+  border-color:var(--gold);
+  color:#fff8ec;text-shadow:0 0 8px rgba(255,214,140,.65);
+  box-shadow:0 0 12px rgba(255,205,120,.4), inset 0 0 10px rgba(255,205,120,.14);
+  z-index:1
+}
+.cal-cell.cal-full .cal-bar{background:rgba(255,205,120,.16)}
+.cal-cell.cal-full .cal-bar i{background:var(--gold-bright);box-shadow:0 0 8px var(--gold)}
+.cal-cell.cal-full::before{
+  content:'';position:absolute;inset:2px;pointer-events:none;
+  border:1px solid rgba(255,231,180,.5)
+}
+.cal-cell.cal-full::after{
+  content:'';position:absolute;inset:-1px;pointer-events:none;
+  border:1px solid rgba(255,205,120,.4);
+  animation:calGold 2.6s ease-in-out infinite
+}
+@keyframes calGold{
+  0%,100%{box-shadow:0 0 5px rgba(255,205,120,.22)}
+  50%{box-shadow:0 0 16px rgba(255,205,120,.55)}
+}
+.cal-cell.cal-full.cal-today{
+  border-color:var(--gold-bright);
+  box-shadow:0 0 17px rgba(255,205,120,.5), inset 0 0 9px rgba(255,214,140,.2)
+}
 
 #cal-detail{
   margin-top:14px;padding:12px 14px;
@@ -323,6 +437,11 @@ body::before{
 .cd-empty{color:var(--tx-faint)}
 .cd-ok{color:var(--pos)}
 .cd-no{color:var(--neg)}
+.cd-clear{
+  display:inline-block;margin-top:4px;
+  color:var(--gold-bright);font-weight:600;letter-spacing:1.5px;
+  text-shadow:0 0 10px rgba(255,205,120,.5)
+}
 
 .cal-legend{
   display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:12px;
@@ -330,7 +449,7 @@ body::before{
 }
 .cal-legend span{display:flex;align-items:center;gap:6px}
 .cal-legend i{width:10px;height:10px;display:inline-block;border:1px solid}
-.lg-full{background:rgba(0,90,160,.4);border-color:rgba(0,235,255,.5)}
+.lg-full{background:rgba(94,68,17,.5);border-color:var(--gold)}
 .lg-part{background:rgba(0,25,50,.4);border-color:rgba(0,200,255,.25)}
 .lg-zero{background:rgba(70,8,16,.45);border-color:rgba(255,93,112,.4)}
 

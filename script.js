@@ -275,6 +275,13 @@ function renderMisiones() {
   const data = getTodayMissionData();
   let html = '', grupoPrev = null;
 
+  if (countDia(data) === defsDelDia(data).length) {
+    html += `<div class="m-clear">
+      <span class="m-clear-t">DESPEJE TOTAL</span>
+      <span class="m-clear-s">Todas las misiones del día cumplidas</span>
+    </div>`;
+  }
+
   for (const m of MISIONES) {
     if (m.grupo !== grupoPrev) { html += `<div class="m-grp">${m.grupo}</div>`; grupoPrev = m.grupo; }
     html += `<div class="m-row${data[m.key] ? ' done' : ''}">
@@ -286,8 +293,10 @@ function renderMisiones() {
 
   for (const m of MISIONES) {
     document.getElementById(`cb-${m.key}`)?.addEventListener('change', () => {
+      const eraPleno = esDiaPleno();
       syncMissionRows();
       guardarMision();
+      if (!eraPleno && esDiaPleno()) dispararPlenoFx();
     });
   }
 }
@@ -300,6 +309,29 @@ function syncMissionRows() {
 }
 
 // ============================================================
+// DÍA PLENO — todas las misiones del día cumplidas
+// ============================================================
+function esDiaPleno() {
+  if (getTodayStr() < getFechaInicio()) return false;
+  const d = getTodayMissionData();
+  const total = defsDelDia(d).length;
+  return total > 0 && countDia(d) === total;
+}
+
+function aplicarEstadoPleno() {
+  document.body.classList.toggle('dia-pleno', esDiaPleno());
+}
+
+function dispararPlenoFx() {
+  const fx = document.getElementById('plenoFlash');
+  if (!fx) return;
+  fx.classList.remove('go');
+  void fx.offsetWidth;               // reinicia la animación
+  fx.classList.add('go');
+  setTimeout(() => fx.classList.remove('go'), 1800);
+}
+
+// ============================================================
 // UI PRINCIPAL
 // ============================================================
 function updateUI() {
@@ -308,6 +340,7 @@ function updateUI() {
   renderEstado();
   renderProyeccion();
   renderCalendar();
+  aplicarEstadoPleno();
 }
 
 // ============================================================
@@ -378,7 +411,9 @@ function renderCalendar() {
       const icon = v => v ? '<span class="cd-ok">✓</span>' : '<span class="cd-no">✗</span>';
       const filas = defs.map(m => `${icon(data[m.key])} ${m.label.toUpperCase()}`).join('<br>');
       const c1 = data.ciclo === 1 ? '<br><span class="cd-empty">Registro del Ciclo 1</span>' : '';
-      detail.innerHTML = `${cab}<br>${filas}${c1}`;
+      const pleno = countDia(data) === defs.length
+        ? '<br><span class="cd-clear">✦ DESPEJE TOTAL</span>' : '';
+      detail.innerHTML = `${cab}<br>${filas}${c1}${pleno}`;
     });
 
     grid.appendChild(cell);

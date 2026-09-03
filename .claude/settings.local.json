@@ -16,7 +16,22 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://marcovirgilio1997.github.io/Solo-Leveling/)",
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
-      "Bash(git commit -m 'Ciclo 2: index.html \\(paneles nuevos, config modal, arise\\) *)"
+      "Bash(git commit -m 'Ciclo 2: index.html \\(paneles nuevos, config modal, arise\\) *)",
+      "Bash(curl -s \"https://jhpyvimfsuvcqtqliffm.supabase.co/rest/v1/missions?select=fecha,ciclo,nutricion,entrenamiento,suplementos,desayuno,almuerzo,merienda,cena,ayuno,dia_limpio&order=fecha.asc\" -H \"apikey: sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c\" -H \"Authorization: Bearer sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c\")",
+      "Bash(curl -s \"https://jhpyvimfsuvcqtqliffm.supabase.co/rest/v1/config?select=*\" -H \"apikey: sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c\" -H \"Authorization: Bearer sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c\")",
+      "Bash(curl -s -X POST https://jhpyvimfsuvcqtqliffm.supabase.co/rest/v1/config -H 'apikey: sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c' -H 'Authorization: Bearer sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c' -H 'Content-Type: application/json' -H 'Prefer: resolution=merge-duplicates,return=representation' -d '[{\"key\":\"fechaInicio\",\"value\":\"2026-08-31\"},{\"key\":\"fechaFinMision\",\"value\":\"2026-11-10\"},{\"key\":\"antroPeso\",\"value\":\"84.8\"},{\"key\":\"antroMusculo\",\"value\":\"39.0\"},{\"key\":\"antroGrasa\",\"value\":\"16.9\"},{\"key\":\"antroObjetivo\",\"value\":\"12.9\"}]')",
+      "Bash(curl -s -X PATCH https://jhpyvimfsuvcqtqliffm.supabase.co/rest/v1/missions?fecha=eq.2026-08-27 -H 'apikey: sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c' -H 'Authorization: Bearer sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c' -H 'Content-Type: application/json' -H 'Prefer: return=representation' -d '{\"ciclo\":1}')",
+      "Bash(curl -s -X PATCH https://jhpyvimfsuvcqtqliffm.supabase.co/rest/v1/missions?fecha=eq.2026-08-29 -H 'apikey: sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c' -H 'Authorization: Bearer sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c' -H 'Content-Type: application/json' -H 'Prefer: return=representation' -d '{\"ciclo\":1,\"desayuno\":false,\"almuerzo\":false,\"merienda\":false,\"cena\":false}')",
+      "Bash(node --check script.js)",
+      "Bash(curl -s \"https://jhpyvimfsuvcqtqliffm.supabase.co/rest/v1/config?select=*&order=key.asc\" -H \"apikey: sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c\" -H \"Authorization: Bearer sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c\")",
+      "Bash(curl -s \"https://jhpyvimfsuvcqtqliffm.supabase.co/rest/v1/config?select=key,value&order=key.asc\" -H \"apikey: sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c\" -H \"Authorization: Bearer sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c\")",
+      "Bash(curl -s -X POST https://jhpyvimfsuvcqtqliffm.supabase.co/rest/v1/config -H 'apikey: sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c' -H 'Authorization: Bearer sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c' -H 'Content-Type: application/json' -H 'Prefer: resolution=merge-duplicates,return=representation' -d '[{\"key\":\"antroObjetivo\",\"value\":\"12.9\"}]')",
+      "Bash(cd \"C:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" && git log --all --diff-filter=D --name-only --oneline | grep -i context; echo \"---find in desktop---\"; find \"C:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\" -maxdepth 3 -iname \"*contexto*\" 2>/dev/null; echo \"---find md on desktop SoloLeveling---\"; find \"C:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" -iname \"*.md\" 2>/dev/null; echo \"---git show HEAD files---\"; git show --stat HEAD)",
+      "Read(//c/Users/Marco/OneDrive/Desktop/**)",
+      "Bash(node -e \"const i=new Date\\('2026-08-31T00:00:00'\\),f=new Date\\('2026-11-10T00:00:00'\\);const dc=Math.round\\(\\(f-i\\)/86400000\\);const deficitKg=16.9-12.9;const need=Math.min\\(dc,Math.ceil\\(deficitKg*7700/600\\)\\);console.log\\('diasCiclo',dc\\);console.log\\('diasLimpiosNecesarios',need\\);console.log\\('umbralGrasa',Math.round\\(need/dc*100\\)+'%'\\);console.log\\('fichasTotal',dc-need\\);\")",
+      "Bash(cd \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" && ls -la && echo \"--- git tracked ---\" && git ls-files && echo \"--- buscar CONTEXTO ---\" && find . -iname \"*contexto*\" 2>/dev/null; find \"/c/Users/Marco/OneDrive/Desktop\" -maxdepth 2 -iname \"*contexto*\" 2>/dev/null)",
+      "Bash(git commit *)",
+      "Bash(git --no-pager diff --stat)"
     ]
   }
 }
