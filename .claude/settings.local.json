@@ -31,7 +31,8 @@
       "Bash(node -e \"const i=new Date\\('2026-08-31T00:00:00'\\),f=new Date\\('2026-11-10T00:00:00'\\);const dc=Math.round\\(\\(f-i\\)/86400000\\);const deficitKg=16.9-12.9;const need=Math.min\\(dc,Math.ceil\\(deficitKg*7700/600\\)\\);console.log\\('diasCiclo',dc\\);console.log\\('diasLimpiosNecesarios',need\\);console.log\\('umbralGrasa',Math.round\\(need/dc*100\\)+'%'\\);console.log\\('fichasTotal',dc-need\\);\")",
       "Bash(cd \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" && ls -la && echo \"--- git tracked ---\" && git ls-files && echo \"--- buscar CONTEXTO ---\" && find . -iname \"*contexto*\" 2>/dev/null; find \"/c/Users/Marco/OneDrive/Desktop\" -maxdepth 2 -iname \"*contexto*\" 2>/dev/null)",
       "Bash(git commit *)",
-      "Bash(git --no-pager diff --stat)"
+      "Bash(git --no-pager diff --stat)",
+      "Bash(git --no-pager diff -- script.js index.html styles.css)"
     ]
   }
 }

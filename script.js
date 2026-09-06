@@ -30,13 +30,17 @@ const MISIONES_C1 = [
 ];
 
 const KEYS_GRASA   = ['desayuno','almuerzo','merienda','cena','ayuno','diaLimpio'];
-const KEYS_MUSCULO = ['entrenamiento','suplementos'];
 const MIN_LIMPIO   = 5;
 
 const KCAL_POR_KG = 7700;
 const DEFICIT_DIARIO = 600;
 const UMBRAL_MUSCULO = 0.75;
 const INCERTIDUMBRE_KG = 1.5;
+
+// Barra de músculo: 4 sesiones de fuerza por semana = 100% del entrenamiento;
+// el entrenamiento pesa 80% y los suplementos 20%.
+const OBJETIVO_ENTRENO_SEMANAL = 4;
+const PESO_ENTRENO = 0.8;
 
 const ANTRO_DEFAULT = { peso:84.8, musculo:39.0, grasa:16.9, objetivo:12.9 };
 
@@ -139,19 +143,27 @@ function statsProyeccion() {
   const umbralGrasa = diasCiclo > 0 ? diasLimpiosNecesarios / diasCiclo : 0;
   const fichasTotal = diasCiclo - diasLimpiosNecesarios;
 
-  let evaluados = 0, limpios = 0, musOK = 0, musPos = 0;
+  let evaluados = 0, limpios = 0, entrenos = 0, supleDias = 0;
   for (let t = inicio.getTime(); t <= ayer.getTime(); t += 86400000) {
     const d = misionesCache[dateToStr(new Date(t))];
     if (d && d.ciclo === 1) continue;
     evaluados++;
     const n = d ? KEYS_GRASA.reduce((a, k) => a + (d[k] ? 1 : 0), 0) : 0;
     if (n >= MIN_LIMPIO) limpios++;
-    musPos += KEYS_MUSCULO.length;
-    if (d) musOK += KEYS_MUSCULO.reduce((a, k) => a + (d[k] ? 1 : 0), 0);
+    if (d && d.entrenamiento) entrenos++;
+    if (d && d.suplementos) supleDias++;
   }
 
   const adhGrasa = evaluados > 0 ? limpios / evaluados : 0;
-  const adhMusculo = musPos > 0 ? musOK / musPos : 0;
+
+  // Entrenamiento contra objetivo semanal (4/sem = 100%), tope 100%.
+  const semanas = evaluados / 7;
+  const adhEntreno = semanas > 0
+    ? Math.min(1, entrenos / (semanas * OBJETIVO_ENTRENO_SEMANAL)) : 0;
+  const adhSuple = evaluados > 0 ? supleDias / evaluados : 0;
+  const adhMusculo = evaluados > 0
+    ? PESO_ENTRENO * adhEntreno + (1 - PESO_ENTRENO) * adhSuple : 0;
+
   const fichasUsadas = Math.max(0, evaluados - limpios);
 
   const perdida = adhGrasa * diasCiclo * DEFICIT_DIARIO / KCAL_POR_KG;
@@ -164,6 +176,8 @@ function statsProyeccion() {
     diasCiclo, diasRestantes, evaluados, limpios, preCiclo,
     fichasTotal, fichasUsadas,
     adhGrasa, adhMusculo, umbralGrasa,
+    entrenos, adhEntreno, adhSuple,
+    ritmoEntreno: semanas > 0 ? entrenos / semanas : 0,
     grasaProy, antro,
     diaActual: Math.max(1, Math.min(diasCiclo, Math.round((hoy - inicio) / 86400000) + 1))
   };
@@ -214,7 +228,8 @@ function renderProyeccion() {
   barra('adhGrasaPct', 'adhGrasaBar', 'adhGrasaMark', 'adhGrasaCap',
     s.adhGrasa, s.umbralGrasa, `${s.limpios} de ${s.evaluados} días en regla`);
   barra('adhMusculoPct', 'adhMusculoBar', 'adhMusculoMark', 'adhMusculoCap',
-    s.adhMusculo, UMBRAL_MUSCULO, 'entrenamiento y suplementos');
+    s.adhMusculo, UMBRAL_MUSCULO,
+    `${s.entrenos} ${s.entrenos === 1 ? 'entreno' : 'entrenos'} · ${nf(s.ritmoEntreno)}/semana (meta ${OBJETIVO_ENTRENO_SEMANAL})`);
 
   const fichasTexto = document.getElementById('fichasTexto');
   const restantes = Math.max(0, s.fichasTotal - s.fichasUsadas);
@@ -712,9 +727,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const proyInfo = document.getElementById('proyInfoModal');
-  document.getElementById('btnProyInfo')?.addEventListener('click', () => {
-    if (proyInfo) proyInfo.style.display = 'flex';
-  });
+  const abrirProyInfo = () => { if (proyInfo) proyInfo.style.display = 'flex'; };
+  document.getElementById('btnProyInfo')?.addEventListener('click', abrirProyInfo);
+  document.getElementById('btnMusculoInfo')?.addEventListener('click', abrirProyInfo);
   document.getElementById('btnCerrarProyInfo')?.addEventListener('click', () => {
     if (proyInfo) proyInfo.style.display = 'none';
   });
