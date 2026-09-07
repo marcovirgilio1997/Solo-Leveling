@@ -545,20 +545,35 @@ async function guardarConfig() {
 function iniciarArise() {
   const overlay = document.getElementById('ariseOverlay');
   const text = document.getElementById('ariseText');
+  const caret = document.getElementById('ariseCaret');
   if (!overlay || !text) return;
 
   const PALABRA = 'ARISE';
+  const INICIO = 360;   // ms hasta la primera letra
+  const PASO = 130;     // ms entre pulsación y pulsación
   const timers = [];
   let cerrado = false;
 
-  // cada letra entra con un pequeño desfase: sube, se enfoca y aparece
+  // se crean todas ocultas: así reservan el ancho final y el cursor avanza
+  // sobre la palabra en vez de re-centrarla en cada letra
   text.innerHTML = '';
-  [...PALABRA].forEach((ch, idx) => {
+  const letras = [...PALABRA].map(ch => {
     const s = document.createElement('span');
     s.className = 'arise-ch';
     s.textContent = ch;
-    s.style.animationDelay = (0.34 + idx * 0.08) + 's';
     text.appendChild(s);
+    return s;
+  });
+
+  // offsetLeft/offsetWidth son de layout: no los altera el transform de entrada
+  const moverCaret = x => { if (caret) caret.style.transform = 'translateX(' + x + 'px)'; };
+  moverCaret(letras[0].offsetLeft);
+
+  letras.forEach((s, idx) => {
+    timers.push(setTimeout(() => {
+      s.classList.add('on');
+      moverCaret(s.offsetLeft + s.offsetWidth);
+    }, INICIO + idx * PASO));
   });
 
   const cerrar = () => {
@@ -569,10 +584,11 @@ function iniciarArise() {
     setTimeout(() => overlay.classList.add('arise-off'), 650);
   };
 
-  // fogonazo + latido cuando las letras terminan de asentarse
-  timers.push(setTimeout(() => overlay.classList.add('arise-charged'), 1050));
+  // fogonazo + latido + cursor parpadeando cuando la última letra se asienta
+  const finTipeo = INICIO + (letras.length - 1) * PASO + 470;
+  timers.push(setTimeout(() => overlay.classList.add('arise-charged'), finTipeo));
   // cierre automático
-  timers.push(setTimeout(cerrar, 2600));
+  timers.push(setTimeout(cerrar, finTipeo + 1550));
 
   overlay.addEventListener('click', cerrar);
 }

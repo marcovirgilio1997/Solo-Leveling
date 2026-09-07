@@ -85,6 +85,7 @@ body::before{
 }
 
 .arise-row{
+  position:relative;
   display:flex;align-items:center;
   font-family:'Orbitron';font-weight:500;
   font-size:clamp(44px,15vw,82px);
@@ -98,14 +99,33 @@ body::before{
   0%,100%{filter:drop-shadow(0 0 5px rgba(0,245,255,.25))}
   50%{filter:drop-shadow(0 0 15px rgba(0,245,255,.6))}
 }
+/* las letras nacen ocultas (reservan el ancho) y se encienden al tipearse */
 .arise-ch{
   display:inline-block;color:#f2fcff;
   text-shadow:0 0 16px var(--cyan),0 0 44px rgba(0,191,255,.5);
   opacity:0;transform:translateY(18px) scale(.9);filter:blur(9px);
-  animation:ariseCh .6s cubic-bezier(.2,.75,.25,1) forwards;
 }
+.arise-ch.on{animation:ariseCh .45s cubic-bezier(.2,.75,.25,1) forwards}
 @keyframes ariseCh{
   to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}
+}
+
+/* cursor de tipeo: el JS lo va corriendo al final de cada letra */
+.arise-caret{
+  position:absolute;left:0;top:50%;
+  width:.08em;height:.78em;margin-top:-.35em;
+  border-radius:1px;background:#dffaff;
+  box-shadow:0 0 10px var(--cyan),0 0 28px rgba(0,191,255,.65);
+  opacity:0;will-change:transform;
+  transition:transform .1s cubic-bezier(.3,.8,.35,1);
+  animation:ariseCaretIn .3s ease .06s forwards;
+}
+@keyframes ariseCaretIn{to{opacity:1}}
+/* al terminar la palabra se queda parpadeando */
+.arise-charged .arise-caret{animation:ariseCaretBlink .62s steps(1,end) infinite}
+@keyframes ariseCaretBlink{
+  0%,49%{opacity:1}
+  50%,100%{opacity:0}
 }
 
 /* ───── AMBIENTE ───── */
