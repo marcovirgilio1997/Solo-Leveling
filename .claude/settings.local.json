@@ -32,7 +32,19 @@
       "Bash(cd \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" && ls -la && echo \"--- git tracked ---\" && git ls-files && echo \"--- buscar CONTEXTO ---\" && find . -iname \"*contexto*\" 2>/dev/null; find \"/c/Users/Marco/OneDrive/Desktop\" -maxdepth 2 -iname \"*contexto*\" 2>/dev/null)",
       "Bash(git commit *)",
       "Bash(git --no-pager diff --stat)",
-      "Bash(git --no-pager diff -- script.js index.html styles.css)"
+      "Bash(git --no-pager diff -- script.js index.html styles.css)",
+      "PowerShell(node --check \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\\\\script.js\")",
+      "PowerShell(git -C \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" status --short)",
+      "PowerShell(git -C \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" log --oneline -3)",
+      "PowerShell(git -C \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" remote -v)",
+      "PowerShell(git -C \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" diff -- .claude/settings.local.json)",
+      "PowerShell(git -C \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" add index.html script.js styles.css)",
+      "PowerShell(git -C \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" push origin main)",
+      "Bash(curl -s \"https://jhpyvimfsuvcqtqliffm.supabase.co/rest/v1/?apikey=sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c\")",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('definitions',{}\\).get\\('config',{}\\), indent=2, ensure_ascii=False\\)\\)\")",
+      "Bash(node -e \"console.log\\(JSON.stringify\\(require\\(process.env.TEMP+'/pgrst.json'\\),null,2\\)\\)\")",
+      "PowerShell(git -C \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" --no-pager diff --stat)",
+      "PowerShell(git -C \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" add .claude/settings.local.json)"
     ]
   }
 }
