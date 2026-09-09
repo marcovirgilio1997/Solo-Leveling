@@ -280,10 +280,6 @@ body::before{
   background:rgba(55,8,14,.25);color:var(--neg);text-shadow:0 0 10px rgba(255,93,112,.5)
 }
 
-/* ───── QUEST DEL DÍA ───── */
-.q-t{font-family:'Orbitron';font-weight:500;font-size:.92em;letter-spacing:2px;color:#fff;margin-bottom:6px;text-shadow:0 0 12px rgba(0,235,255,.25)}
-.q-d{font-size:.98em;font-weight:400;color:var(--tx-dim);line-height:1.5}
-
 /* ───── MISIONES ───── */
 .m-grp{font-family:'Orbitron';font-weight:400;font-size:.48em;letter-spacing:3px;color:var(--tx-faint);margin:16px 0 9px;padding-left:2px}
 .m-grp:first-child{margin-top:2px}
@@ -623,7 +619,8 @@ body::before{
 .pl-sec.open .pl-ch{transform:rotate(225deg)}
 .pl-s{font-size:.9em;color:var(--tx-dim);padding:0 2px 12px;line-height:1.5;letter-spacing:.3px}
 .pl-x{max-height:0;opacity:0;overflow:hidden;transition:max-height .5s cubic-bezier(.25,.8,.3,1),opacity .35s ease}
-.pl-sec.open .pl-x{max-height:1400px;opacity:1;padding-bottom:14px}
+/* el tope tiene que superar a la sección más larga (almuerzo con las salsas) */
+.pl-sec.open .pl-x{max-height:2000px;opacity:1;padding-bottom:14px}
 
 .pl-blk{margin-bottom:16px}
 .pl-blk-h{
@@ -643,8 +640,63 @@ body::before{
 .pl-ej li{color:var(--tx-dim);border-left:1px solid var(--line);padding-left:14px;margin-bottom:2px}
 .pl-sec.veto .pl-eq li::before{border-color:var(--neg)}
 .pl-p{font-size:.94em;color:var(--tx-dim);line-height:1.6;letter-spacing:.3px;margin-bottom:12px}
+
+/* salsas: nombre, casillero que ocupa e ingredientes */
+.pl-sal{list-style:none}
+.pl-sal li{
+  padding:11px 0 12px 14px;border-left:1px solid var(--line);
+  margin-bottom:3px
+}
+.sal-n{
+  font-family:'Orbitron';font-weight:500;font-size:.5em;letter-spacing:2.5px;
+  color:#fff;text-shadow:0 0 8px rgba(0,235,255,.32);margin-bottom:7px
+}
+.sal-c{
+  display:inline-block;margin-bottom:7px;padding:2px 8px;
+  border:1px solid var(--line2);background:rgba(0,50,90,.2);
+  font-family:'Orbitron';font-size:.4em;letter-spacing:2px;color:var(--cyan2)
+}
+.sal-i{font-size:.9em;color:var(--tx-dim);line-height:1.55;letter-spacing:.3px}
 .pl-regla{
   padding:10px 13px;margin-top:12px;
   border:1px solid var(--line2);border-left:2px solid var(--cyan2);
   background:rgba(0,25,50,.3);font-size:.9em;color:var(--tx-dim);letter-spacing:.3px
+}
+
+/* ───── GIMNASIO ───── */
+.gym-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding-bottom:9px;margin-bottom:12px;border-bottom:1px solid var(--line2)
+}
+.gym-fecha{
+  background:none;border:1px solid var(--line);color:var(--cyan2);cursor:pointer;
+  font-family:'Orbitron';font-weight:500;font-size:.46em;letter-spacing:2.5px;
+  padding:8px 12px;transition:all .2s
+}
+.gym-fecha:active{background:rgba(0,200,255,.1);border-color:var(--cyan);color:#fff}
+.gym-estado{
+  font-family:'Orbitron';font-size:.42em;letter-spacing:2px;
+  color:var(--tx-faint);transition:color .25s
+}
+.gym-estado.ok{color:var(--cyan2)}
+.gym-estado.err{color:var(--neg)}
+/* hoja libre: fuente mono para que los pesos queden en columna */
+.gym-hoja{
+  display:block;width:100%;min-height:46vh;resize:none;overflow:hidden;
+  background:rgba(0,15,30,.55);border:1px solid var(--line);color:var(--tx);
+  font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  font-size:.9em;line-height:1.75;font-variant-numeric:tabular-nums;
+  padding:14px 13px;outline:none;
+  /* renglones de cuaderno */
+  background-image:repeating-linear-gradient(
+    rgba(0,200,255,0) 0,rgba(0,200,255,0) calc(1.75em - 1px),
+    rgba(0,200,255,.07) calc(1.75em - 1px),rgba(0,200,255,.07) 1.75em);
+  background-position:0 14px;
+  transition:border-color .2s,box-shadow .2s
+}
+.gym-hoja:focus{border-color:var(--cyan);box-shadow:0 0 18px rgba(0,191,255,.12)}
+.gym-hoja::placeholder{color:rgba(120,170,200,.3)}
+.gym-pie{
+  font-size:.82em;color:var(--tx-faint);letter-spacing:.3px;
+  margin-top:11px;text-align:center
 }

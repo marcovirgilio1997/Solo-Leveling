@@ -463,50 +463,6 @@ function iniciarTimerMision() {
 }
 
 // ============================================================
-// QUEST DEL DÍA
-// ============================================================
-const QUEST_POOL = [
-  { t:'PROTOCOLO DE HIERRO',    d:'Antes del mediodía, completá tu entrenamiento.' },
-  { t:'VENTANA EXACTA',         d:'Cerrá la cena y no vuelvas a comer hasta las 12 horas.' },
-  { t:'CARGA EXTRA',            d:'Sumá 10 repeticiones por encima de tu rutina habitual.' },
-  { t:'DISCIPLINA NOCTURNA',    d:'Apagá todo y dormí antes de medianoche.' },
-  { t:'PROTEÍNA PRIMERO',       d:'En cada comida, empezá por la proteína.' },
-  { t:'HIDRATACIÓN TOTAL',      d:'Tomá al menos 3 litros de agua durante el día.' },
-  { t:'CAMINO DEL ACERO',       d:'Acumulá 5 minutos de plancha antes de dormir.' },
-  { t:'MENTE EN SILENCIO',      d:'Dedicá 10 minutos a respiración o meditación.' },
-  { t:'CACERÍA TEMPRANA',       d:'Tildá el desayuno antes de las 10:00.' },
-  { t:'CUATRO DE CUATRO',       d:'Cerrá el día con las cuatro comidas cumplidas.' },
-  { t:'CÓDIGO DEL CAZADOR',     d:'Dejá preparadas tus comidas de mañana.' },
-  { t:'AVANCE FORZADO',         d:'Agregá 15 minutos de cardio a tu jornada.' },
-  { t:'VOTO DE CONSTANCIA',     d:'Registrá actividad hoy sí o sí.' },
-  { t:'DOMINIO DEL CUERPO',     d:'Estirá 10 minutos al despertar.' },
-  { t:'MERIENDA BLINDADA',      d:'La merienda es la que más se cae. Hoy no.' },
-  { t:'RESPIRO DE GUERRERO',    d:'Hacé 3 pausas de 1 minuto para respirar profundo.' },
-  { t:'LUZ DEL SOL',            d:'Tomá 15 minutos de sol antes del mediodía.' },
-  { t:'SIN DESVÍOS',            d:'Cero gluten, cero lácteos de vaca, cero ultraprocesados.' },
-  { t:'GOLPE MATINAL',          d:'Hacé 30 sentadillas apenas te levantes.' },
-  { t:'ORDEN DEL TERRITORIO',   d:'Ordená tu espacio de entrenamiento o trabajo.' },
-  { t:'PASO LARGO',             d:'Caminá 8.000 pasos hoy.' },
-  { t:'VERDE OBLIGATORIO',      d:'Medio plato de vegetales crudos en almuerzo y cena.' },
-  { t:'FOCO ABSOLUTO',          d:'Trabajá 25 minutos sin tocar el teléfono.' },
-  { t:'FUERZA DE AGARRE',       d:'Hacé una serie máxima de flexiones.' },
-  { t:'GRATITUD DEL CAZADOR',   d:'Anotá 3 cosas que lograste hoy.' },
-  { t:'CIERRE PERFECTO',        d:'Revisá tus misiones antes de dormir y planeá mañana.' }
-];
-
-function renderQuestDia() {
-  const t = document.getElementById('questDiaTitle');
-  const d = document.getElementById('questDiaDesc');
-  if (!t || !d) return;
-  const base = getTodayStr() + 'quest';
-  let hash = 0;
-  for (let i = 0; i < base.length; i++) hash = (hash * 31 + base.charCodeAt(i)) >>> 0;
-  const q = QUEST_POOL[hash % QUEST_POOL.length];
-  t.textContent = q.t;
-  d.textContent = q.d;
-}
-
-// ============================================================
 // CONFIGURACIÓN
 // ============================================================
 function abrirConfig() {
@@ -537,6 +493,104 @@ async function guardarConfig() {
     await db.from('config').upsert({ key: k, value: String(v) }, { onConflict: 'key' });
   }
   location.reload();
+}
+
+// ============================================================
+// GIMNASIO
+// ============================================================
+// La hoja es texto libre. Va en la tabla config (key/value) como una fila más,
+// así viaja a todos los dispositivos con la carga inicial y no hace falta
+// una tabla nueva.
+const GYM_KEY = 'gymHoja';
+let gymTimer = null;
+let gymGuardado = null;   // último texto confirmado en Supabase
+
+function gymEstado(txt, cls) {
+  const el = document.getElementById('gymEstado');
+  if (!el) return;
+  el.textContent = txt;
+  el.className = 'gym-estado' + (cls ? ' ' + cls : '');
+}
+
+// el textarea crece con el contenido: scrollea el overlay, no la caja
+function gymAltura(ta) {
+  ta.style.height = 'auto';
+  ta.style.height = ta.scrollHeight + 'px';
+}
+
+async function guardarGym() {
+  const ta = document.getElementById('gymHoja');
+  if (!ta) return;
+  const txt = ta.value;
+  if (txt === gymGuardado) return;
+
+  localStorage.setItem(GYM_KEY, txt);
+  gymEstado('GUARDANDO…');
+  const { error } = await db.from('config')
+    .upsert({ key: GYM_KEY, value: txt }, { onConflict: 'key' });
+
+  if (error) {
+    // queda en null para que el próximo intento reintente el envío
+    gymGuardado = null;
+    gymEstado('SIN SINCRONIZAR · GUARDADO ACÁ', 'err');
+    console.error('Error guardando gimnasio:', error);
+  } else {
+    gymGuardado = txt;
+    gymEstado('GUARDADO', 'ok');
+  }
+}
+
+function programarGuardadoGym() {
+  gymEstado('ESCRIBIENDO…');
+  clearTimeout(gymTimer);
+  gymTimer = setTimeout(guardarGym, 800);
+}
+
+async function abrirGym() {
+  const modal = document.getElementById('gymModal');
+  const ta = document.getElementById('gymHoja');
+  if (!modal || !ta) return;
+
+  // primero lo que ya está en el dispositivo: abre sin esperar a la red
+  ta.value = localStorage.getItem(GYM_KEY) || '';
+  gymGuardado = ta.value;
+  const abrioCon = ta.value;
+  gymEstado(ta.value ? 'GUARDADO' : '', ta.value ? 'ok' : '');
+  modal.style.display = 'flex';
+  gymAltura(ta);
+
+  // y en paralelo la del servidor, por si se escribió desde otro dispositivo
+  const { data } = await db.from('config').select('value').eq('key', GYM_KEY).maybeSingle();
+  const remoto = data?.value;
+  if (remoto == null || remoto === ta.value) return;
+  if (ta.value !== abrioCon) return;   // ya está tipeando: no le pisamos nada
+  ta.value = remoto;
+  localStorage.setItem(GYM_KEY, remoto);
+  gymGuardado = remoto;
+  gymAltura(ta);
+  gymEstado('ACTUALIZADO', 'ok');
+}
+
+function cerrarGym() {
+  clearTimeout(gymTimer);
+  guardarGym();
+  const modal = document.getElementById('gymModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function insertarFechaGym() {
+  const ta = document.getElementById('gymHoja');
+  if (!ta) return;
+  const h = new Date();
+  const fecha = String(h.getDate()).padStart(2, '0') + '/' + String(h.getMonth() + 1).padStart(2, '0');
+  const t = ta.value;
+  const sep = !t ? '' : t.endsWith('\n\n') ? '' : t.endsWith('\n') ? '\n' : '\n\n';
+  ta.value = t + sep + fecha + '\n';
+  ta.focus();
+  ta.setSelectionRange(ta.value.length, ta.value.length);
+  gymAltura(ta);
+  ta.scrollIntoView({ block: 'end', behavior: 'smooth' });
+  programarGuardadoGym();
 }
 
 // ============================================================
@@ -607,6 +661,28 @@ const EQ_GRASA = [
   '1 tostada de esas harinas'
 ];
 
+// Combinaciones de despensa, nada de recetas largas. "Cubre" dice contra qué
+// casillero del almuerzo se descuenta: solo el aceite y la palta gastan la grasa,
+// el resto de los condimentos no ocupa nada.
+const SALSAS = [
+  { n:'ACEITE Y LIMÓN', c:'CUBRE LA GRASA',
+    i:'1 cda sopera de aceite de oliva, jugo de limón y sal.' },
+  { n:'VINAGRETA DE MANZANA', c:'CUBRE LA GRASA',
+    i:'1 cda sopera de aceite de oliva, un chorro de vinagre de manzana, sal y pimienta.' },
+  { n:'VINAGRETA DE MOSTAZA', c:'CUBRE LA GRASA',
+    i:'1 cda sopera de aceite de oliva, 1 cdita de mostaza y vinagre de manzana. Batido queda espeso y se pega a la hoja.' },
+  { n:'PALTA Y LIMÓN', c:'CUBRE LA GRASA',
+    i:'¼ de palta pisada con limón y sal. Sin aceite: la palta ya es la grasa del plato.' },
+  { n:'MOSTAZA Y LIMÓN', c:'LIBRE',
+    i:'Mostaza sin azúcar, limón y pimienta. Al no llevar aceite te queda la grasa libre para otra cosa.' },
+  { n:'LIMÓN, AJO Y ORÉGANO', c:'LIBRE',
+    i:'Jugo de limón con ajo rallado, orégano y ají molido. Va bien sobre la carne recién salida del fuego.' }
+];
+
+// Lo que queda afuera aunque parezca inofensivo
+const SALSAS_VETO = 'Salsa de soja y teriyaki (soja), kétchup y salsas de frasco (azúcar y jarabe de maíz), ' +
+  'crema, manteca y quesos de vaca, maicena para espesar (maíz) y cualquier salsa ligada con harina de trigo.';
+
 const PLAN = [
   {
     t:'AYUNO 12 H',
@@ -638,8 +714,11 @@ const PLAN = [
     b:[
       { tipo:'lista', h:'PROTEÍNA · 200 g cocidos', items:['Vaca','Cerdo','Pollo','Pescado'] },
       { tipo:'lista', h:'VEGETALES CRUDOS · sin límite', items:['Pepino, tomate, zanahoria','Rúcula, apio, rabanito','Albahaca y demás verdes'] },
-      { tipo:'lista', h:'CARBO · elegís 1', items:['60 g cocidos de grano o cereal sin TACC','200 g de tubérculos','4 cdas soperas de harinas sin TACC'] },
+      { tipo:'lista', h:'CARBO · elegís 1', items:['150–180 g cocidos de grano o cereal sin TACC','200 g de tubérculos','4 cdas soperas de harinas sin TACC'] },
+      { tipo:'regla', txt:'Los 150–180 g del grano son ya cocido, servido en el plato. Son unos 60 g pesados en crudo: el arroz y la quinoa casi triplican su peso al hervirse.' },
       { tipo:'lista', h:'GRASA · elegís 1', items:EQ_GRASA },
+      { tipo:'salsas', h:'SALSAS · qué casillero ocupa cada una', items:SALSAS },
+      { tipo:'regla', txt:'Sal, pimienta, ajo, limón, vinagre de manzana, mostaza sin azúcar y las hierbas secas no gastan nada: combinalas como quieras. Los únicos que ocupan la grasa del plato son el aceite de oliva y la palta, y va uno solo por comida. Todo esto sirve igual para la cena.' },
       { tipo:'ej', h:'EJEMPLOS', items:[
         'Pechuga de pollo con quinoa y ensalada de rúcula, tomate y pepino',
         'Bife con papas y ensalada, terminado con aceite de oliva',
@@ -675,7 +754,8 @@ const PLAN = [
         'Alcohol y exceso de cafeína',
         'Soja, maní y derivados',
         'Maíz y derivados'
-      ]}
+      ]},
+      { tipo:'regla', txt:'Salsas: ' + SALSAS_VETO }
     ]
   },
   {
@@ -694,6 +774,14 @@ function renderPlan() {
     const cuerpo = sec.b.map(bl => {
       if (bl.tipo === 'texto') return `<p class="pl-p">${bl.txt}</p>`;
       if (bl.tipo === 'regla') return `<div class="pl-regla">${bl.txt}</div>`;
+      if (bl.tipo === 'salsas') return `<div class="pl-blk">
+        <div class="pl-blk-h">${bl.h}</div>
+        <ul class="pl-sal">${bl.items.map(s => `<li>
+          <div class="sal-n">${s.n}</div>
+          <div class="sal-c">${s.c}</div>
+          <div class="sal-i">${s.i}</div>
+        </li>`).join('')}</ul>
+      </div>`;
       const cls = bl.tipo === 'ej' ? 'pl-ej' : 'pl-eq';
       return `<div class="pl-blk">
         <div class="pl-blk-h">${bl.h}</div>
@@ -765,6 +853,22 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('planModal').style.display = 'none';
   });
 
+  const gymModal = document.getElementById('gymModal');
+  document.getElementById('btnGym')?.addEventListener('click', abrirGym);
+  document.getElementById('btnCerrarGym')?.addEventListener('click', cerrarGym);
+  document.getElementById('btnGymFecha')?.addEventListener('click', insertarFechaGym);
+  gymModal?.addEventListener('click', e => { if (e.target === gymModal) cerrarGym(); });
+  document.getElementById('gymHoja')?.addEventListener('input', e => {
+    gymAltura(e.target);
+    programarGuardadoGym();
+  });
+  // salir de la app en el teléfono cuenta como cerrar: guarda lo tipeado
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && gymModal?.style.display === 'flex') {
+      clearTimeout(gymTimer);
+      guardarGym();
+    }
+  });
+
   iniciarTimerMision();
-  renderQuestDia();
 });
