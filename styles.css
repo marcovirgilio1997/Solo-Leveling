@@ -665,15 +665,9 @@ body::before{
 
 /* ───── GIMNASIO ───── */
 .gym-bar{
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  display:flex;align-items:center;justify-content:flex-end;min-height:14px;
   padding-bottom:9px;margin-bottom:12px;border-bottom:1px solid var(--line2)
 }
-.gym-fecha{
-  background:none;border:1px solid var(--line);color:var(--cyan2);cursor:pointer;
-  font-family:'Orbitron';font-weight:500;font-size:.46em;letter-spacing:2.5px;
-  padding:8px 12px;transition:all .2s
-}
-.gym-fecha:active{background:rgba(0,200,255,.1);border-color:var(--cyan);color:#fff}
 .gym-estado{
   font-family:'Orbitron';font-size:.42em;letter-spacing:2px;
   color:var(--tx-faint);transition:color .25s
@@ -685,12 +679,12 @@ body::before{
   display:block;width:100%;min-height:46vh;resize:none;overflow:hidden;
   background:rgba(0,15,30,.55);border:1px solid var(--line);color:var(--tx);
   font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
-  font-size:.9em;line-height:1.75;font-variant-numeric:tabular-nums;
+  font-size:.9em;line-height:2.2;font-variant-numeric:tabular-nums;
   padding:14px 13px;outline:none;
-  /* renglones de cuaderno */
+  /* renglones de cuaderno: el paso tiene que ser el mismo line-height */
   background-image:repeating-linear-gradient(
-    rgba(0,200,255,0) 0,rgba(0,200,255,0) calc(1.75em - 1px),
-    rgba(0,200,255,.07) calc(1.75em - 1px),rgba(0,200,255,.07) 1.75em);
+    rgba(0,200,255,0) 0,rgba(0,200,255,0) calc(2.2em - 1px),
+    rgba(0,200,255,.07) calc(2.2em - 1px),rgba(0,200,255,.07) 2.2em);
   background-position:0 14px;
   transition:border-color .2s,box-shadow .2s
 }

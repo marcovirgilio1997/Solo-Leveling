@@ -44,7 +44,8 @@
       "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('definitions',{}\\).get\\('config',{}\\), indent=2, ensure_ascii=False\\)\\)\")",
       "Bash(node -e \"console.log\\(JSON.stringify\\(require\\(process.env.TEMP+'/pgrst.json'\\),null,2\\)\\)\")",
       "PowerShell(git -C \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" --no-pager diff --stat)",
-      "PowerShell(git -C \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" add .claude/settings.local.json)"
+      "PowerShell(git -C \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" add .claude/settings.local.json)",
+      "PowerShell(git -C \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" log --oneline -4)"
     ]
   }
 }

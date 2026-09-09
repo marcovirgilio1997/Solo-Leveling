@@ -578,21 +578,6 @@ function cerrarGym() {
   if (modal) modal.style.display = 'none';
 }
 
-function insertarFechaGym() {
-  const ta = document.getElementById('gymHoja');
-  if (!ta) return;
-  const h = new Date();
-  const fecha = String(h.getDate()).padStart(2, '0') + '/' + String(h.getMonth() + 1).padStart(2, '0');
-  const t = ta.value;
-  const sep = !t ? '' : t.endsWith('\n\n') ? '' : t.endsWith('\n') ? '\n' : '\n\n';
-  ta.value = t + sep + fecha + '\n';
-  ta.focus();
-  ta.setSelectionRange(ta.value.length, ta.value.length);
-  gymAltura(ta);
-  ta.scrollIntoView({ block: 'end', behavior: 'smooth' });
-  programarGuardadoGym();
-}
-
 // ============================================================
 // ARISE
 // ============================================================
@@ -856,7 +841,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const gymModal = document.getElementById('gymModal');
   document.getElementById('btnGym')?.addEventListener('click', abrirGym);
   document.getElementById('btnCerrarGym')?.addEventListener('click', cerrarGym);
-  document.getElementById('btnGymFecha')?.addEventListener('click', insertarFechaGym);
   gymModal?.addEventListener('click', e => { if (e.target === gymModal) cerrarGym(); });
   document.getElementById('gymHoja')?.addEventListener('input', e => {
     gymAltura(e.target);
