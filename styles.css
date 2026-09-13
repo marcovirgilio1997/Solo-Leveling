@@ -406,18 +406,40 @@ body::before{
 .c-h{font-family:'Orbitron';font-size:.44em;letter-spacing:1px;color:var(--tx-faint);text-align:center;padding:4px 0 8px}
 #cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
 .cal-cell{
-  position:relative;text-align:center;padding:10px 0 17px;
+  position:relative;text-align:center;padding:11px 0 18px;
   font-weight:500;font-size:.88em;color:rgba(210,235,250,.6);
   background:rgba(0,25,50,.22);border:1px solid rgba(0,200,255,.07);
   cursor:pointer;transition:border-color .2s, background .2s
 }
 .cal-cell:active{border-color:rgba(0,235,255,.45)}
 .cal-empty{background:none;border:none}
-.cal-bar{position:absolute;left:50%;bottom:7px;transform:translateX(-50%);height:3px;width:62%;max-width:26px;background:rgba(0,210,255,.12);overflow:hidden}
+.cal-bar{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);height:4px;width:66%;max-width:28px;background:rgba(0,210,255,.12);overflow:hidden}
 .cal-bar i{position:absolute;left:0;top:0;bottom:0;background:var(--cyan);box-shadow:0 0 6px rgba(0,235,255,.85)}
-.cal-cell.cal-z{background:rgba(70,8,16,.32);border-color:rgba(255,93,112,.28)}
+
+/* ── grados de cumplimiento ── */
+.cal-cell.cal-hi{
+  background:rgba(0,58,84,.42);border-color:rgba(0,225,255,.4);
+  color:rgba(232,250,255,.94);text-shadow:0 0 7px rgba(0,235,255,.35)
+}
+.cal-cell.cal-mid{background:rgba(0,40,66,.34);border-color:rgba(0,200,255,.22);color:rgba(215,240,250,.78)}
+.cal-cell.cal-low{background:rgba(62,32,8,.32);border-color:rgba(255,168,88,.32);color:rgba(255,220,182,.8)}
+.cal-cell.cal-low .cal-bar{background:rgba(255,168,88,.14)}
+.cal-cell.cal-low .cal-bar i{background:#ffab5e;box-shadow:0 0 6px rgba(255,171,94,.75)}
+
+.cal-cell.cal-z{
+  background:rgba(78,9,18,.42);border-color:rgba(255,93,112,.45);
+  color:rgba(255,190,198,.72)
+}
 .cal-cell.cal-z .cal-bar{background:rgba(255,93,112,.65);box-shadow:0 0 5px rgba(255,93,112,.4)}
 .cal-cell.cal-miss{background:rgba(55,8,14,.2);border-color:rgba(255,93,112,.13);color:rgba(210,235,250,.32)}
+
+/* ── marca de entrenamiento ── */
+.cal-e{
+  position:absolute;top:4px;right:5px;pointer-events:none;
+  font-family:'Orbitron';font-weight:600;font-size:9px;line-height:1;
+  color:var(--pos);text-shadow:0 0 6px rgba(110,255,192,.8)
+}
+.cal-cell.cal-full .cal-e{color:var(--gold-bright);text-shadow:0 0 7px rgba(255,205,120,.9)}
 .cal-cell.cal-today{
   border-color:var(--cyan);
   box-shadow:0 0 10px rgba(0,235,255,.35), inset 0 0 8px rgba(0,235,255,.08);
@@ -460,6 +482,10 @@ body::before{
 }
 #cal-detail:empty{display:none}
 .cd-h{color:var(--cyan);font-weight:600;letter-spacing:1px}
+.cd-count{
+  font-family:'Orbitron';font-weight:500;font-size:.78em;letter-spacing:1px;
+  color:var(--tx-dim);border:1px solid var(--line2);padding:1px 6px;margin-left:4px
+}
 .cd-empty{color:var(--tx-faint)}
 .cd-ok{color:var(--pos)}
 .cd-no{color:var(--neg)}
@@ -476,8 +502,13 @@ body::before{
 .cal-legend span{display:flex;align-items:center;gap:6px}
 .cal-legend i{width:10px;height:10px;display:inline-block;border:1px solid}
 .lg-full{background:rgba(94,68,17,.5);border-color:var(--gold)}
-.lg-part{background:rgba(0,25,50,.4);border-color:rgba(0,200,255,.25)}
-.lg-zero{background:rgba(70,8,16,.45);border-color:rgba(255,93,112,.4)}
+.lg-part{background:rgba(0,58,84,.5);border-color:rgba(0,225,255,.4)}
+.lg-poco{background:rgba(62,32,8,.5);border-color:rgba(255,168,88,.4)}
+.lg-zero{background:rgba(78,9,18,.5);border-color:rgba(255,93,112,.45)}
+.cal-legend b.lg-e{
+  font-family:'Orbitron';font-weight:600;font-size:9px;
+  color:var(--pos);text-shadow:0 0 6px rgba(110,255,192,.7)
+}
 
 /* ───── ACCIONES ───── */
 .acts{

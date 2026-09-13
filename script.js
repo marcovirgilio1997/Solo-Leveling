@@ -395,6 +395,7 @@ function renderCalendar() {
     } else if (data) {
       const defs = defsDelDia(data);
       const count = countDia(data);
+      const ratio = defs.length ? count / defs.length : 0;
       const bar = document.createElement('span');
       bar.className = 'cal-bar';
       const fill = document.createElement('i');
@@ -402,11 +403,21 @@ function renderCalendar() {
         cell.classList.add('cal-z');
         fill.style.width = '0%';
       } else {
-        if (count === defs.length) cell.classList.add('cal-full');
-        fill.style.width = `${Math.round(count / defs.length * 100)}%`;
+        if (count === defs.length)   cell.classList.add('cal-full');
+        else if (ratio >= 0.75)      cell.classList.add('cal-hi');
+        else if (ratio >= 0.5)       cell.classList.add('cal-mid');
+        else                         cell.classList.add('cal-low');
+        fill.style.width = `${Math.round(ratio * 100)}%`;
       }
       bar.appendChild(fill);
       cell.appendChild(bar);
+
+      if (data.entrenamiento) {
+        const e = document.createElement('b');
+        e.className = 'cal-e';
+        e.textContent = 'E';
+        cell.appendChild(e);
+      }
     } else if (!isToday) {
       cell.classList.add('cal-miss');
     }
@@ -423,12 +434,14 @@ function renderCalendar() {
         return;
       }
       const defs = defsDelDia(data);
+      const hechas = countDia(data);
+      const marcador = `<span class="cd-count">${hechas}/${defs.length}</span>`;
       const icon = v => v ? '<span class="cd-ok">✓</span>' : '<span class="cd-no">✗</span>';
       const filas = defs.map(m => `${icon(data[m.key])} ${m.label.toUpperCase()}`).join('<br>');
       const c1 = data.ciclo === 1 ? '<br><span class="cd-empty">Registro del Ciclo 1</span>' : '';
-      const pleno = countDia(data) === defs.length
+      const pleno = hechas === defs.length
         ? '<br><span class="cd-clear">✦ DESPEJE TOTAL</span>' : '';
-      detail.innerHTML = `${cab}<br>${filas}${c1}${pleno}`;
+      detail.innerHTML = `${cab} ${marcador}<br>${filas}${c1}${pleno}`;
     });
 
     grid.appendChild(cell);
