@@ -45,7 +45,10 @@
       "Bash(node -e \"console.log\\(JSON.stringify\\(require\\(process.env.TEMP+'/pgrst.json'\\),null,2\\)\\)\")",
       "PowerShell(git -C \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" --no-pager diff --stat)",
       "PowerShell(git -C \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" add .claude/settings.local.json)",
-      "PowerShell(git -C \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" log --oneline -4)"
+      "PowerShell(git -C \"c:\\\\Users\\\\Marco\\\\OneDrive\\\\Desktop\\\\SoloLeveling\" log --oneline -4)",
+      "Bash(curl -s \"https://jhpyvimfsuvcqtqliffm.supabase.co/rest/v1/missions?fecha=gte.2026-09-14&fecha=lte.2026-09-18&select=*\" -H \"apikey: sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c\" -H \"Authorization: Bearer sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c\")",
+      "Bash(curl -s -X PATCH \"https://jhpyvimfsuvcqtqliffm.supabase.co/rest/v1/missions?fecha=eq.2026-09-17\" -H \"apikey: sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c\" -H \"Authorization: Bearer sb_publishable_9FHnlbOZhyitZIqMPbrt9A_hZlQyO5c\" -H \"Content-Type: application/json\" -H \"Prefer: return=representation\" -d '{\"ciclo\":2,\"desayuno\":true,\"almuerzo\":true,\"merienda\":true,\"cena\":true,\"ayuno\":true,\"dia_limpio\":true,\"entrenamiento\":true,\"suplementos\":true}')",
+      "Bash(git commit -q -m ' *)"
     ]
   }
 }
