@@ -13,20 +13,20 @@ const FECHA_INICIO_FALLBACK = '2026-08-31';
 const FECHA_FIN_FALLBACK = '2026-11-10';
 
 const MISIONES = [
-  { key:'desayuno',      col:'desayuno',      label:'Desayuno',           grupo:'NUTRICIÓN' },
-  { key:'almuerzo',      col:'almuerzo',      label:'Almuerzo',           grupo:'NUTRICIÓN' },
-  { key:'merienda',      col:'merienda',      label:'Merienda',           grupo:'NUTRICIÓN' },
-  { key:'cena',          col:'cena',          label:'Cena',               grupo:'NUTRICIÓN' },
-  { key:'ayuno',         col:'ayuno',         label:'Ayuno 12 h',         grupo:'PROTOCOLO' },
-  { key:'diaLimpio',     col:'dia_limpio',    label:'Día limpio',         grupo:'PROTOCOLO' },
-  { key:'entrenamiento', col:'entrenamiento', label:'Entrenamiento',      grupo:'CUERPO' },
-  { key:'suplementos',   col:'suplementos',   label:'Omega 3 + creatina', grupo:'CUERPO' }
+  { key:'desayuno',      col:'desayuno',      label:'Desayuno',           grupo:'NUTRICIÓN', xp:10 },
+  { key:'almuerzo',      col:'almuerzo',      label:'Almuerzo',           grupo:'NUTRICIÓN', xp:10 },
+  { key:'merienda',      col:'merienda',      label:'Merienda',           grupo:'NUTRICIÓN', xp:10 },
+  { key:'cena',          col:'cena',          label:'Cena',               grupo:'NUTRICIÓN', xp:10 },
+  { key:'ayuno',         col:'ayuno',         label:'Ayuno 12 h',         grupo:'PROTOCOLO', xp:10 },
+  { key:'diaLimpio',     col:'dia_limpio',    label:'Día limpio',         grupo:'PROTOCOLO', xp:10 },
+  { key:'entrenamiento', col:'entrenamiento', label:'Entrenamiento',      grupo:'CUERPO',    xp:25 },
+  { key:'suplementos',   col:'suplementos',   label:'Omega 3 + creatina', grupo:'CUERPO',    xp:10 }
 ];
 
 const MISIONES_C1 = [
-  { key:'nutricion',     col:'nutricion',     label:'Nutrición' },
-  { key:'entrenamiento', col:'entrenamiento', label:'Entrenamiento' },
-  { key:'suplementos',   col:'suplementos',   label:'Suplementos' }
+  { key:'nutricion',     col:'nutricion',     label:'Nutrición',     xp:40 },
+  { key:'entrenamiento', col:'entrenamiento', label:'Entrenamiento', xp:25 },
+  { key:'suplementos',   col:'suplementos',   label:'Suplementos',   xp:10 }
 ];
 
 const KEYS_GRASA   = ['desayuno','almuerzo','merienda','cena','ayuno','diaLimpio'];
@@ -103,7 +103,9 @@ async function cargarDesdeSupabase() {
   }
   const { data: configData } = await db.from('config').select('*');
   if (configData) for (const row of configData) localStorage.setItem(row.key, row.value);
+  datosCargados = true;
   updateUI();
+  chequearAscensos(0);
 }
 
 async function guardarMision() {
@@ -302,16 +304,25 @@ function renderMisiones() {
     html += `<div class="m-row${data[m.key] ? ' done' : ''}">
       <label class="m-check"><input type="checkbox" id="cb-${m.key}"${data[m.key] ? ' checked' : ''}><span class="m-mk"></span></label>
       <span class="m-n">${m.label}</span>
+      <span class="m-xp">+${m.xp} XP</span>
     </div>`;
   }
   cont.innerHTML = html;
 
   for (const m of MISIONES) {
-    document.getElementById(`cb-${m.key}`)?.addEventListener('change', () => {
+    document.getElementById(`cb-${m.key}`)?.addEventListener('change', e => {
       const eraPleno = esDiaPleno();
+      const xpAntes = xpDia(getTodayMissionData());
+      // guardarMision re-dibuja la lista: la posición se toma antes
+      const rect = e.target.closest('.m-row')?.getBoundingClientRect();
       syncMissionRows();
       guardarMision();
-      if (!eraPleno && esDiaPleno()) dispararPlenoFx();
+      const delta = xpDia(getTodayMissionData()) - xpAntes;
+      if (rect && delta) { flotarXp(rect, delta); pulsoXp(); }
+      const pleno = !eraPleno && esDiaPleno();
+      if (pleno) dispararPlenoFx();
+      // si además sube de nivel, la notificación espera a que pase el dorado
+      chequearAscensos(pleno ? 1500 : 250);
     });
   }
 }
@@ -354,8 +365,616 @@ function updateUI() {
   syncMissionRows();
   renderEstado();
   renderProyeccion();
+  renderCazador();
+  if (evoVisto) renderEvolucion(false);
   renderCalendar();
   aplicarEstadoPleno();
+}
+
+// ============================================================
+// NIVEL Y XP
+// ============================================================
+// El XP se recalcula siempre desde el historial de misiones: no se guarda
+// aparte, así que es el mismo en cualquier dispositivo.
+const XP_DESPEJE = 50;      // bonus por cerrar las 8 del día
+const XP_DESPEJE_C1 = 30;   // bonus por cerrar las 3 del ciclo 1
+let datosCargados = false;
+
+function xpDia(d) {
+  if (!d) return 0;
+  const defs = defsDelDia(d);
+  let xp = 0;
+  for (const m of defs) if (d[m.key]) xp += m.xp;
+  if (countDia(d) === defs.length) xp += d.ciclo === 1 ? XP_DESPEJE_C1 : XP_DESPEJE;
+  return xp;
+}
+
+function xpTotal() {
+  const hoy = getTodayStr();
+  let xp = 0;
+  for (const f in misionesCache) if (f <= hoy) xp += xpDia(misionesCache[f]);
+  return xp;
+}
+
+// cada nivel pide 4 XP más que el anterior: 100, 104, 108…
+function xpParaSubir(nivel) { return 100 + 4 * (nivel - 1); }
+
+function nivelDe(xp) {
+  let nivel = 1, resto = xp;
+  while (resto >= xpParaSubir(nivel)) { resto -= xpParaSubir(nivel); nivel++; }
+  return { nivel, actual: resto, necesario: xpParaSubir(nivel), total: xp };
+}
+
+function miles(n) { return Math.round(n).toLocaleString('es-AR'); }
+
+// ============================================================
+// RANGO DE CAZADOR
+// ============================================================
+// Sale de las dos barras de la proyección (60% grasa, 40% músculo), sobre los
+// días ya cerrados del ciclo: se gana sosteniendo, no tildando un día suelto.
+const RANGOS = [
+  { r:'E', min:0,    titulo:'DESPERTADO' },
+  { r:'D', min:0.45, titulo:'APRENDIZ' },
+  { r:'C', min:0.58, titulo:'CAZADOR' },
+  { r:'B', min:0.70, titulo:'VETERANO' },
+  { r:'A', min:0.80, titulo:'ÉLITE' },
+  { r:'S', min:0.90, titulo:'MONARCA DE LAS SOMBRAS' }
+];
+const PESO_RANGO_GRASA = 0.6;
+
+function rangoActual(s) {
+  s = s || statsProyeccion();
+  const evaluado = s.evaluados > 0;
+  const score = evaluado
+    ? PESO_RANGO_GRASA * s.adhGrasa + (1 - PESO_RANGO_GRASA) * s.adhMusculo : 0;
+  let idx = 0;
+  RANGOS.forEach((x, i) => { if (score >= x.min) idx = i; });
+  return { ...RANGOS[idx], idx, score, evaluado };
+}
+
+function emblemaHTML(r, cls) {
+  return `<span class="rk-emb${cls ? ' ' + cls : ''}" data-rk="${r}">` +
+    '<svg viewBox="0 0 60 68" aria-hidden="true">' +
+    '<polygon class="rk-o" points="30,2 57,17.5 57,50.5 30,66 3,50.5 3,17.5"/>' +
+    '<polygon class="rk-i" points="30,9 51,21 51,47 30,59 9,47 9,21"/>' +
+    `</svg><b>${r}</b></span>`;
+}
+
+function renderCazador() {
+  const lv = nivelDe(xpTotal());
+  const rk = rangoActual();
+  const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+
+  const emb = document.getElementById('hunterEmb');
+  if (emb && emb.dataset.rk !== rk.r) { emb.dataset.rk = rk.r; emb.innerHTML = emblemaHTML(rk.r); }
+  set('hunterNivel', lv.nivel);
+  set('hunterTitulo', `RANGO ${rk.r} · ${rk.titulo}`);
+  set('xpTexto', `${miles(lv.actual)} / ${miles(lv.necesario)} XP`);
+  set('xpHoy', `+${xpDia(misionesCache[getTodayStr()])} HOY`);
+  const fill = document.getElementById('xpFill');
+  if (fill) fill.style.width = `${(lv.actual / lv.necesario) * 100}%`;
+}
+
+function pulsoXp() {
+  const h = document.getElementById('btnHunter');
+  if (!h) return;
+  h.classList.remove('gain');
+  void h.offsetWidth;
+  h.classList.add('gain');
+}
+
+function flotarXp(rect, xp) {
+  const el = document.createElement('span');
+  el.className = 'xp-float' + (xp < 0 ? ' neg' : '') + (xp > 30 ? ' big' : '');
+  el.textContent = (xp > 0 ? '+' : '−') + Math.abs(xp) + ' XP';
+  el.style.left = (rect.right - 14) + 'px';
+  el.style.top = (rect.top + rect.height / 2) + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1400);
+}
+
+function renderRangoModal() {
+  const body = document.getElementById('rangoBody');
+  if (!body) return;
+  const lv = nivelDe(xpTotal());
+  const rk = rangoActual();
+  const sig = RANGOS[rk.idx + 1];
+  const pct = Math.round(rk.score * 100);
+  const falta = sig ? Math.max(1, Math.ceil((sig.min - rk.score) * 100)) : 0;
+
+  const escalera = RANGOS.slice().reverse().map(x => {
+    const i = RANGOS.indexOf(x);
+    const st = i === rk.idx ? 'cur' : i < rk.idx ? 'done' : 'lock';
+    return `<li class="${st}">${emblemaHTML(x.r, 'sm')}
+      <span class="rg-n">RANGO ${x.r}<em>${x.titulo}</em></span>
+      <span class="rg-min">${i === rk.idx ? 'ACTUAL' : x.min ? '≥ ' + Math.round(x.min * 100) + '%' : 'BASE'}</span>
+    </li>`;
+  }).join('');
+
+  body.innerHTML = `
+    <div class="rg-hero">
+      ${emblemaHTML(rk.r, 'big')}
+      <div class="rg-hero-t">CAZADOR DE RANGO ${rk.r}</div>
+      <div class="rg-hero-s" data-rk="${rk.r}">${rk.titulo}</div>
+    </div>
+    <div class="rg-lv">
+      <div class="rg-lv-row"><span class="rg-lv-n">NIVEL <b>${lv.nivel}</b></span><span class="rg-lv-x">${miles(lv.total)} XP TOTAL</span></div>
+      <div class="xp-track"><i class="xp-fill" style="width:${(lv.actual / lv.necesario) * 100}%"></i></div>
+      <div class="rg-lv-cap">${miles(lv.necesario - lv.actual)} XP para el nivel ${lv.nivel + 1}</div>
+    </div>
+    <div class="cfg-section-title">ESCALAFÓN</div>
+    <div class="rg-score">${rk.evaluado
+      ? `Adherencia combinada <b>${pct}%</b>` + (sig ? ` · te faltan <b>${falta}</b> puntos para el rango ${sig.r}` : ' · rango máximo')
+      : 'El rango se calcula desde el segundo día del ciclo'}</div>
+    <ul class="rg-ladder">${escalera}</ul>
+    <div class="info-block">
+      <div class="info-h">Cómo se gana XP</div>
+      <ul class="rg-xp">
+        <li><span>Cada comida, el ayuno, el día limpio y los suplementos</span><b>+10</b></li>
+        <li><span>Entrenamiento</span><b>+25</b></li>
+        <li><span>Despeje total: las 8 del día</span><b>+${XP_DESPEJE}</b></li>
+      </ul>
+      <p>Cuenta todo el historial, ciclo 1 incluido. Cada nivel pide 4 XP más que el anterior.</p>
+    </div>
+    <div class="info-block">
+      <div class="info-h">Cómo se calcula el rango</div>
+      <p>Sale de las dos barras de la proyección: 60 % la de grasa y 40 % la de músculo, sobre los días ya cerrados del ciclo. Se recalcula cada día, así que si aflojás, baja. El nivel no se pierde; el rango hay que sostenerlo.</p>
+    </div>`;
+}
+
+// ============================================================
+// NOTIFICACIONES DEL SISTEMA — subida de nivel y de rango
+// ============================================================
+function chequearAscensos(delay) {
+  if (!datosCargados) return;
+  const lv = nivelDe(xpTotal());
+  const rk = rangoActual();
+  const nvVisto = parseInt(localStorage.getItem('nivelVisto'), 10);
+  const rkVisto = RANGOS.findIndex(x => x.r === localStorage.getItem('rangoVisto'));
+
+  if (!nvVisto) {
+    // primera vez en este dispositivo: el sistema presenta al cazador
+    localStorage.setItem('nivelVisto', lv.nivel);
+    if (rk.evaluado) localStorage.setItem('rangoVisto', rk.r);
+    encolarAlerta({ tipo:'despertar', nivel: lv.nivel, rango: rk }, delay);
+    return;
+  }
+  // el máximo visto: destildar y volver a tildar no repite la fanfarria
+  if (lv.nivel > nvVisto) {
+    localStorage.setItem('nivelVisto', lv.nivel);
+    encolarAlerta({ tipo:'nivel', de: nvVisto, a: lv.nivel }, delay);
+  }
+  if (rk.evaluado && rk.idx !== rkVisto) {
+    if (rkVisto >= 0 && rk.idx > rkVisto) encolarAlerta({ tipo:'rango', de: RANGOS[rkVisto], a: rk }, delay);
+    localStorage.setItem('rangoVisto', rk.r);
+  }
+}
+
+const alertas = [];
+let alertaActiva = false;
+
+function encolarAlerta(a, delay) {
+  setTimeout(() => {
+    alertas.push(a);
+    if (!alertaActiva) siguienteAlerta();
+  }, delay || 0);
+}
+
+function siguienteAlerta() {
+  if (!alertas.length) { alertaActiva = false; return; }
+  alertaActiva = true;
+  // no se pisa con la intro
+  const arise = document.getElementById('ariseOverlay');
+  if (arise && !arise.classList.contains('arise-off')) { setTimeout(siguienteAlerta, 200); return; }
+  mostrarAlerta(alertas.shift());
+}
+
+function mostrarAlerta(a) {
+  const ov = document.getElementById('sysAlert');
+  if (!ov) { alertaActiva = false; return; }
+  const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+
+  ov.className = 'sys-alert';
+  delete ov.dataset.rk;
+  let titulo, core, sub, dura = 3400;
+
+  if (a.tipo === 'nivel') {
+    titulo = '¡HAS SUBIDO DE NIVEL!';
+    core = `<div class="sa-lv-l">NIVEL</div>
+      <div class="sa-roll"><span class="sa-old">${a.de}</span><span class="sa-new">${a.a}</span></div>`;
+    const lv = nivelDe(xpTotal());
+    sub = `Próximo nivel en ${miles(lv.necesario - lv.actual)} XP`;
+  } else if (a.tipo === 'rango') {
+    ov.classList.add('sa-rank');
+    ov.dataset.rk = a.a.r;
+    titulo = 'RANGO ASCENDIDO';
+    core = `<div class="sa-rk-row">
+      <span class="sa-rk-old">${emblemaHTML(a.de.r)}</span>
+      <span class="sa-arrow"></span>
+      ${emblemaHTML(a.a.r, 'big')}
+    </div>`;
+    sub = `CAZADOR DE RANGO ${a.a.r} · ${a.a.titulo}`;
+    dura = 3800;
+  } else {
+    ov.classList.add('sa-rank', 'sa-wake');
+    ov.dataset.rk = a.rango.r;
+    titulo = 'EL SISTEMA TE RECONOCE';
+    core = `<div class="sa-wake-row">
+      ${emblemaHTML(a.rango.r, 'big')}
+      <div class="sa-wake-lv"><div class="sa-lv-l">NIVEL</div><div class="sa-num">${a.nivel}</div></div>
+    </div>`;
+    sub = `CAZADOR DE RANGO ${a.rango.r} · ${a.rango.titulo}`;
+    dura = 4200;
+  }
+
+  set('saTitulo', titulo);
+  set('saCore', core);
+  set('saSub', sub);
+  set('saPts', Array.from({ length: 26 }, () =>
+    `<i style="--x:${(Math.random() * 100).toFixed(1)}%;--d:${(Math.random() * 1.6).toFixed(2)}s;` +
+    `--t:${(1.8 + Math.random() * 1.8).toFixed(2)}s;--s:${(2 + Math.random() * 3).toFixed(1)}px"></i>`).join(''));
+
+  ov.hidden = false;
+  // el navegador solo deja vibrar después de un toque en la página
+  if (navigator.vibrate && navigator.userActivation?.hasBeenActive) navigator.vibrate([25, 50, 70]);
+
+  let cerrado = false;
+  const cerrar = () => {
+    if (cerrado) return;
+    cerrado = true;
+    clearTimeout(t);
+    ov.classList.add('out');
+    setTimeout(() => {
+      ov.hidden = true;
+      ov.classList.remove('out');
+      siguienteAlerta();
+    }, 450);
+  };
+  const t = setTimeout(cerrar, dura);
+  ov.onclick = cerrar;
+}
+
+// ============================================================
+// EVOLUCIÓN
+// ============================================================
+// Las mediciones (balanza o InBody) viajan como un JSON en la tabla config,
+// igual que la hoja del gimnasio.
+const MED_KEY = 'mediciones';
+const KG_POR_DIA_LIMPIO = DEFICIT_DIARIO / KCAL_POR_KG;
+const MESES3 = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+const EVO_UNIDADES = { grasa:'GRASA', peso:'PESO', musculo:'MÚSCULO' };
+let evoMetrica = 'grasa';
+let evoVisto = false;
+
+function getMediciones() {
+  try {
+    const lista = JSON.parse(localStorage.getItem(MED_KEY) || '[]');
+    return Array.isArray(lista) ? lista.sort((a, b) => a.fecha < b.fecha ? -1 : 1) : [];
+  } catch (e) { return []; }
+}
+
+async function guardarMediciones(lista) {
+  const txt = JSON.stringify(lista);
+  localStorage.setItem(MED_KEY, txt);
+  const { error } = await db.from('config').upsert({ key: MED_KEY, value: txt }, { onConflict: 'key' });
+  if (error) console.error('Error guardando mediciones:', error);
+}
+
+function serieEvolucion(metrica) {
+  const s = statsProyeccion();
+  const a = s.antro;
+  const N = s.diasCiclo;
+  const inicio = new Date(getFechaInicio() + 'T00:00:00');
+  const fecha = i => { const d = new Date(inicio); d.setDate(d.getDate() + i); return d; };
+  const idxDe = f => Math.round((new Date(f + 'T00:00:00') - inicio) / 86400000);
+  const hoyIdx = Math.max(0, Math.min(N, idxDe(getTodayStr())));
+  const base = metrica === 'grasa' ? a.grasa : metrica === 'peso' ? a.peso : a.musculo;
+
+  // grasa y peso bajan lo mismo: el modelo asume que el músculo se sostiene
+  let est = null, proy = null;
+  const bajar = metrica === 'musculo' ? 0 : Math.max(0, a.grasa - a.objetivo);
+  if (metrica !== 'musculo') {
+    est = [base];
+    let limpios = 0;
+    for (let i = 0; i < hoyIdx; i++) {
+      const d = misionesCache[dateToStr(fecha(i))];
+      if (d && d.ciclo !== 1 && KEYS_GRASA.reduce((n, k) => n + (d[k] ? 1 : 0), 0) >= MIN_LIMPIO) limpios++;
+      est.push(base - limpios * KG_POR_DIA_LIMPIO);
+    }
+    const ritmo = s.adhGrasa * KG_POR_DIA_LIMPIO;
+    const tramo = N - hoyIdx;
+    proy = [];
+    for (let i = hoyIdx; i <= N; i++) proy.push({
+      i, v: est[hoyIdx] - (i - hoyIdx) * ritmo,
+      u: tramo > 0 ? INCERTIDUMBRE_KG * (i - hoyIdx) / tramo : 0
+    });
+  }
+
+  const meds = [{ i: 0, v: base, base: true, fecha: getFechaInicio() }];
+  for (const m of getMediciones()) {
+    const v = parseFloat(m[metrica]);
+    const i = idxDe(m.fecha);
+    if (!(v > 0) || i < 0 || i > N) continue;
+    if (i === 0) meds[0].v = v;
+    else meds.push({ i, v, fecha: m.fecha });
+  }
+
+  return { s, N, hoyIdx, base, est, proy, meds, fecha, meta: { de: base, a: base - bajar } };
+}
+
+function evoValor(S, i) {
+  if (!S.est) return null;
+  return i <= S.hoyIdx ? S.est[i] : S.proy[i - S.hoyIdx].v;
+}
+
+function renderEvolucion(animar) {
+  const cont = document.getElementById('evoChart');
+  if (!cont) return;
+  const S = serieEvolucion(evoMetrica);
+
+  const W = Math.max(260, cont.clientWidth), H = 216;
+  const M = { l: 34, r: 50, t: 20, b: 24 };
+  const pw = W - M.l - M.r, ph = H - M.t - M.b;
+
+  const vals = [S.meta.de, S.meta.a, ...S.meds.map(p => p.v)];
+  if (S.est) vals.push(...S.est);
+  if (S.proy) S.proy.forEach(p => vals.push(p.v - p.u, p.v + p.u));
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  if (hi - lo < 2) { const c = (hi + lo) / 2; lo = c - 1; hi = c + 1; }
+  const crudo = (hi - lo) * 1.16 / 4;
+  const paso = [0.25, 0.5, 1, 2, 5, 10].find(p => p >= crudo) || 10;
+  lo = Math.floor((lo - (hi - lo) * 0.08) / paso) * paso;
+  hi = Math.ceil((hi + (hi - lo) * 0.08) / paso) * paso;
+
+  const x = i => M.l + (i / S.N) * pw;
+  const y = v => M.t + (1 - (v - lo) / (hi - lo)) * ph;
+  const xy = (i, v) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`;
+  const linea = pts => pts.map((p, k) => (k ? 'L' : 'M') + xy(p.i, p.v)).join('');
+  const dec = paso < 1 ? 1 : 0;
+  const yBase = M.t + ph;
+
+  let g = '';
+  // grilla y eje Y
+  for (let v = lo; v <= hi + 1e-9; v += paso) {
+    g += `<line class="ev-grid" x1="${M.l}" x2="${M.l + pw}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}"/>`;
+    g += `<text class="ev-ax" x="${M.l - 7}" y="${(y(v) + 3).toFixed(1)}" text-anchor="end">${nf(v, dec)}</text>`;
+  }
+  // eje X: inicio de cada mes
+  for (let i = 0; i <= S.N; i++) {
+    const f = S.fecha(i);
+    if (f.getDate() !== 1 && i !== 0) continue;
+    const lbl = i === 0 ? `${f.getDate()} ${MESES3[f.getMonth()]}` : MESES3[f.getMonth()];
+    if (i !== 0 && x(i) - x(0) < 46) continue;
+    g += `<line class="ev-tick" x1="${x(i).toFixed(1)}" x2="${x(i).toFixed(1)}" y1="${yBase}" y2="${yBase + 4}"/>`;
+    g += `<text class="ev-ax" x="${x(i).toFixed(1)}" y="${yBase + 15}" text-anchor="${i === 0 ? 'start' : 'middle'}">${lbl}</text>`;
+  }
+  g += `<line class="ev-base" x1="${M.l}" x2="${M.l + pw}" y1="${yBase}" y2="${yBase}"/>`;
+
+  // meta
+  g += `<line class="ev-meta" x1="${x(0)}" y1="${y(S.meta.de).toFixed(1)}" x2="${x(S.N)}" y2="${y(S.meta.a).toFixed(1)}"/>`;
+
+  // hoy
+  const xh = x(S.hoyIdx).toFixed(1);
+  g += `<line class="ev-hoy" x1="${xh}" x2="${xh}" y1="${M.t - 6}" y2="${yBase}"/>`;
+  g += `<text class="ev-hoy-t" x="${xh}" y="${M.t - 10}" text-anchor="middle">HOY</text>`;
+
+  const etiquetas = [];
+  if (S.est) {
+    const pts = S.est.map((v, i) => ({ i, v }));
+    const p0 = S.proy[0], pN = S.proy[S.proy.length - 1];
+    // cono de incertidumbre y proyección
+    const sup = S.proy.map(p => ({ i: p.i, v: p.v + p.u }));
+    const inf = S.proy.map(p => ({ i: p.i, v: p.v - p.u })).reverse();
+    g += `<path class="ev-cone" d="${linea(sup)}${linea(inf).replace('M', 'L')}Z"/>`;
+    g += `<path class="ev-proy" d="M${xy(p0.i, p0.v)}L${xy(pN.i, pN.v)}"/>`;
+    // área + línea estimada
+    if (pts.length > 1) {
+      g += `<path class="ev-area" d="${linea(pts)}L${xh},${yBase}L${x(0)},${yBase}Z"/>`;
+      g += `<path class="ev-est-glow" d="${linea(pts)}" pathLength="1"/>`;
+      g += `<path class="ev-est" d="${linea(pts)}" pathLength="1"/>`;
+    }
+    etiquetas.push({ y: y(pN.v), txt: nf(pN.v), cls: 'ev-lbl-proy' });
+    // punto de hoy
+    const yh = y(S.est[S.hoyIdx]).toFixed(1);
+    g += `<circle class="ev-now-ring" cx="${xh}" cy="${yh}" r="4"/><circle class="ev-now" cx="${xh}" cy="${yh}" r="3.5"/>`;
+  }
+  etiquetas.push({ y: y(S.meta.a), txt: (evoMetrica === 'musculo' ? 'PISO ' : 'META ') + nf(S.meta.a), cls: 'ev-lbl-meta' });
+
+  // mediciones reales
+  if (S.meds.length > 1) {
+    g += `<path class="ev-med-glow" d="${linea(S.meds)}" pathLength="1"/>`;
+    g += `<path class="ev-med" d="${linea(S.meds)}" pathLength="1"/>`;
+  }
+  S.meds.forEach((p, k) => {
+    const cx = x(p.i), cy = y(p.v), r = 5;
+    g += `<path class="ev-dot${p.base ? ' base' : ''}" style="--k:${k}" d="M${cx.toFixed(1)},${(cy - r).toFixed(1)}l${r},${r}l${-r},${r}l${-r},${-r}Z"/>`;
+  });
+  if (S.meds.length > 1) {
+    // la etiqueta va del lado opuesto a la línea estimada para no pisarla
+    const u = S.meds[S.meds.length - 1];
+    const ref = evoValor(S, u.i);
+    const abajo = ref !== null && u.v < ref;
+    g += `<text class="ev-lbl-med" x="${x(u.i).toFixed(1)}" y="${(y(u.v) + (abajo ? 18 : -10)).toFixed(1)}" text-anchor="middle">${nf(u.v)}</text>`;
+  }
+
+  // etiquetas del margen derecho, separadas para que no se pisen
+  etiquetas.sort((a, b) => a.y - b.y);
+  for (let k = 1; k < etiquetas.length; k++)
+    if (etiquetas[k].y - etiquetas[k - 1].y < 12) etiquetas[k].y = etiquetas[k - 1].y + 12;
+  for (const e of etiquetas)
+    g += `<text class="${e.cls}" x="${M.l + pw + 7}" y="${(e.y + 3).toFixed(1)}">${e.txt}</text>`;
+
+  if (!S.est && S.meds.length < 2)
+    g += `<text class="ev-empty" x="${M.l + pw / 2}" y="${M.t + ph / 2 - 14}" text-anchor="middle">SIN MEDICIONES TODAVÍA</text>` +
+         `<text class="ev-empty2" x="${M.l + pw / 2}" y="${M.t + ph / 2 + 2}" text-anchor="middle">Registrá la próxima para ver la curva real</text>`;
+
+  // cruz de lectura
+  g += `<g class="ev-cross" id="evoCross" style="display:none">
+    <line class="ev-cross-l" y1="${M.t - 4}" y2="${yBase}"/>
+    <circle class="ev-cross-d" r="4"/>
+  </g>`;
+  g += `<rect class="ev-hit" x="${M.l - 6}" y="0" width="${pw + 12}" height="${H}"/>`;
+
+  cont.innerHTML = `<svg class="${animar ? 'anim' : ''}" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Evolución de ${EVO_UNIDADES[evoMetrica].toLowerCase()} en el ciclo">
+    <defs>
+      <linearGradient id="evoArea" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#00e5ff" stop-opacity=".26"/>
+        <stop offset="1" stop-color="#00e5ff" stop-opacity="0"/>
+      </linearGradient>
+    </defs>${g}</svg>`;
+
+  const svg = cont.querySelector('svg');
+  const cross = svg.querySelector('#evoCross');
+  const cl = cross.querySelector('.ev-cross-l');
+  const cd = cross.querySelector('.ev-cross-d');
+  const hit = svg.querySelector('.ev-hit');
+
+  const leer = i => {
+    if (i === null) { cross.style.display = 'none'; evoLeer(S, S.hoyIdx); return; }
+    const v = evoValor(S, i);
+    const med = S.meds.find(p => p.i === i);
+    const vy = med ? med.v : v;
+    cross.style.display = '';
+    cl.setAttribute('x1', x(i)); cl.setAttribute('x2', x(i));
+    cd.setAttribute('cx', x(i));
+    cd.setAttribute('cy', vy === null ? -20 : y(vy));
+    cd.classList.toggle('med', !!med);
+    evoLeer(S, i);
+  };
+  const desdePuntero = e => {
+    const r = svg.getBoundingClientRect();
+    const i = Math.round(((e.clientX - r.left) - M.l) / pw * S.N);
+    leer(Math.max(0, Math.min(S.N, i)));
+  };
+  hit.addEventListener('pointerdown', desdePuntero);
+  hit.addEventListener('pointermove', desdePuntero);
+  hit.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') leer(null); });
+
+  evoLeer(S, S.hoyIdx);
+  renderEvoResumen(S);
+}
+
+function evoLeer(S, i) {
+  const el = document.getElementById('evoRead');
+  if (!el) return;
+  const f = S.fecha(i);
+  const cuando = i === S.hoyIdx ? 'HOY' : `${f.getDate()} ${MESES3[f.getMonth()]}`;
+  const v = evoValor(S, i);
+  const meta = S.meta.de + (S.meta.a - S.meta.de) * i / S.N;
+  const med = S.meds.find(p => p.i === i);
+  let vals = '';
+  if (v !== null) vals += `<span class="er-v"><i class="sw-est"></i>${i > S.hoyIdx ? 'PROYECTADO' : 'ESTIMADO'} <b>${nf(v)}</b></span>`;
+  if (med) vals += `<span class="er-v"><i class="sw-med"></i>${med.base ? 'INICIO' : 'MEDIDO'} <b>${nf(med.v)}</b></span>`;
+  vals += `<span class="er-v"><i class="sw-meta"></i>${evoMetrica === 'musculo' ? 'PISO' : 'META'} <b>${nf(meta)}</b></span>`;
+  el.innerHTML = `<span class="er-d">${cuando} · DÍA ${i + 1}</span><span class="er-vs">${vals}</span>`;
+}
+
+function renderEvoResumen(S) {
+  const leg = document.getElementById('evoLegend');
+  const st = document.getElementById('evoStats');
+  const kg = v => `${nf(v)}<small>kg</small>`;
+  const dif = (v, ref) => {
+    const d = v - ref;
+    if (Math.abs(d) < 0.05) return '<em>=</em>';
+    // en músculo subir es bueno; en grasa y peso, bajar
+    const bien = evoMetrica === 'musculo' ? d > 0 : d < 0;
+    return `<em class="${bien ? 'up' : 'dn'}">${d > 0 ? '+' : '−'}${nf(Math.abs(d))}</em>`;
+  };
+
+  if (leg) leg.innerHTML = (S.est
+    ? '<span><i class="sw-est"></i>ESTIMADO</span><span><i class="sw-proy"></i>PROYECCIÓN</span>' : '') +
+    '<span><i class="sw-med"></i>MEDIDO</span>' +
+    `<span><i class="sw-meta"></i>${evoMetrica === 'musculo' ? 'PISO' : 'META'}</span>`;
+
+  const ultima = S.meds.length > 1 ? S.meds[S.meds.length - 1] : null;
+  let tiles;
+  if (S.est) {
+    const hoyV = S.est[S.hoyIdx], fin = S.proy[S.proy.length - 1].v;
+    tiles = [
+      ['INICIO', kg(S.base), ''],
+      ['HOY · EST.', kg(hoyV), dif(hoyV, S.base)],
+      ['CIERRE · PROY.', kg(fin), dif(fin, S.base)]
+    ];
+  } else {
+    tiles = [
+      ['INICIO', kg(S.base), ''],
+      ['ÚLTIMA MEDIDA', ultima ? kg(ultima.v) : '—', ultima ? dif(ultima.v, S.base) : ''],
+      ['OBJETIVO', 'MANTENER', '']
+    ];
+  }
+  let html = `<div class="evo-tiles">${tiles.map(([l, v, d]) =>
+    `<div class="evo-tile"><div class="et-l">${l}</div><div class="et-v">${v}</div><div class="et-d">${d}</div></div>`).join('')}</div>`;
+  if (ultima && S.est) {
+    const est = S.est[Math.min(ultima.i, S.hoyIdx)];
+    const [, mes, dia] = ultima.fecha.split('-');
+    const gap = ultima.v - est;
+    html += `<div class="evo-real">Medición del ${dia}/${mes}: <b>${nf(ultima.v)} kg</b>. El estimado ese día era ${nf(est)} kg — ` +
+      (Math.abs(gap) < 0.3 ? 'vas tal cual lo previsto.'
+        : gap < 0 ? `vas <b class="up">${nf(-gap)} kg mejor</b> que lo previsto.`
+        : `vas <b class="dn">${nf(gap)} kg por encima</b> de lo previsto.`) + '</div>';
+  }
+  if (st) st.innerHTML = html;
+
+  renderEvoLista();
+}
+
+function renderEvoLista() {
+  const cont = document.getElementById('evoLista');
+  if (!cont) return;
+  const meds = getMediciones();
+  if (!meds.length) { cont.innerHTML = ''; return; }
+  const v = (n, l) => n > 0 ? `<span><small>${l}</small>${nf(n)}</span>` : `<span class="nd"><small>${l}</small>—</span>`;
+  cont.innerHTML = '<div class="evo-lista-h">MEDICIONES</div>' + meds.slice().reverse().map(m => {
+    const [, mes, dia] = m.fecha.split('-');
+    return `<div class="evo-item">
+      <span class="ei-f">${dia}/${mes}</span>
+      ${v(m.peso, 'P')}${v(m.musculo, 'M')}${v(m.grasa, 'G')}
+      <button class="ei-x" data-f="${m.fecha}" aria-label="Borrar medición del ${dia}/${mes}">✕</button>
+    </div>`;
+  }).join('');
+  cont.querySelectorAll('.ei-x').forEach(b => b.addEventListener('click', async () => {
+    if (!confirm('¿Borrar esta medición?')) return;
+    await guardarMediciones(getMediciones().filter(m => m.fecha !== b.dataset.f));
+    renderEvolucion(false);
+  }));
+}
+
+function abrirMedicion() {
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+  set('medFecha', getTodayStr());
+  set('medPeso', ''); set('medMusculo', ''); set('medGrasa', '');
+  const err = document.getElementById('medError');
+  if (err) err.textContent = '';
+  document.getElementById('medModal').style.display = 'flex';
+}
+
+async function guardarMedicion() {
+  const num = id => { const n = parseFloat(String(document.getElementById(id)?.value || '').replace(',', '.')); return n > 0 ? n : null; };
+  const fecha = document.getElementById('medFecha')?.value;
+  const nueva = { peso: num('medPeso'), musculo: num('medMusculo'), grasa: num('medGrasa') };
+  const err = document.getElementById('medError');
+  if (!fecha || (!nueva.peso && !nueva.musculo && !nueva.grasa)) {
+    if (err) err.textContent = 'Cargá la fecha y al menos un valor.';
+    return;
+  }
+  // misma fecha: se completa la que ya estaba, sin borrar lo que no se tocó
+  const lista = getMediciones();
+  const prev = lista.find(m => m.fecha === fecha);
+  const fila = { ...(prev || {}), fecha };
+  for (const k in nueva) if (nueva[k]) fila[k] = nueva[k];
+  await guardarMediciones([...lista.filter(m => m.fecha !== fecha), fila]);
+  document.getElementById('medModal').style.display = 'none';
+  renderEvolucion(true);
+}
+
+function observarEvolucion() {
+  const panel = document.getElementById('panelEvo');
+  const arrancar = () => { evoVisto = true; renderEvolucion(true); };
+  if (!panel || !('IntersectionObserver' in window)) { arrancar(); return; }
+  const io = new IntersectionObserver(ents => {
+    if (ents.some(e => e.isIntersecting)) { io.disconnect(); arrancar(); }
+  }, { threshold: 0.3 });
+  io.observe(panel);
 }
 
 // ============================================================
@@ -866,6 +1485,42 @@ document.addEventListener('DOMContentLoaded', () => {
       guardarGym();
     }
   });
+
+  // rango y nivel
+  const rangoModal = document.getElementById('rangoModal');
+  document.getElementById('btnHunter')?.addEventListener('click', () => {
+    renderRangoModal();
+    if (rangoModal) rangoModal.style.display = 'flex';
+  });
+  document.getElementById('btnCerrarRango')?.addEventListener('click', () => {
+    if (rangoModal) rangoModal.style.display = 'none';
+  });
+  rangoModal?.addEventListener('click', e => {
+    if (e.target === rangoModal) rangoModal.style.display = 'none';
+  });
+
+  // evolución
+  document.querySelectorAll('.evo-tab').forEach(btn => btn.addEventListener('click', () => {
+    if (btn.dataset.m === evoMetrica) return;
+    evoMetrica = btn.dataset.m;
+    document.querySelectorAll('.evo-tab').forEach(b => b.classList.toggle('on', b === btn));
+    renderEvolucion(true);
+  }));
+  const medModal = document.getElementById('medModal');
+  document.getElementById('btnMedicion')?.addEventListener('click', abrirMedicion);
+  document.getElementById('btnGuardarMed')?.addEventListener('click', guardarMedicion);
+  document.getElementById('btnCerrarMed')?.addEventListener('click', () => {
+    if (medModal) medModal.style.display = 'none';
+  });
+  medModal?.addEventListener('click', e => {
+    if (e.target === medModal) medModal.style.display = 'none';
+  });
+  let evoResize = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(evoResize);
+    evoResize = setTimeout(() => { if (evoVisto) renderEvolucion(false); }, 150);
+  });
+  observarEvolucion();
 
   iniciarTimerMision();
 });

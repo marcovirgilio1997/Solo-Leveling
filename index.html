@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=62">
+    <link rel="stylesheet" href="styles.css?v=63">
 </head>
 <body>
     <div id="ariseOverlay" class="arise-overlay">
@@ -26,6 +26,21 @@
         <span class="pleno-flash-t">DESPEJE TOTAL</span>
     </div>
 
+    <div id="sysAlert" class="sys-alert" role="status" aria-live="polite" hidden>
+        <div class="sa-beam"></div>
+        <div class="sa-burst"></div>
+        <div class="sa-ring"></div>
+        <div class="sa-ring sa-ring2"></div>
+        <div class="sa-pts" id="saPts"></div>
+        <div class="sa-win">
+            <i class="sa-cx"></i>
+            <div class="sa-h"><span class="sa-ico">!</span><span>NOTIFICACIÓN</span></div>
+            <div class="sa-t" id="saTitulo"></div>
+            <div class="sa-core" id="saCore"></div>
+            <div class="sa-s" id="saSub"></div>
+        </div>
+    </div>
+
     <div class="shaft"></div>
     <i class="pt pt1"></i><i class="pt pt2"></i><i class="pt pt3"></i>
 
@@ -35,6 +50,17 @@
             <div class="hd-rule"><i></i><b></b><i></i></div>
             <div class="hd-title">SOLO LEVELING</div>
             <div class="hd-ciclo">CICLO 2 · <span id="cicloDia">—</span></div>
+            <button class="hunter" id="btnHunter" aria-label="Rango y nivel del cazador">
+                <span class="hunter-emb" id="hunterEmb"></span>
+                <span class="hunter-b">
+                    <span class="hunter-top">
+                        <span class="hunter-nv">NV.<b id="hunterNivel">1</b></span>
+                        <span class="hunter-t" id="hunterTitulo">—</span>
+                    </span>
+                    <span class="xp-track"><i class="xp-fill" id="xpFill"></i></span>
+                    <span class="hunter-xp"><span id="xpTexto">0 / 100 XP</span><span class="hunter-hoy" id="xpHoy">+0 HOY</span></span>
+                </span>
+            </button>
             <div class="timer">
                 <div class="timer-l">TIEMPO RESTANTE</div>
                 <div class="timer-d" id="misionTimer">
@@ -132,6 +158,24 @@
             <div class="sw-h"><span class="sw-t">MISIONES DIARIAS</span></div>
             <div class="sw-b sw-b-tight">
                 <div id="misionesLista"></div>
+            </div>
+        </section>
+
+        <section class="sw" id="panelEvo">
+            <i class="cx"></i>
+            <div class="sw-h"><span class="sw-t">EVOLUCIÓN</span></div>
+            <div class="sw-b">
+                <div class="evo-tabs" role="tablist">
+                    <button class="evo-tab on" data-m="grasa">GRASA</button>
+                    <button class="evo-tab" data-m="peso">PESO</button>
+                    <button class="evo-tab" data-m="musculo">MÚSCULO</button>
+                </div>
+                <div class="evo-read" id="evoRead"></div>
+                <div class="evo-chart" id="evoChart"></div>
+                <div class="evo-legend" id="evoLegend"></div>
+                <div id="evoStats"></div>
+                <button class="evo-add" id="btnMedicion">+ REGISTRAR MEDICIÓN</button>
+                <div class="evo-lista" id="evoLista"></div>
             </div>
         </section>
 
@@ -233,6 +277,42 @@
         </div>
     </div>
 
+    <div id="rangoModal" class="cfg-overlay" style="display:none;">
+        <div class="cfg-content">
+            <button class="cfg-close" id="btnCerrarRango">✕</button>
+            <div class="cfg-header">ESTADO DEL CAZADOR</div>
+            <div id="rangoBody"></div>
+        </div>
+    </div>
+
+    <div id="medModal" class="cfg-overlay" style="display:none;">
+        <div class="cfg-content">
+            <button class="cfg-close" id="btnCerrarMed">✕</button>
+            <div class="cfg-header">REGISTRAR MEDICIÓN</div>
+            <div class="cfg-section">
+                <div class="cfg-desc">Cargá lo que tengas: la balanza da el peso; el InBody, los tres.</div>
+                <div class="cfg-field">
+                    <label for="medFecha">Fecha</label>
+                    <input type="date" id="medFecha" class="cfg-input">
+                </div>
+                <div class="cfg-field">
+                    <label for="medPeso">Peso (kg)</label>
+                    <input type="number" step="0.1" inputmode="decimal" id="medPeso" class="cfg-input">
+                </div>
+                <div class="cfg-field">
+                    <label for="medMusculo">Masa muscular (kg)</label>
+                    <input type="number" step="0.1" inputmode="decimal" id="medMusculo" class="cfg-input">
+                </div>
+                <div class="cfg-field">
+                    <label for="medGrasa">Masa grasa (kg)</label>
+                    <input type="number" step="0.1" inputmode="decimal" id="medGrasa" class="cfg-input">
+                </div>
+                <div class="med-err" id="medError"></div>
+            </div>
+            <button id="btnGuardarMed" class="cfg-save">GUARDAR</button>
+        </div>
+    </div>
+
     <div id="proyInfoModal" class="cfg-overlay" style="display:none;">
         <div class="cfg-content">
             <button class="cfg-close" id="btnCerrarProyInfo">✕</button>
@@ -270,6 +350,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="script.js?v=62"></script>
+    <script src="script.js?v=63"></script>
 </body>
 </html>
