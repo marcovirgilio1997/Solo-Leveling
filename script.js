@@ -601,8 +601,8 @@ function iniciarArise() {
   if (!overlay || !text) return;
 
   const PALABRA = 'ARISE';
-  const INICIO = 220;   // ms hasta la primera letra
-  const PASO = 90;      // ms entre pulsación y pulsación
+  const INICIO = 120;   // ms hasta la primera letra
+  const PASO = 60;      // ms entre pulsación y pulsación
   const timers = [];
   let cerrado = false;
 
@@ -633,14 +633,14 @@ function iniciarArise() {
     cerrado = true;
     timers.forEach(clearTimeout);
     overlay.classList.add('arise-done');
-    setTimeout(() => overlay.classList.add('arise-off'), 650);
+    setTimeout(() => overlay.classList.add('arise-off'), 450);
   };
 
   // fogonazo + latido + cursor parpadeando cuando la última letra se asienta
-  const finTipeo = INICIO + (letras.length - 1) * PASO + 370;
+  const finTipeo = INICIO + (letras.length - 1) * PASO + 270;
   timers.push(setTimeout(() => overlay.classList.add('arise-charged'), finTipeo));
   // cierre automático
-  timers.push(setTimeout(cerrar, finTipeo + 1100));
+  timers.push(setTimeout(cerrar, finTipeo + 700));
 
   overlay.addEventListener('click', cerrar);
 }

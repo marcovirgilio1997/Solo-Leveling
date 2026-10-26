@@ -49,9 +49,9 @@ body::before{
   display:flex;flex-direction:column;align-items:center;gap:26px;
   /* sube el bloque respecto al centro real (la barra inferior de Safari lo baja) */
   transform:translateY(-6vh);
-  transition:transform .6s cubic-bezier(.4,0,.2,1), filter .6s ease;
+  transition:transform .4s cubic-bezier(.4,0,.2,1), filter .4s ease;
 }
-.arise-overlay.arise-done{opacity:0;pointer-events:none;transition:opacity .6s ease}
+.arise-overlay.arise-done{opacity:0;pointer-events:none;transition:opacity .4s ease}
 .arise-overlay.arise-done .arise-stack{
   transform:translateY(-6vh) scale(1.06);
   filter:blur(3px);
@@ -65,7 +65,7 @@ body::before{
   transform:translate(-50%,-50%) scale(.35);
   background:radial-gradient(circle,rgba(0,245,255,.5),rgba(0,191,255,.12) 42%,transparent 70%);
 }
-.arise-charged .arise-flash{animation:ariseFlash .95s cubic-bezier(.2,.7,.3,1) forwards}
+.arise-charged .arise-flash{animation:ariseFlash .65s cubic-bezier(.2,.7,.3,1) forwards}
 @keyframes ariseFlash{
   0%{opacity:0;transform:translate(-50%,-50%) scale(.35)}
   28%{opacity:.85}
@@ -77,7 +77,7 @@ body::before{
   background:var(--cyan);
   box-shadow:0 0 10px var(--cyan),0 0 30px rgba(0,191,255,.55);
   transform:scaleX(0);transform-origin:center;
-  animation:ariseLine .6s cubic-bezier(.16,.9,.3,1) .05s forwards;
+  animation:ariseLine .4s cubic-bezier(.16,.9,.3,1) .02s forwards;
 }
 @keyframes ariseLine{
   0%{transform:scaleX(0);opacity:.35}
@@ -105,7 +105,7 @@ body::before{
   text-shadow:0 0 16px var(--cyan),0 0 44px rgba(0,191,255,.5);
   opacity:0;transform:translateY(18px) scale(.9);filter:blur(9px);
 }
-.arise-ch.on{animation:ariseCh .35s cubic-bezier(.2,.75,.25,1) forwards}
+.arise-ch.on{animation:ariseCh .25s cubic-bezier(.2,.75,.25,1) forwards}
 @keyframes ariseCh{
   to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}
 }
@@ -117,8 +117,8 @@ body::before{
   border-radius:1px;background:#dffaff;
   box-shadow:0 0 10px var(--cyan),0 0 28px rgba(0,191,255,.65);
   opacity:0;will-change:transform;
-  transition:transform .07s cubic-bezier(.3,.8,.35,1);
-  animation:ariseCaretIn .3s ease .06s forwards;
+  transition:transform .05s cubic-bezier(.3,.8,.35,1);
+  animation:ariseCaretIn .2s ease .03s forwards;
 }
 @keyframes ariseCaretIn{to{opacity:1}}
 /* al terminar la palabra se queda parpadeando */
