@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=63">
+    <link rel="stylesheet" href="styles.css?v=64">
 </head>
 <body>
     <div id="ariseOverlay" class="arise-overlay">
@@ -50,17 +50,20 @@
             <div class="hd-rule"><i></i><b></b><i></i></div>
             <div class="hd-title">SOLO LEVELING</div>
             <div class="hd-ciclo">CICLO 2 · <span id="cicloDia">—</span></div>
-            <button class="hunter" id="btnHunter" aria-label="Rango y nivel del cazador">
-                <span class="hunter-emb" id="hunterEmb"></span>
-                <span class="hunter-b">
-                    <span class="hunter-top">
-                        <span class="hunter-nv">NV.<b id="hunterNivel">1</b></span>
-                        <span class="hunter-t" id="hunterTitulo">—</span>
+            <div class="hunter-wrap">
+                <button class="hunter" id="btnHunter" aria-label="Rango y nivel del cazador">
+                    <span class="hunter-emb" id="hunterEmb"></span>
+                    <span class="hunter-b">
+                        <span class="hunter-top">
+                            <span class="hunter-nv">NV.<b id="hunterNivel">1</b></span>
+                            <span class="hunter-t" id="hunterTitulo">—</span>
+                        </span>
+                        <span class="xp-track"><i class="xp-fill" id="xpFill"></i></span>
+                        <span class="hunter-xp"><span id="xpTexto">0 / 100 XP</span><span class="hunter-hoy" id="xpHoy">+0 HOY</span></span>
                     </span>
-                    <span class="xp-track"><i class="xp-fill" id="xpFill"></i></span>
-                    <span class="hunter-xp"><span id="xpTexto">0 / 100 XP</span><span class="hunter-hoy" id="xpHoy">+0 HOY</span></span>
-                </span>
-            </button>
+                </button>
+                <button class="pb-i hunter-i" id="btnNivelInfo" aria-label="Cómo funciona el nivel">i</button>
+            </div>
             <div class="timer">
                 <div class="timer-l">TIEMPO RESTANTE</div>
                 <div class="timer-d" id="misionTimer">
@@ -163,16 +166,21 @@
 
         <section class="sw" id="panelEvo">
             <i class="cx"></i>
-            <div class="sw-h"><span class="sw-t">EVOLUCIÓN</span></div>
+            <div class="sw-h">
+                <span class="sw-t">EVOLUCIÓN</span>
+                <button class="sw-i" id="btnEvoInfo" aria-label="Cómo leer el gráfico">i</button>
+            </div>
             <div class="sw-b">
                 <div class="evo-tabs" role="tablist">
                     <button class="evo-tab on" data-m="grasa">GRASA</button>
                     <button class="evo-tab" data-m="peso">PESO</button>
                     <button class="evo-tab" data-m="musculo">MÚSCULO</button>
                 </div>
+                <div class="evo-sub" id="evoSub"></div>
                 <div class="evo-read" id="evoRead"></div>
                 <div class="evo-chart" id="evoChart"></div>
                 <div class="evo-legend" id="evoLegend"></div>
+                <div class="evo-hint">Tocá o deslizá el dedo sobre el gráfico para ver cada día</div>
                 <div id="evoStats"></div>
                 <button class="evo-add" id="btnMedicion">+ REGISTRAR MEDICIÓN</button>
                 <div class="evo-lista" id="evoLista"></div>
@@ -285,6 +293,63 @@
         </div>
     </div>
 
+    <div id="nivelInfoModal" class="cfg-overlay" style="display:none;">
+        <div class="cfg-content">
+            <button class="cfg-close" id="btnCerrarNivelInfo">✕</button>
+            <div class="cfg-header">CÓMO FUNCIONA EL NIVEL</div>
+            <div id="nivelInfoBody"></div>
+        </div>
+    </div>
+
+    <div id="evoInfoModal" class="cfg-overlay" style="display:none;">
+        <div class="cfg-content">
+            <button class="cfg-close" id="btnCerrarEvoInfo">✕</button>
+            <div class="cfg-header">CÓMO LEER EL GRÁFICO</div>
+
+            <div class="info-block">
+                <div class="info-h">Qué muestra</div>
+                <p>Cómo va cambiando tu cuerpo día a día durante el ciclo, desde el InBody de partida hasta el del cierre. Arriba elegís qué ver: grasa, peso o músculo.</p>
+            </div>
+            <div class="info-block">
+                <div class="info-h">Cada cosa del gráfico</div>
+                <ul class="ev-key">
+                    <li><span class="ev-key-sw"><i class="sw-est"></i></span>
+                        <p><b>Estimado.</b> Lo que calculamos que llevás bajado según tus tildes. Cada día en regla (5 de las 6 misiones de nutrición) resta unos 78 g de grasa: 600 kcal de déficit ÷ 7.700 kcal por kilo. Si el día no está en regla, la línea queda plana. El día de hoy se suma cuando termina.</p></li>
+                    <li><span class="ev-key-sw"><i class="sw-now"></i></span>
+                        <p><b>Hoy.</b> El punto blanco que late: dónde estás hoy según el estimado.</p></li>
+                    <li><span class="ev-key-sw"><i class="sw-proy"></i></span>
+                        <p><b>Proyección.</b> Hacia dónde vas si seguís con el mismo porcentaje de días en regla que tenés hasta ahora.</p></li>
+                    <li><span class="ev-key-sw"><i class="sw-cone"></i></span>
+                        <p><b>Margen.</b> Como es una cuenta y no una balanza, puede errar. El abanico se abre hasta ±1,5 kg el día del cierre: lo real probablemente caiga ahí adentro.</p></li>
+                    <li><span class="ev-key-sw"><i class="sw-plan"></i></span>
+                        <p><b>Plan.</b> La recta del inicio a la meta: dónde tendrías que estar cada día para llegar justo. Si la línea celeste queda por debajo de la verde, vas adelantado; si queda por encima, atrasado.</p></li>
+                    <li><span class="ev-key-sw"><i class="sw-goal"></i></span>
+                        <p><b>Meta.</b> El objetivo de grasa para el día del cierre, el que está en Configuración del ciclo. En peso es el peso inicial menos esos mismos kilos.</p></li>
+                    <li><span class="ev-key-sw"><i class="sw-base"></i></span>
+                        <p><b>Inicio.</b> El InBody de partida, también de Configuración del ciclo.</p></li>
+                    <li><span class="ev-key-sw"><i class="sw-med"></i></span>
+                        <p><b>Medición.</b> Lo que cargás con “+ Registrar medición” (balanza o InBody). Es el dato real: si queda por debajo de la línea celeste, tu cuerpo va mejor que la cuenta.</p></li>
+                </ul>
+            </div>
+            <div class="info-block">
+                <div class="info-h">Las etiquetas de la derecha</div>
+                <p><b>PROY</b> es dónde termina la proyección el día del cierre y <b>META</b>, el objetivo. Si PROY queda arriba de META, al ritmo de ahora no llegás; si queda abajo, te sobra.</p>
+            </div>
+            <div class="info-block">
+                <div class="info-h">Tocá el gráfico</div>
+                <p>Tocá o deslizá el dedo sobre el gráfico: arriba aparecen los valores de ese día y cuánto ibas adelantado o atrasado contra el plan.</p>
+            </div>
+            <div class="info-block">
+                <div class="info-h">Las pestañas</div>
+                <p><b>Grasa</b> es la principal: todo sale de tus días en regla. <b>Peso</b> arranca en el peso del InBody y baja lo mismo que la grasa, porque supone que el músculo y el agua se mantienen; la balanza va a moverse más de un día para otro. <b>Músculo</b> no se puede calcular con tildes, así que sólo muestra tus mediciones; la línea verde es el piso, lo que tenías al empezar y no tenés que perder.</p>
+            </div>
+            <div class="info-block">
+                <div class="info-h">Los cuadros de abajo</div>
+                <p>Dónde arrancaste, dónde estás hoy y dónde cerrás si seguís así. El número chico es la diferencia con el inicio: verde si va para el lado bueno. Debajo, lo mismo contado en palabras, con los días en regla que te faltan para la meta.</p>
+            </div>
+        </div>
+    </div>
+
     <div id="medModal" class="cfg-overlay" style="display:none;">
         <div class="cfg-content">
             <button class="cfg-close" id="btnCerrarMed">✕</button>
@@ -350,6 +415,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="script.js?v=63"></script>
+    <script src="script.js?v=64"></script>
 </body>
 </html>

@@ -176,7 +176,7 @@ function statsProyeccion() {
 
   return {
     diasCiclo, diasRestantes, evaluados, limpios, preCiclo,
-    fichasTotal, fichasUsadas,
+    fichasTotal, fichasUsadas, diasLimpiosNecesarios,
     adhGrasa, adhMusculo, umbralGrasa,
     entrenos, adhEntreno, adhSuple,
     ritmoEntreno: semanas > 0 ? entrenos / semanas : 0,
@@ -522,6 +522,53 @@ function renderRangoModal() {
     </div>`;
 }
 
+// la guía del nivel se arma con los números del momento, así cada cosa que
+// explica es la misma que se ve en la tarjeta
+function renderNivelInfo() {
+  const body = document.getElementById('nivelInfoBody');
+  if (!body) return;
+  const lv = nivelDe(xpTotal());
+  const rk = rangoActual();
+  const hoy = xpDia(misionesCache[getTodayStr()]);
+  const perfecto = MISIONES.reduce((n, m) => n + m.xp, 0) + XP_DESPEJE;
+  const falta = lv.necesario - lv.actual;
+  const dias = Math.ceil(falta / perfecto);
+
+  body.innerHTML = `
+    <div class="info-block">
+      <div class="info-h">Qué es cada cosa de la tarjeta</div>
+      <ul class="nv-key">
+        <li><span class="nv-chip">NV.<b>${lv.nivel}</b></span>
+          <p><b>Tu nivel.</b> Sube a medida que juntás XP (puntos de experiencia) y nunca baja.</p></li>
+        <li><span class="nv-chip nv-chip-bar"><i style="width:${(lv.actual / lv.necesario) * 100}%"></i></span>
+          <p><b>La barra.</b> Cuánto llevás del nivel ${lv.nivel}. Cuando se llena pasás al ${lv.nivel + 1} y arranca de cero.</p></li>
+        <li><span class="nv-chip">${miles(lv.actual)} / ${miles(lv.necesario)}</span>
+          <p><b>Los números de la barra.</b> Tenés ${miles(lv.actual)} XP de los ${miles(lv.necesario)} que pide este nivel: te faltan ${miles(falta)}.</p></li>
+        <li><span class="nv-chip nv-chip-hoy">+${hoy} HOY</span>
+          <p><b>Lo de hoy.</b> El XP que sumaste hoy con lo que tildaste. Si destildás algo, se descuenta.</p></li>
+        <li><span class="nv-chip nv-chip-rk">${emblemaHTML(rk.r, 'sm')}</span>
+          <p><b>El emblema: rango ${rk.r}, ${rk.titulo.toLowerCase()}.</b> Es otra cosa: no sale del XP sino de qué tan parejo venís cumpliendo este ciclo.</p></li>
+      </ul>
+    </div>
+    <div class="info-block">
+      <div class="info-h">Cómo se gana XP</div>
+      <ul class="rg-xp">
+        <li><span>Cada comida, el ayuno, el día limpio y los suplementos</span><b>+10</b></li>
+        <li><span>Entrenamiento</span><b>+25</b></li>
+        <li><span>Despeje total: las 8 del día</span><b>+${XP_DESPEJE}</b></li>
+        <li class="nv-total"><span>Un día perfecto</span><b>${perfecto} XP</b></li>
+      </ul>
+    </div>
+    <div class="info-block">
+      <div class="info-h">Cuánto pide cada nivel</div>
+      <p>El nivel 1 pide 100 XP y cada nivel pide 4 más que el anterior: el ${lv.nivel} pide ${miles(lv.necesario)}. Así que cuanto más alto, más cuesta subir. Con días perfectos te faltan ${dias === 1 ? '1 día' : dias + ' días'} para el ${lv.nivel + 1}.</p>
+    </div>
+    <div class="info-block">
+      <div class="info-h">Nivel o rango</div>
+      <p>El <b>nivel</b> mide cuánto trabajaste en total, con todo el historial (ciclo 1 incluido): sólo sube. El <b>rango</b> (de E a S) mide cómo venís sosteniendo este ciclo, y si aflojás baja. Tocá la tarjeta para ver el escalafón de rangos.</p>
+    </div>`;
+}
+
 // ============================================================
 // NOTIFICACIONES DEL SISTEMA — subida de nivel y de rango
 // ============================================================
@@ -643,6 +690,11 @@ const MED_KEY = 'mediciones';
 const KG_POR_DIA_LIMPIO = DEFICIT_DIARIO / KCAL_POR_KG;
 const MESES3 = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
 const EVO_UNIDADES = { grasa:'GRASA', peso:'PESO', musculo:'MÚSCULO' };
+const EVO_SUB = {
+  grasa:   'Kilos de grasa. La línea celeste se calcula con tus días en regla; los rombos naranjas son mediciones reales.',
+  peso:    'Peso en kilos. Arranca en el InBody y baja lo mismo que la grasa, porque se supone que el músculo se mantiene.',
+  musculo: 'Masa muscular. No se puede calcular con los tildes: sólo se ven tus mediciones. La línea verde es el piso.'
+};
 let evoMetrica = 'grasa';
 let evoVisto = false;
 
@@ -707,13 +759,39 @@ function evoValor(S, i) {
   return i <= S.hoyIdx ? S.est[i] : S.proy[i - S.hoyIdx].v;
 }
 
+// el plan es la recta del inicio a la meta: dónde tendrías que estar cada día
+function evoPlan(S, i) { return S.meta.de + (S.meta.a - S.meta.de) * i / S.N; }
+
+function evoFecha(S, i) { const f = S.fecha(i); return `${f.getDate()} ${MESES3[f.getMonth()]}`; }
+
+// La diferencia sale de los números ya redondeados como se muestran, con dos
+// decimales si es chica: así nunca se lee "13,2 contra 13,1: 0,03 kg".
+// Quien la muestre tiene que escribir los dos valores con esos mismos decimales.
+function evoComparar(v, ref) {
+  const dec = Math.abs(v - ref) < 0.1 ? 2 : 1;
+  const r = n => Math.round(n * 10 ** dec) / 10 ** dec;
+  return { dec, d: r(v) - r(ref) };
+}
+
+// en grasa y peso, quedar por debajo del plan es ir adelantado; en músculo,
+// lo bueno es quedar por encima del piso
+function evoVsPlan(S, v, i) {
+  const { dec, d } = evoComparar(v, evoPlan(S, i));
+  const musc = evoMetrica === 'musculo';
+  const n = nf(Math.abs(d), dec);
+  if (Math.abs(d) < 1e-9) return { txt: musc ? 'justo en el piso' : 'al día con el plan', cls: '', dec };
+  if (musc) return d > 0 ? { txt: `${n} kg sobre el piso`, cls: 'up', dec } : { txt: `${n} kg bajo el piso`, cls: 'dn', dec };
+  return d < 0 ? { txt: `${n} kg adelantado`, cls: 'up', dec } : { txt: `${n} kg atrasado`, cls: 'dn', dec };
+}
+
 function renderEvolucion(animar) {
   const cont = document.getElementById('evoChart');
   if (!cont) return;
   const S = serieEvolucion(evoMetrica);
+  const musc = evoMetrica === 'musculo';
 
   const W = Math.max(260, cont.clientWidth), H = 216;
-  const M = { l: 34, r: 50, t: 20, b: 24 };
+  const M = { l: 34, r: 42, t: 22, b: 24 };
   const pw = W - M.l - M.r, ph = H - M.t - M.b;
 
   const vals = [S.meta.de, S.meta.a, ...S.meds.map(p => p.v)];
@@ -723,8 +801,9 @@ function renderEvolucion(animar) {
   if (hi - lo < 2) { const c = (hi + lo) / 2; lo = c - 1; hi = c + 1; }
   const crudo = (hi - lo) * 1.16 / 4;
   const paso = [0.25, 0.5, 1, 2, 5, 10].find(p => p >= crudo) || 10;
-  lo = Math.floor((lo - (hi - lo) * 0.08) / paso) * paso;
-  hi = Math.ceil((hi + (hi - lo) * 0.08) / paso) * paso;
+  const margen = (hi - lo) * 0.08;
+  lo = Math.floor((lo - margen) / paso) * paso;
+  hi = Math.ceil((hi + margen) / paso) * paso;
 
   const x = i => M.l + (i / S.N) * pw;
   const y = v => M.t + (1 - (v - lo) / (hi - lo)) * ph;
@@ -739,19 +818,19 @@ function renderEvolucion(animar) {
     g += `<line class="ev-grid" x1="${M.l}" x2="${M.l + pw}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}"/>`;
     g += `<text class="ev-ax" x="${M.l - 7}" y="${(y(v) + 3).toFixed(1)}" text-anchor="end">${nf(v, dec)}</text>`;
   }
-  // eje X: inicio de cada mes
+  // eje X: inicio de cada mes (con el día si el ciclo no arranca un 1°)
   for (let i = 0; i <= S.N; i++) {
     const f = S.fecha(i);
     if (f.getDate() !== 1 && i !== 0) continue;
-    const lbl = i === 0 ? `${f.getDate()} ${MESES3[f.getMonth()]}` : MESES3[f.getMonth()];
+    const lbl = f.getDate() === 1 ? MESES3[f.getMonth()] : evoFecha(S, i);
     if (i !== 0 && x(i) - x(0) < 46) continue;
     g += `<line class="ev-tick" x1="${x(i).toFixed(1)}" x2="${x(i).toFixed(1)}" y1="${yBase}" y2="${yBase + 4}"/>`;
     g += `<text class="ev-ax" x="${x(i).toFixed(1)}" y="${yBase + 15}" text-anchor="${i === 0 ? 'start' : 'middle'}">${lbl}</text>`;
   }
   g += `<line class="ev-base" x1="${M.l}" x2="${M.l + pw}" y1="${yBase}" y2="${yBase}"/>`;
 
-  // meta
-  g += `<line class="ev-meta" x1="${x(0)}" y1="${y(S.meta.de).toFixed(1)}" x2="${x(S.N)}" y2="${y(S.meta.a).toFixed(1)}"/>`;
+  // plan: la recta del inicio a la meta (en músculo, el piso)
+  g += `<line class="ev-plan" x1="${x(0)}" y1="${y(S.meta.de).toFixed(1)}" x2="${x(S.N)}" y2="${y(S.meta.a).toFixed(1)}"/>`;
 
   // hoy
   const xh = x(S.hoyIdx).toFixed(1);
@@ -759,6 +838,7 @@ function renderEvolucion(animar) {
   g += `<text class="ev-hoy-t" x="${xh}" y="${M.t - 10}" text-anchor="middle">HOY</text>`;
 
   const etiquetas = [];
+  let decLbl = 1;
   if (S.est) {
     const pts = S.est.map((v, i) => ({ i, v }));
     const p0 = S.proy[0], pN = S.proy[S.proy.length - 1];
@@ -773,12 +853,18 @@ function renderEvolucion(animar) {
       g += `<path class="ev-est-glow" d="${linea(pts)}" pathLength="1"/>`;
       g += `<path class="ev-est" d="${linea(pts)}" pathLength="1"/>`;
     }
-    etiquetas.push({ y: y(pN.v), txt: nf(pN.v), cls: 'ev-lbl-proy' });
+    decLbl = evoComparar(pN.v, S.meta.a).dec;
+    etiquetas.push({ y: y(pN.v), cap: 'PROY', val: nf(pN.v, decLbl), cls: 'ev-lbl-proy' });
     // punto de hoy
     const yh = y(S.est[S.hoyIdx]).toFixed(1);
     g += `<circle class="ev-now-ring" cx="${xh}" cy="${yh}" r="4"/><circle class="ev-now" cx="${xh}" cy="${yh}" r="3.5"/>`;
   }
-  etiquetas.push({ y: y(S.meta.a), txt: (evoMetrica === 'musculo' ? 'PISO ' : 'META ') + nf(S.meta.a), cls: 'ev-lbl-meta' });
+  etiquetas.push({ y: y(S.meta.a), cap: musc ? 'PISO' : 'META', val: nf(S.meta.a, decLbl), cls: 'ev-lbl-meta' });
+  // la meta es un punto al final del plan, no la línea entera
+  if (!musc) {
+    const gx = x(S.N).toFixed(1), gy = y(S.meta.a).toFixed(1);
+    g += `<circle class="ev-goal-r" cx="${gx}" cy="${gy}" r="5.5"/><circle class="ev-goal" cx="${gx}" cy="${gy}" r="2.2"/>`;
+  }
 
   // mediciones reales
   if (S.meds.length > 1) {
@@ -789,24 +875,37 @@ function renderEvolucion(animar) {
     const cx = x(p.i), cy = y(p.v), r = 5;
     g += `<path class="ev-dot${p.base ? ' base' : ''}" style="--k:${k}" d="M${cx.toFixed(1)},${(cy - r).toFixed(1)}l${r},${r}l${-r},${r}l${-r},${-r}Z"/>`;
   });
+  // la etiqueta de partida va arriba, donde no pasa ninguna línea: la estimada
+  // y el plan bajan o siguen planos. Sólo si la primera medición sube, va abajo.
+  const subeMed = S.meds.length > 1 && S.meds[1].v > S.meds[0].v;
+  g += `<text class="ev-lbl-ini" x="${(x(0) + 9).toFixed(1)}" y="${(y(S.meds[0].v) + (subeMed ? 15 : -6)).toFixed(1)}">INICIO</text>`;
   if (S.meds.length > 1) {
-    // la etiqueta va del lado opuesto a la línea estimada para no pisarla
+    // la etiqueta va del lado opuesto a la línea estimada (o al piso) para no pisarla
     const u = S.meds[S.meds.length - 1];
-    const ref = evoValor(S, u.i);
-    const abajo = ref !== null && u.v < ref;
+    const ref = S.est ? evoValor(S, u.i) : evoPlan(S, u.i);
+    const abajo = u.v < ref;
     g += `<text class="ev-lbl-med" x="${x(u.i).toFixed(1)}" y="${(y(u.v) + (abajo ? 18 : -10)).toFixed(1)}" text-anchor="middle">${nf(u.v)}</text>`;
   }
 
-  // etiquetas del margen derecho, separadas para que no se pisen
+  // etiquetas del margen derecho (nombre arriba, valor abajo); si se pisan,
+  // se abren las dos desde el medio
   etiquetas.sort((a, b) => a.y - b.y);
-  for (let k = 1; k < etiquetas.length; k++)
-    if (etiquetas[k].y - etiquetas[k - 1].y < 12) etiquetas[k].y = etiquetas[k - 1].y + 12;
+  if (etiquetas.length === 2 && etiquetas[1].y - etiquetas[0].y < 21) {
+    const mid = (etiquetas[0].y + etiquetas[1].y) / 2;
+    etiquetas[0].y = mid - 10.5;
+    etiquetas[1].y = mid + 10.5;
+  }
+  const xl = M.l + pw + 9;
   for (const e of etiquetas)
-    g += `<text class="${e.cls}" x="${M.l + pw + 7}" y="${(e.y + 3).toFixed(1)}">${e.txt}</text>`;
+    g += `<text class="ev-lbl ${e.cls}" x="${xl}" y="${(e.y - 1.5).toFixed(1)}">` +
+      `<tspan class="ev-lbl-c">${e.cap}</tspan><tspan x="${xl}" dy="9.5">${e.val}</tspan></text>`;
 
-  if (!S.est && S.meds.length < 2)
-    g += `<text class="ev-empty" x="${M.l + pw / 2}" y="${M.t + ph / 2 - 14}" text-anchor="middle">SIN MEDICIONES TODAVÍA</text>` +
-         `<text class="ev-empty2" x="${M.l + pw / 2}" y="${M.t + ph / 2 + 2}" text-anchor="middle">Registrá la próxima para ver la curva real</text>`;
+  if (!S.est && S.meds.length < 2) {
+    // el aviso va en la mitad del gráfico donde no está la línea del piso
+    const yc = y(S.meta.a) > M.t + ph / 2 ? M.t + ph * 0.26 : M.t + ph * 0.66;
+    g += `<text class="ev-empty" x="${M.l + pw / 2}" y="${yc.toFixed(1)}" text-anchor="middle">SIN MEDICIONES TODAVÍA</text>` +
+         `<text class="ev-empty2" x="${M.l + pw / 2}" y="${(yc + 16).toFixed(1)}" text-anchor="middle">Registrá la próxima para ver la curva real</text>`;
+  }
 
   // cruz de lectura
   g += `<g class="ev-cross" id="evoCross" style="display:none">
@@ -857,65 +956,115 @@ function renderEvolucion(animar) {
 function evoLeer(S, i) {
   const el = document.getElementById('evoRead');
   if (!el) return;
-  const f = S.fecha(i);
-  const cuando = i === S.hoyIdx ? 'HOY' : `${f.getDate()} ${MESES3[f.getMonth()]}`;
+  const musc = evoMetrica === 'musculo';
+  // el índice N es el 10/11: el día del InBody de cierre, no un día más del ciclo
+  const cuando = i >= S.N ? `CIERRE · ${evoFecha(S, i)}`
+    : `${i === S.hoyIdx ? 'HOY · ' : ''}${evoFecha(S, i)} · DÍA ${i + 1} DE ${S.N}`;
   const v = evoValor(S, i);
-  const meta = S.meta.de + (S.meta.a - S.meta.de) * i / S.N;
   const med = S.meds.find(p => p.i === i);
-  let vals = '';
-  if (v !== null) vals += `<span class="er-v"><i class="sw-est"></i>${i > S.hoyIdx ? 'PROYECTADO' : 'ESTIMADO'} <b>${nf(v)}</b></span>`;
-  if (med) vals += `<span class="er-v"><i class="sw-med"></i>${med.base ? 'INICIO' : 'MEDIDO'} <b>${nf(med.v)}</b></span>`;
-  vals += `<span class="er-v"><i class="sw-meta"></i>${evoMetrica === 'musculo' ? 'PISO' : 'META'} <b>${nf(meta)}</b></span>`;
-  el.innerHTML = `<span class="er-d">${cuando} · DÍA ${i + 1}</span><span class="er-vs">${vals}</span>`;
+  const val = (sw, txt, n, dec) => `<span class="er-v"><i class="${sw}"></i>${txt} <b>${nf(n, dec)}</b><small>kg</small></span>`;
+  let vals = '', st;
+  if (med && med.base) {
+    st = { txt: 'InBody de partida', cls: '', dec: 1 };
+    vals = val('sw-base', 'INICIO', med.v, 1);
+  } else {
+    // los valores van con los decimales de la comparación, así cierran con ella
+    const real = med ? med.v : v;
+    st = real !== null ? evoVsPlan(S, real, i) : { txt: 'sin medición ese día', cls: '', dec: 1 };
+    if (med) vals += val('sw-med', 'MEDIDO', med.v, st.dec);
+    if (v !== null) vals += i > S.hoyIdx ? val('sw-proy', 'PROYECTADO', v, st.dec) : val('sw-est', 'ESTIMADO', v, st.dec);
+    vals += val('sw-plan', musc ? 'PISO' : 'PLAN', evoPlan(S, i), st.dec);
+  }
+  el.innerHTML = `<div class="er-top"><span class="er-d">${cuando}</span>` +
+    `<span class="er-s ${st.cls}">${st.txt}</span></div><div class="er-vs">${vals}</div>`;
 }
 
 function renderEvoResumen(S) {
   const leg = document.getElementById('evoLegend');
   const st = document.getElementById('evoStats');
+  const sub = document.getElementById('evoSub');
+  const musc = evoMetrica === 'musculo';
   const kg = v => `${nf(v)}<small>kg</small>`;
   const dif = (v, ref) => {
-    const d = v - ref;
-    if (Math.abs(d) < 0.05) return '<em>=</em>';
+    // sobre los valores redondeados del cuadro, para que la resta cierre a la vista
+    const d = Math.round(v * 10) / 10 - Math.round(ref * 10) / 10;
+    if (Math.abs(d) < 0.05) return '<em>sin cambio</em>';
     // en músculo subir es bueno; en grasa y peso, bajar
-    const bien = evoMetrica === 'musculo' ? d > 0 : d < 0;
-    return `<em class="${bien ? 'up' : 'dn'}">${d > 0 ? '+' : '−'}${nf(Math.abs(d))}</em>`;
+    const bien = musc ? d > 0 : d < 0;
+    return `<em class="${bien ? 'up' : 'dn'}">${d > 0 ? '+' : '−'}${nf(Math.abs(d))} kg</em>`;
   };
 
-  if (leg) leg.innerHTML = (S.est
-    ? '<span><i class="sw-est"></i>ESTIMADO</span><span><i class="sw-proy"></i>PROYECCIÓN</span>' : '') +
-    '<span><i class="sw-med"></i>MEDIDO</span>' +
-    `<span><i class="sw-meta"></i>${evoMetrica === 'musculo' ? 'PISO' : 'META'}</span>`;
+  if (sub) sub.textContent = EVO_SUB[evoMetrica];
 
   const ultima = S.meds.length > 1 ? S.meds[S.meds.length - 1] : null;
+  if (leg) leg.innerHTML = (S.est
+    ? '<span><i class="sw-est"></i>ESTIMADO</span><span><i class="sw-proy"></i>PROYECCIÓN</span><span><i class="sw-cone"></i>MARGEN</span>' : '') +
+    `<span><i class="sw-plan"></i>${musc ? 'PISO' : 'PLAN'}</span>` +
+    (musc ? '' : '<span><i class="sw-goal"></i>META</span>') +
+    '<span><i class="sw-base"></i>INICIO</span>' +
+    (ultima ? '<span><i class="sw-med"></i>MEDICIÓN</span>' : '');
+
   let tiles;
   if (S.est) {
     const hoyV = S.est[S.hoyIdx], fin = S.proy[S.proy.length - 1].v;
     tiles = [
-      ['INICIO', kg(S.base), ''],
+      ['INICIO', kg(S.base), `<em>${evoFecha(S, 0)}</em>`],
       ['HOY · EST.', kg(hoyV), dif(hoyV, S.base)],
       ['CIERRE · PROY.', kg(fin), dif(fin, S.base)]
     ];
   } else {
     tiles = [
-      ['INICIO', kg(S.base), ''],
+      ['INICIO', kg(S.base), `<em>${evoFecha(S, 0)}</em>`],
       ['ÚLTIMA MEDIDA', ultima ? kg(ultima.v) : '—', ultima ? dif(ultima.v, S.base) : ''],
       ['OBJETIVO', 'MANTENER', '']
     ];
   }
   let html = `<div class="evo-tiles">${tiles.map(([l, v, d]) =>
     `<div class="evo-tile"><div class="et-l">${l}</div><div class="et-v">${v}</div><div class="et-d">${d}</div></div>`).join('')}</div>`;
+  html += `<div class="evo-plan">${evoLectura(S, ultima)}</div>`;
   if (ultima && S.est) {
     const est = S.est[Math.min(ultima.i, S.hoyIdx)];
     const [, mes, dia] = ultima.fecha.split('-');
-    const gap = ultima.v - est;
-    html += `<div class="evo-real">Medición del ${dia}/${mes}: <b>${nf(ultima.v)} kg</b>. El estimado ese día era ${nf(est)} kg — ` +
+    const { dec, d: gap } = evoComparar(ultima.v, est);
+    html += `<div class="evo-real">Medición del ${dia}/${mes}: <b>${nf(ultima.v, dec)} kg</b>. El estimado ese día era ${nf(est, dec)} kg — ` +
       (Math.abs(gap) < 0.3 ? 'vas tal cual lo previsto.'
-        : gap < 0 ? `vas <b class="up">${nf(-gap)} kg mejor</b> que lo previsto.`
-        : `vas <b class="dn">${nf(gap)} kg por encima</b> de lo previsto.`) + '</div>';
+        : gap < 0 ? `vas <b class="up">${nf(-gap, dec)} kg mejor</b> que lo previsto.`
+        : `vas <b class="dn">${nf(gap, dec)} kg por encima</b> de lo previsto.`) + '</div>';
   }
   if (st) st.innerHTML = html;
 
   renderEvoLista();
+}
+
+// el gráfico contado en palabras: dónde estás, a dónde vas y qué falta.
+// Los días que pide salen de la misma cuenta que el presupuesto de fallas.
+function evoLectura(S, ultima) {
+  const s = S.s;
+  if (!S.est) {
+    const vm = ultima && evoVsPlan(S, ultima.v, ultima.i);
+    const t = ultima
+      ? `<p><b>Última medición:</b> ${nf(ultima.v, vm.dec)} kg el ${evoFecha(S, ultima.i).toLowerCase()}, <b class="${vm.cls}">${vm.txt}</b>.</p>`
+      : '<p>El músculo no se puede calcular con los tildes: para verlo hace falta una medición de InBody.</p>';
+    return t + `<p><b>El piso</b> es ${nf(S.meta.a)} kg, lo que tenías al empezar. Si la barra de músculo de la proyección está arriba del ${Math.round(UMBRAL_MUSCULO * 100)} %, estás entrenando lo suficiente para no perderlo.</p>`;
+  }
+  if (s.evaluados === 0)
+    return '<p>Todavía no hay días cerrados: la línea empieza a moverse cuando termina el primer día del ciclo.</p>';
+
+  const hoyV = S.est[S.hoyIdx], fin = S.proy[S.proy.length - 1].v, meta = S.meta.a;
+  const vs = evoVsPlan(S, hoyV, S.hoyIdx);
+  const quedan = S.N - S.hoyIdx;
+  const faltan = Math.max(0, s.diasLimpiosNecesarios - s.limpios);
+  let t = `<p><b>Hoy:</b> ${nf(hoyV, vs.dec)} kg estimados; el plan pedía ${nf(evoPlan(S, S.hoyIdx), vs.dec)}. ` +
+    `Vas <b class="${vs.cls}">${vs.txt}</b>.</p>`;
+  const c = evoComparar(fin, meta);
+  t += `<p><b>Al cierre:</b> con el ${Math.round(s.adhGrasa * 100)} % de días en regla que llevás, el ${evoFecha(S, S.N).toLowerCase()} llegás a ${nf(fin, c.dec)} kg` +
+    (c.d > 1e-9 ? ` y la meta es ${nf(meta, c.dec)}: quedás <b class="dn">${nf(c.d, c.dec)} kg arriba</b>.`
+      : ` y cumplís la meta de ${nf(meta, c.dec)}` + (c.d < -1e-9 ? `, con <b class="up">${nf(-c.d, c.dec)} kg de sobra</b>.` : '.')) + '</p>';
+  if (quedan > 0) t += '<p><b>Para la meta:</b> ' + (
+    faltan === 0 ? 'con los días en regla que ya juntaste te alcanza.'
+    : faltan > quedan ? `ya no alcanza aunque cumplas todos los días; el mejor cierre posible es ${nf(hoyV - quedan * KG_POR_DIA_LIMPIO)} kg.`
+    : `necesitás <b>${faltan} días en regla de los ${quedan}</b> que quedan (podés fallar ${quedan - faltan}).`) + '</p>';
+  return t;
 }
 
 function renderEvoLista() {
@@ -1498,6 +1647,17 @@ document.addEventListener('DOMContentLoaded', () => {
   rangoModal?.addEventListener('click', e => {
     if (e.target === rangoModal) rangoModal.style.display = 'none';
   });
+  const nivelInfo = document.getElementById('nivelInfoModal');
+  document.getElementById('btnNivelInfo')?.addEventListener('click', () => {
+    renderNivelInfo();
+    if (nivelInfo) nivelInfo.style.display = 'flex';
+  });
+  document.getElementById('btnCerrarNivelInfo')?.addEventListener('click', () => {
+    if (nivelInfo) nivelInfo.style.display = 'none';
+  });
+  nivelInfo?.addEventListener('click', e => {
+    if (e.target === nivelInfo) nivelInfo.style.display = 'none';
+  });
 
   // evolución
   document.querySelectorAll('.evo-tab').forEach(btn => btn.addEventListener('click', () => {
@@ -1514,6 +1674,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   medModal?.addEventListener('click', e => {
     if (e.target === medModal) medModal.style.display = 'none';
+  });
+  const evoInfo = document.getElementById('evoInfoModal');
+  document.getElementById('btnEvoInfo')?.addEventListener('click', () => {
+    if (evoInfo) evoInfo.style.display = 'flex';
+  });
+  document.getElementById('btnCerrarEvoInfo')?.addEventListener('click', () => {
+    if (evoInfo) evoInfo.style.display = 'none';
+  });
+  evoInfo?.addEventListener('click', e => {
+    if (e.target === evoInfo) evoInfo.style.display = 'none';
   });
   let evoResize = null;
   window.addEventListener('resize', () => {
